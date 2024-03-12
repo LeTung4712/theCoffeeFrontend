@@ -1,499 +1,735 @@
 <template>
-<div class="container-lg container-fluid body" style="align-items: center; margin-top: 24px">
-
-    <div class="user-info-head">
-        <img src="https://order.thecoffeehouse.com/_nuxt/img/user-icon-gold.5f2886d.svg" alt="" class="user-info-icon-head" />
+    <div
+      class="container-lg container-fluid body"
+      style="align-items: center; margin-top: 24px"
+    >
+      <div class="user-info-head">
+        <img
+          src="https://order.thecoffeehouse.com/_nuxt/img/user-icon-gold.5f2886d.svg"
+          alt=""
+          class="user-info-icon-head"
+        />
         <span class="user-info-text">Tài khoản của bạn</span>
-    </div>
-
-    <section class="user-info">
+      </div>
+  
+      <section class="user-info">
         <div class="user-info-left">
-            <div class="user-info-card" style="
-            background: linear-gradient(
-              rgb(255, 149, 34) 0%,
-              rgb(218, 84, 9) 50%
-            );
-          ">
-                <div class="armorial-point">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxMCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwKSI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAgMS45MjM3M0w1IDUuNzY2NjdMLTEuNzM5NDRlLTA4IDEuOTIzNzNMMC4xMzc4MjggMUw1IDQuNzM3TDkuODYyMTcgMUwxMCAxLjkyMzczWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggb3BhY2l0eT0iMC41IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEwIDUuNjU3TDUgOS40OTk5M0wtMi4xMDYzNWUtMDggNS42NTdMMC4xMzc4MjggNC41TDUgOC4yMzdMOS44NjIxNyA0LjVMMTAgNS42NTdaIiBmaWxsPSJ3aGl0ZSIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwIj4KPHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjkiIGZpbGw9IndoaXRlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDAuNSkiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K" alt="" class="armorial-point-icon" />
-                    <span class="armorial-point-txt">Tích điểm</span>
-                </div>
-                <div class="user-info-card-header">
-                    <span class="user-card-code">{{ userInfomation.last_name }}</span>
-                    <p class="user-bean">{{bean}} bean - Mới</p>
-                </div>
-                <div class="user-card-barcode d-flex flex-column align-items-center">
-                    <!-- <barcode value="112335" class="barcode" width="244" height="122"></barcode> -->
-                    <p class="code-number">M161682829</p>
-                </div>
-                <img src="" class="leaves-image" />
+          <div
+            class="user-info-card"
+            style="
+              background: linear-gradient(
+                rgb(255, 149, 34) 0%,
+                rgb(218, 84, 9) 50%
+              );
+            "
+          >
+            <div class="armorial-point">
+              <img
+                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxMCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwKSI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAgMS45MjM3M0w1IDUuNzY2NjdMLTEuNzM5NDRlLTA4IDEuOTIzNzNMMC4xMzc4MjggMUw1IDQuNzM3TDkuODYyMTcgMUwxMCAxLjkyMzczWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggb3BhY2l0eT0iMC41IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEwIDUuNjU3TDUgOS40OTk5M0wtMi4xMDYzNWUtMDggNS42NTdMMC4xMzc4MjggNC41TDUgOC4yMzdMOS44NjIxNyA0LjVMMTAgNS42NTdaIiBmaWxsPSJ3aGl0ZSIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwIj4KPHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjkiIGZpbGw9IndoaXRlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDAuNSkiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K"
+                alt=""
+                class="armorial-point-icon"
+              />
+              <span class="armorial-point-txt">Tích điểm</span>
             </div>
-            <div class="user-info-detail">
-                <div class="user-rank">
-                    <span class="user-txt">VÀNG</span>
-                    <span class="user-rank-detail">KIM CƯƠNG</span>
-
-                    <v-progress-linear :value=persent :reverse="$vuetify.rtl" color="yellow " class="user-progress-bar" style="
-                background: linear-gradient(
-                  rgb(255, 149, 34) 0%,
-                  rgb(218, 84, 9) 50%
-                );
-              ">
-                        <div class="dot-begin"></div>
-                        <div class="dot" :style="{ 'left': persent -13 + '%' }" style="
-                  transform: translateY(-50%);
-                  top: 60%;
-                  /*left: calc(80% - 30px);*/
-                "></div>
-                        <div class="dot-after"></div>
-                    </v-progress-linear>
-                </div>
-                <p class="user-next-bean">
-                    Còn {{3000 - this.bean}} BEAN nữa bạn sẽ thăng hạng. Đổi quà không ảnh hưởng tới việc
-                    thăng hạng của bạn Chưa tích điểm
-                </p>
+            <div class="user-info-card-header">
+              <span class="user-card-code">{{ userInfomation.last_name }}</span>
+              <p class="user-bean">{{ bean }} bean - Mới</p>
             </div>
-            <div class="user-menu">
-                <ul class="user-list">
-                    <li class="user-item" @click="handleClick1" :class="{ iconActive: select === 1 }">
-                        <img src="https://order.thecoffeehouse.com/icon/user-icon.svg" alt="" class="icon-user" :class="{ iconActive: select === 1 }" />
-                        <span class="user-item-txt">Thông tin tài khoản</span>
-                    </li>
-                    <li class="user-item" @click="handleClick2" :class="{ active: select === 2 }">
-                        <img src="https://order.thecoffeehouse.com/icon/address-book.svg" alt="" class="icon-user" :class="{ iconActive: select === 2 }" />
-                        <span class="user-item-txt">Sổ địa chỉ</span>
-                    </li>
-                    <li class="user-item" @click="handleClick3" :class="{ iconActive: select === 3 }">
-                        <img src="https://order.thecoffeehouse.com/icon/member-benefit.svg" alt="" class="icon-user" :class="{ active: select === 3 }" />
-                        <span class="user-item-txt">Quyền lợi thành viên</span>
-                    </li>
-                    <li class="user-item" @click="handleClick4" :class="{ active: select === 4 }">
-                        <img src="https://order.thecoffeehouse.com/icon/history-order.svg" alt="" class="icon-user" :class="{ active: select === 4 }" />
-                        <span class="user-item-txt">Lịch sử mua hàng</span>
-                    </li>
-                </ul>
+            <div class="user-card-barcode d-flex flex-column align-items-center">
+              <!-- <barcode value="112335" class="barcode" width="244" height="122"></barcode> -->
+              <p class="code-number">M161682829</p>
             </div>
-            <div class="user-menu-mobile">
-                <ul class="user-list-mobile">
-                    <li class="user-item-mobile active">
-                        <img src="/icon/user-icon.svg" alt="" class="img-mobile" />
-                    </li>
-                    <li class="user-item-mobile">
-                        <img src="/icon/address-book.svg" alt="" class="img-mobile" />
-                    </li>
-                    <li class="user-item-mobile">
-                        <img src="/icon/member-benefit.svg" alt="" class="img-mobile" />
-                    </li>
-                    <li class="user-item-mobile">
-                        <img src="/icon/history-order.svg" alt="" class="img-mobile" />
-                    </li>
-                </ul>
+            <img src="" class="leaves-image" />
+          </div>
+          <div class="user-info-detail">
+            <div class="user-rank">
+              <span class="user-txt">VÀNG</span>
+              <span class="user-rank-detail">KIM CƯƠNG</span>
+  
+              <v-progress-linear
+                :value="persent"
+                :reverse="$vuetify.rtl"
+                color="yellow "
+                class="user-progress-bar"
+                style="
+                  background: linear-gradient(
+                    rgb(255, 149, 34) 0%,
+                    rgb(218, 84, 9) 50%
+                  );
+                "
+              >
+                <div class="dot-begin"></div>
+                <div
+                  class="dot"
+                  :style="{ 'left': persent - 13 + '%' }"
+                  style="
+                    transform: translateY(-50%);
+                    top: 60%;
+                    /*left: calc(80% - 30px);*/
+                  "
+                ></div>
+                <div class="dot-after"></div>
+              </v-progress-linear>
             </div>
+            <p class="user-next-bean">
+              Còn {{ 3000 - this.bean }} BEAN nữa bạn sẽ thăng hạng. Đổi quà không
+              ảnh hưởng tới việc thăng hạng của bạn Chưa tích điểm
+            </p>
+          </div>
+          <div class="user-menu">
+            <ul class="user-list">
+              <li
+                class="user-item"
+                @click="handleClick1"
+                :class="{ iconActive: select === 1 }"
+              >
+                <img
+                  src="https://order.thecoffeehouse.com/icon/user-icon.svg"
+                  alt=""
+                  class="icon-user"
+                  :class="{ iconActive: select === 1 }"
+                />
+                <span class="user-item-txt">Thông tin tài khoản</span>
+              </li>
+              <li
+                class="user-item"
+                @click="handleClick2"
+                :class="{ active: select === 2 }"
+              >
+                <img
+                  src="https://order.thecoffeehouse.com/icon/address-book.svg"
+                  alt=""
+                  class="icon-user"
+                  :class="{ iconActive: select === 2 }"
+                />
+                <span class="user-item-txt">Sổ địa chỉ</span>
+              </li>
+              <li
+                class="user-item"
+                @click="handleClick3"
+                :class="{ iconActive: select === 3 }"
+              >
+                <img
+                  src="https://order.thecoffeehouse.com/icon/member-benefit.svg"
+                  alt=""
+                  class="icon-user"
+                  :class="{ active: select === 3 }"
+                />
+                <span class="user-item-txt">Quyền lợi thành viên</span>
+              </li>
+              <li
+                class="user-item"
+                @click="handleClick4"
+                :class="{ active: select === 4 }"
+              >
+                <img
+                  src="https://order.thecoffeehouse.com/icon/history-order.svg"
+                  alt=""
+                  class="icon-user"
+                  :class="{ active: select === 4 }"
+                />
+                <span class="user-item-txt">Lịch sử mua hàng</span>
+              </li>
+            </ul>
+          </div>
+          <div class="user-menu-mobile">
+            <ul class="user-list-mobile">
+              <li class="user-item-mobile active">
+                <img src="/icon/user-icon.svg" alt="" class="img-mobile" />
+              </li>
+              <li class="user-item-mobile">
+                <img src="/icon/address-book.svg" alt="" class="img-mobile" />
+              </li>
+              <li class="user-item-mobile">
+                <img src="/icon/member-benefit.svg" alt="" class="img-mobile" />
+              </li>
+              <li class="user-item-mobile">
+                <img src="/icon/history-order.svg" alt="" class="img-mobile" />
+              </li>
+            </ul>
+          </div>
         </div>
-
+  
         <div class="user-info-right">
-            <div v-if="select === 1">
-                <div class="processing">
-                    <h1 class="row user-information">
-                        Thông tin tài khoản
-                    </h1>
-                    <form class="form-user">
-                        <div class="form-group row">
-                            <div class="col-6 d-flex flex-column align-items-start name-input">
-                                <label for="first-name" class="form-control-label">Tên khách hàng</label>
-                                <input id="first-name" name="name" placeholder="Tên" type="text" required="required" class="form-control" style="margin-top: 10px" v-model="userInfomation.first_name" />
-                                <!-- <div data-v-3a213b80="" class="invalid-feedback">
-                    Vui lòng nhập Tên
-                  </div> -->
-                            </div>
-                            <div class="col-6 d-flex flex-column align-items-start name-input">
-                                <label for="last-name" class="form-control-label invisible">.</label>
-                                <input id="last-name" name="number" placeholder="Họ" type="text" required="required" class="form-control" style="margin-top: 10px" v-model="userInfomation.last_name" />
-                                <!-- <div data-v-3a213b80="" class="invalid-feedback">
-                    Vui lòng nhập Họ
-                  </div> -->
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="phone-number" class="form-control-label" style="display: flex">Số điện thoại</label>
-                            <input id="phone-number" name="phone-number" type="text" disabled="disabled" class="form-control" v-model="userInfomation.mobile_no" />
-                        </div>
-                        <div class="form-group row">
-                            <label for="birth" style="display: flex">Sinh nhật</label>
-                            <label for="vueDatepicker" style="display: flex">
-                            Sinh nhật</label>
-                        <input class="form-control" placeholder="DD-MM-YYYY" id="vueDatepicker" type="datetime-local" v-model="userInfomation.birth">
-                        </div>
-                        <div class="form-group row">
-                            <label for="email" class="form-control-label" style="display: flex">Email</label>
-                            <input id="email" name="email" type="text" class="form-control" v-model="userInfomation.email" />
-                        </div>
-                        <div class="d-flex justify-content-start">
-                            <div class="
-                    custom-control
-                    card-product-option-item
-                    custom-radio
-                    mb-0
-                    cursor-pointer">
-                                <input type="radio" name="gender-mapping" id="1" class="custom-control-input" :checked="userInfomation.gender == 'Nam'" />
-                                <label for="1" class="
-                      custom-control-label
-                      card-product-option-label
-                      tch-custom-radio
-                    ">
-                                    <div class="card-product-option-value">
-                                        <span class="text card-product-option-size">Nam
-                                        </span>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="
-                    custom-control
-                    card-product-option-item
-                    custom-radio
-                    mb-0
-                    cursor-pointer
-                  ">
-                                <input type="radio" name="gender-mapping" id="2" class="custom-control-input" :checked="userInfomation.gender == 'Nữ'" />
-                                <label for="2" class="
-                      custom-control-label
-                      card-product-option-label
-                      tch-custom-radio
-                    ">
-                                    <div class="card-product-option-value">
-                                        <span class="text card-product-option-size">Nữ
-                                        </span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="row d-flex justify-content-end">
-                            <button class="btn btn--orange btn-update" @click.prevent="handleUpdate">Cập nhật</button>
-                        </div>
-                    </form>
+          <div v-if="select === 1">
+            <div class="processing">
+              <h1 class="row user-information">Thông tin tài khoản</h1>
+              <form class="form-user">
+                <div class="form-group row">
+                  <div
+                    class="col-6 d-flex flex-column align-items-start name-input"
+                  >
+                    <label for="first-name" class="form-control-label"
+                      >Tên khách hàng</label
+                    >
+                    <input
+                      id="first-name"
+                      name="name"
+                      placeholder="Tên"
+                      type="text"
+                      required="required"
+                      class="form-control"
+                      style="margin-top: 10px"
+                      v-model="userInfomation.first_name"
+                    />
+                    <!-- <div data-v-3a213b80="" class="invalid-feedback">
+                      Vui lòng nhập Tên
+                    </div> -->
+                  </div>
+                  <div
+                    class="col-6 d-flex flex-column align-items-start name-input"
+                  >
+                    <label for="last-name" class="form-control-label invisible"
+                      >.</label
+                    >
+                    <input
+                      id="last-name"
+                      name="number"
+                      placeholder="Họ"
+                      type="text"
+                      required="required"
+                      class="form-control"
+                      style="margin-top: 10px"
+                      v-model="userInfomation.last_name"
+                    />
+                    <!-- <div data-v-3a213b80="" class="invalid-feedback">
+                      Vui lòng nhập Họ
+                    </div> -->
+                  </div>
                 </div>
-            </div>
-            <div v-if="select === 2">
-                <!-- <h1>select=2</h1> -->
-                <div class="processing">
-                    <h1 class="user-address-title">Sổ địa chỉ</h1>
-                    <div style="overflow: auto">
-                        <div class="card-cover" v-for="(listAddress,index) in listAddresses" :key="index">
-                            <div class="cover-card-address">
-                                <div class="name">{{listAddress.user_name}}</div>
-                                <div class="full-address">
-                                    <span class="title-data">Địa chỉ:</span>
-                                    {{listAddress.address}}
-                                </div>
-                                <div class="phone-number">
-                                    <span class="title-data">Điện thoại:</span> {{listAddress.mobile_no}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="form-group row">
+                  <label
+                    for="phone-number"
+                    class="form-control-label"
+                    style="display: flex"
+                    >Số điện thoại</label
+                  >
+                  <input
+                    id="phone-number"
+                    name="phone-number"
+                    type="text"
+                    disabled="disabled"
+                    class="form-control"
+                    v-model="userInfomation.mobile_no"
+                  />
                 </div>
-            </div>
-            <div v-if="select === 3">
-                <!-- <h1>select=3</h1> -->
-                <div class="processing">
-                    <nav>
-                        <div id="nav-tab" role="tablist" class="nav nav-tabs cursor-pointer">
-                            <a data-toggle="tab" role="tab" class="nav-item nav-link " :class="{active : active1}" @click="active1 = true;active2 = false ; active3 = false;active4 = false ; active5 = false">Mới</a>
-                            <a data-toggle="tab" role="tab" class="nav-item nav-link" @click="active1 = false;active2 = true ; active3 = false;active4 = false ; active5 = false" :class="{active : active2}">Đồng
-                            </a>
-                            <a role="tab" class="nav-item nav-link" @click="active1 = false;active2 = false ; active3 = true;active4 = false ; active5 = false" :class="{active : active3}">Bạc</a><a data-toggle="tab" role="tab" class="nav-item nav-link" @click="active1 = false;active2 = false ; active3 = false;active4 = true ; active5 = false" :class="{active : active4}">Vàng</a><a data-toggle="tab" role="tab" class="nav-item nav-link" @click="active1 = false;active2 = false ; active3 = false;active4 = false ; active5 = true" :class="{active : active5}">Kim Cương</a>
-                        </div>
-                    </nav>
-                    <div id="nav-tabContent" class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade show " :class="{active : active1, hidden : !active1}">
-                            <div class="cover-all-benefit row">
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/878_v5Membership2coffeeCup.png" class="cover-image" />
-                                    </div>
-                                    <span>Miễn phí upsize cho đơn đầu tiên</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" :class="{active : active2, hidden : !active2}">
-                            <div class="cover-all-benefit row">
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png" class="cover-image" />
-                                    </div>
-                                    <span>Tặng 01 phần bánh sinh nhật</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/879_v5Membership2snack.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Miễn phí 01 phần Snack cho đơn hàng trên 100,000đ</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" :class="{active : active3 , hidden : !active3}">
-                            <div class="cover-all-benefit row">
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png" class="cover-image" />
-                                    </div>
-                                    <span>Tặng 01 phần bánh sinh nhật</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/882_v5Membership2voucher.png" class="cover-image" />
-                                    </div>
-                                    <span>Ưu đãi Mua 2 tặng 1</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" :class="{active : active4 , hidden : !active4}">
-                            <div class="cover-all-benefit row">
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png" class="cover-image" />
-                                    </div>
-                                    <span>Tặng 01 phần bánh sinh nhật</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/878_v5Membership2coffeeCup.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Miễn phí 1 phần nước Cà phê / Trà</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" :class="{active : active5 , hidden : !active5}">
-                            <div class="cover-all-benefit row">
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/876_v5Membership2bean.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Được nhân 1.5 BEAN tích lũy</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png" class="cover-image" />
-                                    </div>
-                                    <span>Tặng 01 phần bánh sinh nhật</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/878_v5Membership2coffeeCup.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Miễn phí 1 phần nước bất kì</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/882_v5Membership2voucher.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Nhận riêng Ưu đãi từ The Coffee House và đối tác khác</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center
-                    ">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/880_v5Membership2star.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Cơ hội trải nghiệm &amp; hưởng đặc quyền đầu tiên</span>
-                                </div>
-                                <div class="
-                      all-benefit
-                      d-flex
-                      flex-column
-                      justify-content-center
-                      align-items-center">
-                                    <div class="cover-image">
-                                        <img src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png" class="cover-image" alt="" />
-                                    </div>
-                                    <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="form-group row">
+                  <label for="birth" style="display: flex">Sinh nhật</label>
+                  <label for="vueDatepicker" style="display: flex">
+                    Sinh nhật</label
+                  >
+                  <input
+                    id="birth"
+                    type="text"
+                    class="form-control"
+                    disabled="disabled"
+                    v-model="userInfomation.birth"
+                  />
                 </div>
-            </div>
-            <div v-if="select === 4">
-                <!-- <h1>select=4</h1> -->
-                <div>
-                    <div class="card-product-note-item">
-                        <input type="text" v-model="search" placeholder="Tra cứu theo mã đơn hàng" class="card-product-text" />
-                        <div style="background-color: #ededee">
-                            <v-icon color="grey" dark style="font-weight: 900;cursor:pointer;margin: 9px 11px 12px">mdi-magnify</v-icon>
-                        </div>
-                        <!--              <i-->
-                        <!--                class="fa fa-search card-product-note-icon"-->
-                        <!--              ></i>-->
-                    </div>
-                    <div class="card-history">
-                        <ul class="card-history-list">
-                            <li class="card-history-item" v-for="listOrder in filteredList" :key=listOrder.order_id>
-                                <div class="card-history-head">
-                                    <span class="card-history-type">Tại cửa hàng</span>
-                                    <span class="card-history-status" v-if="listOrder.state === 0">Đang chờ xác nhận</span>
-                                    <span class="card-history-status" v-if="listOrder.state === 1">Đã xác nhận</span>
-                                    <span class="card-history-status" v-if="listOrder.state === -1">Đã hủy</span>
-                                    <div class="card-id">
-                                        <p class="card-history-ref">{{listOrder.order_id}}</p>
-                                        <p class="card-history-ref">{{listOrder.payment_method}}</p>
-                                    </div>
-
-                                </div>
-                                <div class="card-history-body">
-                                    <div class="order-info">
-                                        <div class="product-info" style="display: flex;flex-direction: column">
-                                            <div v-for="(subProduct,subProduct_index) in listOrder.product" :key=subProduct.name>
-                                                <span class="product-name">
-                                                    {{subProduct.name}}
-                                                </span>
-                                                <div v-for="(topping, index) in listOrder.product[subProduct_index].topping[0]" :key=index>
-                                                    <span class="product-name" style="font-size: 14px; color: rgba(0, 0, 0, 0.45);" v-if="listOrder.product[subProduct_index].topping[1][index] > 0">
-                                                        {{topping.name}}
-                                                    </span>
-                                                </div>
-                                                <span>------------</span>
-                                            </div>
-
-                                            <!-- <div v-for="(topping, index) in listOrder.product[0].topping[0]" :key=index>
-                                                <span class="product-name"  v-if="listOrder.product[0].topping[1][index] > 0">
-                                                    {{topping.name}} - {{index}}
-                                                </span>
-                                            </div> -->
-                                        </div> <span class="total-price">{{separator(listOrder.total_price)}}đ</span>
-                                    </div>
-                                </div>
-                                <div class="card-history-footer">
-                                    <div class="date-order-wrap">
-                                        <span class="time-order">{{listOrder.order_time_clock}}</span>
-                                        - <span class="date-order">{{listOrder.order_time_day}}</span>
-                                    </div>
-                                    <span class="user-bean-footer">+{{checkBean(listOrder.total_price)}} bean</span>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="form-group row">
+                  <label
+                    for="email"
+                    class="form-control-label"
+                    style="display: flex"
+                    >Email</label
+                  >
+                  <input
+                    id="email"
+                    name="email"
+                    type="text"
+                    class="form-control"
+                    v-model="userInfomation.email"
+                  />
                 </div>
+                <div class="d-flex justify-content-start">
+                  <div
+                    class="custom-control card-product-option-item custom-radio mb-0 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="gender-mapping"
+                      id="1"
+                      class="custom-control-input"
+                      :checked="userInfomation.gender == 'Nam'"
+                    />
+                    <label
+                      for="1"
+                      class="custom-control-label card-product-option-label tch-custom-radio"
+                    >
+                      <div class="card-product-option-value">
+                        <span class="text card-product-option-size">Nam </span>
+                      </div>
+                    </label>
+                  </div>
+                  <div
+                    class="custom-control card-product-option-item custom-radio mb-0 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="gender-mapping"
+                      id="2"
+                      class="custom-control-input"
+                      :checked="userInfomation.gender == 'Nữ'"
+                    />
+                    <label
+                      for="2"
+                      class="custom-control-label card-product-option-label tch-custom-radio"
+                    >
+                      <div class="card-product-option-value">
+                        <span class="text card-product-option-size">Nữ </span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="row d-flex justify-content-end">
+                  <button
+                    class="btn btn--orange btn-update"
+                    @click.prevent="handleUpdate"
+                  >
+                    Cập nhật
+                  </button>
+                </div>
+              </form>
             </div>
+          </div>
+          <div v-if="select === 2">
+            <!-- <h1>select=2</h1> -->
+            <div class="processing">
+              <h1 class="user-address-title">Sổ địa chỉ</h1>
+              <div style="overflow: auto">
+                <div
+                  class="card-cover"
+                  v-for="(listAddress, index) in listAddresses"
+                  :key="index"
+                >
+                  <div class="cover-card-address">
+                    <div class="name">{{ listAddress.user_name }}</div>
+                    <div class="full-address">
+                      <span class="title-data">Địa chỉ:</span>
+                      {{ listAddress.address }}
+                    </div>
+                    <div class="phone-number">
+                      <span class="title-data">Điện thoại:</span>
+                      {{ listAddress.mobile_no }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="select === 3">
+            <!-- <h1>select=3</h1> -->
+            <div class="processing">
+              <nav>
+                <div
+                  id="nav-tab"
+                  role="tablist"
+                  class="nav nav-tabs cursor-pointer"
+                >
+                  <a
+                    data-toggle="tab"
+                    role="tab"
+                    class="nav-item nav-link"
+                    :class="{ active: active1 }"
+                    @click="active1 = true; active2 = false; active3 = false; active4 = false; active5 = false"
+                    >Mới</a
+                  >
+                  <a
+                    data-toggle="tab"
+                    role="tab"
+                    class="nav-item nav-link"
+                    @click="active1 = false; active2 = true; active3 = false; active4 = false; active5 = false"
+                    :class="{ active: active2 }"
+                    >Đồng
+                  </a>
+                  <a
+                    role="tab"
+                    class="nav-item nav-link"
+                    @click="active1 = false; active2 = false; active3 = true; active4 = false; active5 = false"
+                    :class="{ active: active3 }"
+                    >Bạc</a
+                  ><a
+                    data-toggle="tab"
+                    role="tab"
+                    class="nav-item nav-link"
+                    @click="active1 = false; active2 = false; active3 = false; active4 = true; active5 = false"
+                    :class="{ active: active4 }"
+                    >Vàng</a
+                  ><a
+                    data-toggle="tab"
+                    role="tab"
+                    class="nav-item nav-link"
+                    @click="active1 = false; active2 = false; active3 = false; active4 = false; active5 = true"
+                    :class="{ active: active5 }"
+                    >Kim Cương</a
+                  >
+                </div>
+              </nav>
+              <div id="nav-tabContent" class="tab-content">
+                <div
+                  role="tabpanel"
+                  class="tab-pane fade show"
+                  :class="{ active: active1, hidden: !active1 }"
+                >
+                  <div class="cover-all-benefit row">
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/878_v5Membership2coffeeCup.png"
+                          class="cover-image"
+                        />
+                      </div>
+                      <span>Miễn phí upsize cho đơn đầu tiên</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  role="tabpanel"
+                  class="tab-pane fade"
+                  :class="{ active: active2, hidden: !active2 }"
+                >
+                  <div class="cover-all-benefit row">
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png"
+                          class="cover-image"
+                        />
+                      </div>
+                      <span>Tặng 01 phần bánh sinh nhật</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/879_v5Membership2snack.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span
+                        >Miễn phí 01 phần Snack cho đơn hàng trên 100,000đ</span
+                      >
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  role="tabpanel"
+                  class="tab-pane fade"
+                  :class="{ active: active3, hidden: !active3 }"
+                >
+                  <div class="cover-all-benefit row">
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png"
+                          class="cover-image"
+                        />
+                      </div>
+                      <span>Tặng 01 phần bánh sinh nhật</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/882_v5Membership2voucher.png"
+                          class="cover-image"
+                        />
+                      </div>
+                      <span>Ưu đãi Mua 2 tặng 1</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  role="tabpanel"
+                  class="tab-pane fade"
+                  :class="{ active: active4, hidden: !active4 }"
+                >
+                  <div class="cover-all-benefit row">
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png"
+                          class="cover-image"
+                        />
+                      </div>
+                      <span>Tặng 01 phần bánh sinh nhật</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/878_v5Membership2coffeeCup.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span>Miễn phí 1 phần nước Cà phê / Trà</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  role="tabpanel"
+                  class="tab-pane fade"
+                  :class="{ active: active5, hidden: !active5 }"
+                >
+                  <div class="cover-all-benefit row">
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/876_v5Membership2bean.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span>Được nhân 1.5 BEAN tích lũy</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/877_v5Membership2birthdayCake.png"
+                          class="cover-image"
+                        />
+                      </div>
+                      <span>Tặng 01 phần bánh sinh nhật</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/878_v5Membership2coffeeCup.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span>Miễn phí 1 phần nước bất kì</span>
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/882_v5Membership2voucher.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span
+                        >Nhận riêng Ưu đãi từ The Coffee House và đối tác
+                        khác</span
+                      >
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/880_v5Membership2star.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span
+                        >Cơ hội trải nghiệm &amp; hưởng đặc quyền đầu tiên</span
+                      >
+                    </div>
+                    <div
+                      class="all-benefit d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div class="cover-image">
+                        <img
+                          src="https://minio.thecoffeehouse.com/image/tchmobileapp/881_v5Membership2store.png"
+                          class="cover-image"
+                          alt=""
+                        />
+                      </div>
+                      <span>Đặc quyền Đổi Ưu đãi bằng điểm BEAN tích lũy</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="select === 4">
+            <!-- <h1>select=4</h1> -->
+            <div>
+              <div class="card-product-note-item">
+                <input
+                  type="text"
+                  v-model="search"
+                  placeholder="Tra cứu theo mã đơn hàng"
+                  class="card-product-text"
+                />
+                <div style="background-color: #ededee">
+                  <v-icon
+                    color="grey"
+                    dark
+                    style="
+                      font-weight: 900;
+                      cursor: pointer;
+                      margin: 9px 11px 12px;
+                    "
+                    >mdi-magnify</v-icon
+                  >
+                </div>
+                <!--              <i-->
+                <!--                class="fa fa-search card-product-note-icon"-->
+                <!--              ></i>-->
+              </div>
+              <div class="card-history">
+                <ul class="card-history-list">
+                  <li
+                    class="card-history-item"
+                    v-for="listOrder in filteredList"
+                    :key="listOrder.order_id"
+                  >
+                    <div class="card-history-head">
+                      <span class="card-history-type">Tại cửa hàng</span>
+                      <span
+                        class="card-history-status"
+                        v-if="listOrder.state === 0"
+                        >Đang chờ xác nhận</span
+                      >
+                      <span
+                        class="card-history-status"
+                        v-if="listOrder.state === 1"
+                        >Đã xác nhận</span
+                      >
+                      <span
+                        class="card-history-status"
+                        v-if="listOrder.state === -1"
+                        >Đã hủy</span
+                      >
+                      <div class="card-id">
+                        <p class="card-history-ref">{{ listOrder.order_id }}</p>
+                        <p class="card-history-ref">
+                          {{ listOrder.payment_method }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="card-history-body">
+                      <div class="order-info">
+                        <div
+                          class="product-info"
+                          style="display: flex; flex-direction: column"
+                        >
+                          <div
+                            v-for="(subProduct, subProduct_index) in listOrder.product"
+                            :key="subProduct.name"
+                          >
+                            <span class="product-name">
+                              {{ subProduct.name }}
+                            </span>
+                            <div
+                              v-for="(topping, index) in listOrder.product[subProduct_index].topping[0]"
+                              :key="index"
+                            >
+                              <span
+                                class="product-name"
+                                style="
+                                  font-size: 14px;
+                                  color: rgba(0, 0, 0, 0.45);
+                                "
+                                v-if="listOrder.product[subProduct_index].topping[1][index] > 0"
+                              >
+                                {{ topping.name }}
+                              </span>
+                            </div>
+                            <span>------------</span>
+                          </div>
+                        </div>
+                        <span class="total-price"
+                          >{{ separator(listOrder.total_price) }}đ</span
+                        >
+                      </div>
+                    </div>
+                    <div class="card-history-footer">
+                      <div class="date-order-wrap">
+                        <span class="time-order">{{
+                          listOrder.order_time_clock
+                        }}</span>
+                        -
+                        <span class="date-order">{{
+                          listOrder.order_time_day
+                        }}</span>
+                      </div>
+                      <span class="user-bean-footer"
+                        >+{{ checkBean(listOrder.total_price) }} bean</span
+                      >
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
-</div>
+      </section>
+    </div>
 </template>
+
 
 <script>
 import { getOrdersUser } from "@/api/order";
-import {getAddressNote,updateInfo} from "@/api/user";
+import { getAddressNote, updateInfo } from "@/api/user";
 export default {
     name: "userInfo",
     data() {
         return {
             persent: 0,
             select: 1,
-            active1: true,active2: false,active3: false,active4: false,active5: false,
+            active1: true, active2: false, active3: false, active4: false, active5: false,
             currentPath: this.$route.path,
             search: '',
             list: [],
@@ -508,7 +744,7 @@ export default {
                 email: "iamrobotdiy@gmail.com",
                 gender: "male",
             },
-            state:'',
+            state: '',
             listOrders: [],
             listAddresses: [],
         };
@@ -552,42 +788,42 @@ export default {
                     }
                 )
                 for (let order_index in response.data.productsOfOrder) {
-                        let product_tmp = []
-                        let order = response.data.productsOfOrder[order_index]
-                        //console.log("At ", order[0].order_id)
-                        for (let order_item_index in order) {
-                            let order_item = order[order_item_index]
-                            //console.log("Push: ", order_item.product_id.name)
-                            product_tmp.push({
-                                name: order_item.product_id.name,
-                                topping: JSON.parse(JSON.stringify([order_item.topping_id, order_item.topping_count]))
-                            })
-                        }
-                        this.listOrders.push({
-                            order_id: order[0].order_id,
-                            payment_method: response.data.orders[order_index].payment_method,
-                            state: response.data.orders[order_index].state,
-                            product: JSON.parse(JSON.stringify(product_tmp)),
-                            total_price: response.data.orders[order_index].total_price,
-                            order_time_day: response.data.orders[order_index].order_time.split(" ")[0],
-                            order_time_clock: response.data.orders[order_index].order_time.split(" ")[1]
+                    let product_tmp = []
+                    let order = response.data.productsOfOrder[order_index]
+                    //console.log("At ", order[0].order_id)
+                    for (let order_item_index in order) {
+                        let order_item = order[order_item_index]
+                        //console.log("Push: ", order_item.product_id.name)
+                        product_tmp.push({
+                            name: order_item.product_id.name,
+                            topping: JSON.parse(JSON.stringify([order_item.topping_id, order_item.topping_count]))
                         })
                     }
-                    //console.log(this.listOrders)
-                    //tính bean
-                    this.bean = 0
-                    for (let listOrder of this.listOrders) {
-                        this.bean += this.checkBean(listOrder.total_price)
-                    }
-                    this.persent = this.bean / 3000 * 100
+                    this.listOrders.push({
+                        order_id: order[0].order_id,
+                        payment_method: response.data.orders[order_index].payment_method,
+                        state: response.data.orders[order_index].state,
+                        product: JSON.parse(JSON.stringify(product_tmp)),
+                        total_price: response.data.orders[order_index].total_price,
+                        order_time_day: response.data.orders[order_index].order_time.split(" ")[0],
+                        order_time_clock: response.data.orders[order_index].order_time.split(" ")[1]
+                    })
+                }
+                //console.log(this.listOrders)
+                //tính bean
+                this.bean = 0
+                for (let listOrder of this.listOrders) {
+                    this.bean += this.checkBean(listOrder.total_price)
+                }
+                this.persent = this.bean / 3000 * 100
             } catch (error) {
                 console.error(error);
             }
         },
-        
+
         async getAddresses() {
             try {
-                const response = await getAddressNote( {user_id: this.userInfomation.id})
+                const response = await getAddressNote({ user_id: this.userInfomation.id })
                 //console.log('address: ', response.data.address_note)
                 this.listAddresses = response.data.address_note
 
@@ -595,29 +831,29 @@ export default {
                 console.error(error);
             }
         },
-        
+
         async handleUpdate() {
             if (confirm('Bạn có chắc muốn update không?')) {
                 alert('Update thành công');
 
                 // luu vao localStorage
                 localStorage.setItem('user', JSON.stringify(this.userInfomation))
-            try {
-                const response = await updateInfo(
-                    {
+                try {
+                    const response = await updateInfo(
+                        {
                             id: this.userInfomation.id,
                             last_name: this.userInfomation.last_name,
                             first_name: this.userInfomation.first_name,
                             email: this.userInfomation.email,
                             gender: this.userInfomation.gender,
 
-                    }
-                )
-                console.log('update thanh cong lastname :', response.data.userInfo.last_name);
-            } catch (error) {
-                console.error(error);
-            }  
-        }
+                        }
+                    )
+                    console.log('update thanh cong lastname :', response.data.userInfo.last_name);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
         },
 
         checkBean(price) {
@@ -1572,6 +1808,7 @@ div {
     font-weight: 600;
     font-size: 16px;
 }
+
 .card-history-ref {
     color: #f5222d;
     font-weight: 600;

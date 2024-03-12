@@ -1,167 +1,266 @@
 <template>
     <div class="tch-box">
-        <div class="cover-listing">
-            <div class="container">
-                <div class="container-lg container-fluid">
-                    <div>
-                        <div style="margin-bottom: 1.875rem">
-                            <!-- header -->
-                            <div class="product-listing-title">
-                                <div style="display: flex">
-                                    <!-- icon + text title -->
-                                    <v-icon style="margin-right: 12px"> mdi-beer-outline </v-icon>
-                                    <span data-v-5abbf04c="" class="text">Sản phẩm từ Nhà</span>
-                                    <template>
-                                        <v-row justify="center">
-                                            <v-dialog v-model="dialogSearch" max-width="700" content-class="my-custom-dialog" style="z-index : 999;">
-                                                <template v-slot:activator="{ on, attrs }">
-                                                    <v-btn v-bind="attrs" v-on="on" color="#e3e3e3"
-                                                        style="border-radius: 10px;padding: 0;margin: 0 12px 0 42px"
-                                                        min-width="34px" min-height="32px">
-                                                        <v-icon style="font-weight: 200;font-size: 32px;color: #838387">mdi-magnify </v-icon>
-
-                                                    </v-btn>
-                                                </template>
-                                                <v-card style="display: flex;flex-direction: column;border-radius: 8px;">
-                                                    <div class="modal-header ">
-                                                        <v-btn text style="padding: 8px" @click="dialogSearch = false">
-                                                            <v-icon x-large color="#808080"
-                                                                style="font-weight: 200;font-size: 32px"> mdi-close
-                                                            </v-icon>
-                                                        </v-btn>
-                                                        <div style="margin: auto;font-size: 14px;line-height: 24px;color: #262626;font-weight: 500">
-                                                            Tìm kiếm 
-                                                        </div>
-                                                    </div>
-                                                    <hr style="color: #dee2e6">
-                                                    <div class="modal-body">
-                                                        <div class="card-product-note-item">
-                                                            <v-icon color="#808080"
-                                                                style="font-weight: 200;font-size: 32px;padding: 12px">
-                                                                mdi-magnify </v-icon>
-                                                            <input @keydown.delete="updateSearch()" type="text"
-                                                                placeholder="Tìm kiếm theo sản phẩm bạn quan tâm "
-                                                                class="card-product-text" v-model="searchProduct">
-                                                        </div>
-                                                    </div>
-
-                                                    <v-row style="margin: 0 0px">
-                                                        <v-col cols="12" md="6" sm="6" v-for="product_search in filteredList" :key="product_search.id"> 
-                                                            <div class="cover-product">
-                                                                <div class="product-search">
-                                                                    <div class="product-search-img">
-                                                                        <img style="width: 100%;height: 100%"
-                                                                            :src=product_search.image_url alt="">
-                                                                    </div>
-                                                                    <div class="product-search-right">
-                                                                        <div style="flex: 1">
-                                                                            <div class="product-search-name">
-                                                                                {{ product_search.name }}</div>
-                                                                        </div>
-                                                                        <div
-                                                                            style="display: flex!important;justify-content: space-between;align-items: center">
-                                                                            <div class="product-search-price">
-                                                                                {{ separator(product_search.price) }}</div>
-                                                                            <Card_User_Order style="z-index : 999"
-                                                                                :currentID="product_search.id"
-                                                                                :dialog="dialog" :id="product_search.id"
-                                                                                :image_url="product_search.image_url"
-                                                                                :name="product_search.name"
-                                                                                :description="product_search.description"
-                                                                                :price="product_search.price"
-                                                                                :isInProductListing=1>
-                                                                            </Card_User_Order>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </v-col>
-                                                    </v-row>
-                                                </v-card>
-                                            </v-dialog>
-                                        </v-row>
-                                    </template>
-                                </div>
-
-                                <div>
-                                    <!-- icon search -->
-                                </div>
+      <div class="cover-listing">
+        <div class="container">
+          <div class="container-lg container-fluid">
+            <div style="margin-bottom: 1.875rem">
+              <!-- header -->
+              <div class="product-listing-title">
+                <div style="display: flex">
+                  <!-- icon + text title -->
+                  <v-icon style="margin-right: 12px"> mdi-beer-outline </v-icon>
+                  <span data-v-5abbf04c="" class="text">Sản phẩm từ Nhà</span>
+                  <template>
+                    <v-row justify="center">
+                      <v-dialog
+                        v-model="dialogSearch"
+                        max-width="700"
+                        content-class="my-custom-dialog"
+                        style="z-index: 999"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn
+                            v-bind="attrs"
+                            v-on="on"
+                            color="#e3e3e3"
+                            style="
+                              border-radius: 10px;
+                              padding: 0;
+                              margin: 0 12px 0 42px;
+                            "
+                            min-width="34px"
+                            min-height="32px"
+                          >
+                            <v-icon
+                              style="
+                                font-weight: 200;
+                                font-size: 32px;
+                                color: #838387;
+                              "
+                              >mdi-magnify
+                            </v-icon>
+                          </v-btn>
+                        </template>
+                        <v-card
+                          style="
+                            display: flex;
+                            flex-direction: column;
+                            border-radius: 8px;
+                          "
+                        >
+                          <div class="modal-header">
+                            <v-btn
+                              text
+                              style="padding: 8px"
+                              @click="dialogSearch = false"
+                            >
+                              <v-icon
+                                x-large
+                                color="#808080"
+                                style="font-weight: 200; font-size: 32px"
+                              >
+                                mdi-close
+                              </v-icon>
+                            </v-btn>
+                            <div
+                              style="
+                                margin: auto;
+                                font-size: 14px;
+                                line-height: 24px;
+                                color: #262626;
+                                font-weight: 500;
+                              "
+                            >
+                              Tìm kiếm
                             </div>
-                        </div>
-                        <div>
-                            <!-- category -->
-                            <ul role="tablist" class="product-category">
-                                <!-- Tung item mot -->
-                                <li v-for="category in categories" :key="category.id" style="margin-left: 1rem">
-                                    <a aria-selected="true" class="nav-link">
-                                        <div class="tch-category-card" @click="category_type = category.id">
-                                            <!-- Picture of category -->
-                                            <div class="justify-content-center align-items-center tch-category-card__image ">
-                                                <img :src="category.image_url" style="max-width: 70%; max-height: 70%" />
-                                            </div>
-                                            <!-- Name of category -->
-                                            <div style="margin-top: 0.375rem">
-                                                <h5 class="tch-category-card__title text-center">
-                                                    {{ category.name }}
-                                                </h5>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-                            <!-- table of item -->
-                            <div class="row">
-                                <div v-for="product in products" :key="product.product_id" @click="handleProduct(product.id, product.name)" class="product">
-                                    <div class="productDetail">
-                                        <!-- image -->
-                                        <div class="productImage">
-                                            <img :src="product.image_url" style="width: 155px; height: 155px" />
-                                        </div>
-                                        <!-- block price and title -->
-                                        <div style="padding-top: 0.75rem">
-                                            <!-- title -->
-                                            <div class="productTitleBlock">
-                                                <h4 class="productTitle">{{ product.name }}</h4>
-                                            </div>
-                                            <!-- block price and + -->
-                                            <div class="blockPriceAdd">
-                                                <!-- price -->
-                                                <p class="mb-0">
-                                                    <span class="d-block">{{ separator(product.price) }}đ</span>
-                                                    <!---->
-                                                </p>
-                                                <!-- Nut + -->
-
-                                                <Card_User_Order style="z-index : 999" :currentID="currentID"
-                                                    :dialog="dialog" :id="product.id" :image_url="product.image_url.toString()"
-                                                    :name="product.name.toString()" :description="product.description.toString()"
-                                                    :price="product.price.toString()" :isInProductListing=1>
-                                                </Card_User_Order>
-
-                                            </div>
-                                        </div>
+                          </div>
+                          <hr style="color: #dee2e6" />
+                          <div class="modal-body">
+                            <div class="card-product-note-item">
+                              <v-icon
+                                color="#808080"
+                                style="
+                                  font-weight: 200;
+                                  font-size: 32px;
+                                  padding: 12px;
+                                "
+                              >
+                                mdi-magnify
+                              </v-icon>
+                              <input
+                                @keydown.delete="updateSearch()"
+                                type="text"
+                                placeholder="Tìm kiếm theo sản phẩm bạn quan tâm "
+                                class="card-product-text"
+                                v-model="searchProduct"
+                              />
+                            </div>
+                          </div>
+  
+                          <v-row style="margin: 0 0px">
+                            <v-col
+                              cols="12"
+                              md="6"
+                              sm="6"
+                              v-for="product_search in filteredList"
+                              :key="product_search.id"
+                            >
+                              <div class="cover-product">
+                                <div class="product-search">
+                                  <div class="product-search-img">
+                                    <img
+                                      style="width: 100%; height: 100%"
+                                      :src="product_search.image_url"
+                                      alt=""
+                                    />
+                                  </div>
+                                  <div class="product-search-right">
+                                    <div style="flex: 1">
+                                      <div class="product-search-name">
+                                        {{ product_search.name }}
+                                      </div>
                                     </div>
+                                    <div
+                                      style="
+                                        display: flex !important;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                      "
+                                    >
+                                      <div class="product-search-price">
+                                        {{ separator(product_search.price) }}
+                                      </div>
+                                      <Card_User_Order
+                                        style="z-index: 999"
+                                        :currentID="product_search.id"
+                                        :dialog="dialog"
+                                        :id="product_search.id"
+                                        :image_url="product_search.image_url"
+                                        :name="product_search.name"
+                                        :description="product_search.description"
+                                        :price="product_search.price"
+                                        :isInProductListing="1"
+                                      >
+                                      </Card_User_Order>
+                                    </div>
+                                  </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                              </div>
+                            </v-col>
+                          </v-row>
+                        </v-card>
+                      </v-dialog>
+                    </v-row>
+                  </template>
                 </div>
+  
+                <div>
+                  <!-- icon search -->
+                </div>
+              </div>
             </div>
+            <div>
+              <!-- category -->
+              <ul role="tablist" class="product-category">
+                <!-- Tung item mot -->
+                <li
+                  v-for="category in categories"
+                  :key="category.id"
+                  style="margin-left: 1rem"
+                >
+                  <a aria-selected="true" class="nav-link">
+                    <div
+                      class="tch-category-card"
+                      @click="category_type = category.id"
+                    >
+                      <!-- Picture of category -->
+                      <div
+                        class="justify-content-center align-items-center tch-category-card__image"
+                      >
+                        <img
+                          :src="category.image_url"
+                          style="max-width: 70%; max-height: 70%"
+                        />
+                      </div>
+                      <!-- Name of category -->
+                      <div style="margin-top: 0.375rem">
+                        <h5 class="tch-category-card__title text-center">
+                          {{ category.name }}
+                        </h5>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <!-- table of item -->
+              <div class="row">
+                <div
+                  v-for="product in products"
+                  :key="product.product_id"
+                  @click="handleProduct(product.id, product.name)"
+                  class="product"
+                >
+                  <div class="productDetail">
+                    <!-- image -->
+                    <div class="productImage">
+                      <img
+                        :src="product.image_url"
+                        style="width: 155px; height: 155px"
+                      />
+                    </div>
+                    <!-- block price and title -->
+                    <div style="padding-top: 0.75rem">
+                      <!-- title -->
+                      <div class="productTitleBlock">
+                        <h4 class="productTitle">{{ product.name }}</h4>
+                      </div>
+                      <!-- block price and + -->
+                      <div class="blockPriceAdd">
+                        <!-- price -->
+                        <p class="mb-0">
+                          <span class="d-block"
+                            >{{ separator(product.price) }}đ</span
+                          >
+                          <!---->
+                        </p>
+                        <!-- Nut + -->
+  
+                        <Card_User_Order
+                          style="z-index: 999"
+                          :currentID="currentID"
+                          :dialog="dialog"
+                          :id="product.id"
+                          :image_url="product.image_url.toString()"
+                          :name="product.name.toString()"
+                          :description="product.description.toString()"
+                          :price="product.price.toString()"
+                          :isInProductListing="1"
+                        >
+                        </Card_User_Order>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 </template>
+  
 
 <script>
-import {removeVietnameseTones} from "@/utils/format";
-import {getCategoriesByParentId} from "@/api/category";
-import {getAllProducts,getProductsByCategoryId} from "@/api/product";
+import { removeVietnameseTones } from "@/utils/format";
+import { getCategoriesByParentId } from "@/api/category";
+import { getAllProducts, getProductsByCategoryId } from "@/api/product";
 // /* global axios */
 export default {
     name: "productListing",
     components: {
-        //Card_User_Order: () => import("@/components/userComponents/Card_User_Order"),
+        Card_User_Order: () => import("@/components/productComponents/Card_User_Order"),
     },
     props: {
         currentID: String,
@@ -175,18 +274,18 @@ export default {
             products: [],
             searchProduct: null,
             product_searchs: [
-            {
-                id: 5,
-                image_url: "https://minio.thecoffeehouse.com/image/admin/1672731234_hitea-thom_400x400.jpg",
-                name: "Hi-Tea Thơm",
-                price: "75000",
-            },
-            {
-                id: 10,
-                image_url: "https://minio.thecoffeehouse.com/image/admin/1672731234_hitea-thom_400x400.jpg",
-                name: "Hi-Tea Đào",
-                price: "72000",
-            }
+                {
+                    id: 5,
+                    image_url: "https://minio.thecoffeehouse.com/image/admin/1672731234_hitea-thom_400x400.jpg",
+                    name: "Hi-Tea Thơm",
+                    price: "75000",
+                },
+                {
+                    id: 10,
+                    image_url: "https://minio.thecoffeehouse.com/image/admin/1672731234_hitea-thom_400x400.jpg",
+                    name: "Hi-Tea Đào",
+                    price: "72000",
+                }
             ]
 
         };
@@ -198,12 +297,12 @@ export default {
         this.getAllProducts()
     },
     methods: {
-        
+
         async getCategories() {
             try {
-                const response = await getCategoriesByParentId( 
+                const response = await getCategoriesByParentId(
                     {
-                        params: {parent_id: 0}
+                        params: { parent_id: 0 }
                     }
                 );
                 this.categories = response.data.categories;
@@ -215,7 +314,7 @@ export default {
             try {
                 const response = await getProductsByCategoryId(
                     {
-                        params: {category_id: this.category_type}
+                        params: { category_id: this.category_type }
                     }
                 );
                 this.products = response.data.products;
@@ -242,14 +341,14 @@ export default {
             this.product_id = product_id;
             this.product_name = product_name;
             //console.log(this.product_name_convert),
-                this.$router.push({
-                    path: `/${this.product_id}`,
-                    name: "productInfo",
-                    params: {
-                        product_id: `${this.product_id}`, 
-                        product_name_convert: `${this.product_name_convert_computed}`
-                    },
-                });
+            this.$router.push({
+                path: `/${this.product_id}`,
+                name: "productInfo",
+                params: {
+                    product_id: `${this.product_id}`,
+                    product_name_convert: `${this.product_name_convert_computed}`
+                },
+            });
         },
         // format number
         separator(numb) {
@@ -257,8 +356,8 @@ export default {
             str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             return str.join(".");
         },
-        
-        
+
+
     },
 
     watch: { //khi có sự thay đổi về category_type thì sẽ gọi lại hàm getProductsByCategoryId
@@ -266,7 +365,7 @@ export default {
             this.getProductsByCategoryId();
         }
     },
-    computed: { 
+    computed: {
         product_name_convert_computed() {
             return removeVietnameseTones(this.product_name).replaceAll(' ', '-').toLowerCase()
         },
