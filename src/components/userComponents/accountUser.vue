@@ -1,84 +1,97 @@
 <template>
-<div>
-  <userHeader />
-<div class="container-lg container-fluid body" style="align-items: center; margin-top: 24px">
-    <div class="user-info-head ">
-        <img src="https://order.thecoffeehouse.com/_nuxt/img/user-icon-gold.5f2886d.svg" alt="" class="user-info-icon-head" />
-        <span class="user-info-text">Tài khoản của bạn</span>
-    </div>
-    <section class="user-info">
-        <div class="user-info-right">
-            <div class="processing">
-                <h1 class="row user-information">
-                    Thông tin tài khoản
-                </h1>
-                <form class="form-user">
-                    <div class="form-group row">
-                        <div class="col-6 d-flex flex-column align-items-start name-input">
-                            <label for="first-name" class="form-control-label">
-                                Tên khách hàng</label>
-                            <input id="first-name" name="name" placeholder="Tên" type="text" required="required" class="form-control" style="margin-top: 10px" v-model="userInfomation.first_name" />
-                            <!-- <div data-v-3a213b80="" class="invalid-feedback">
+    <div>
+        <userHeader />
+        <div class="container-lg container-fluid body" style="align-items: center; margin-top: 24px">
+            <div class="user-info-head ">
+                <img src="https://order.thecoffeehouse.com/_nuxt/img/user-icon-gold.5f2886d.svg" alt=""
+                    class="user-info-icon-head" />
+                <span class="user-info-text">Tài khoản của bạn</span>
+            </div>
+            <section class="user-info">
+                <div class="user-info-right">
+                    <div class="processing">
+                        <h1 class="row user-information">
+                            Thông tin tài khoản
+                        </h1>
+                        <form class="form-user">
+                            <div class="form-group row">
+                                <div class="col-6 d-flex flex-column align-items-start name-input">
+                                    <label for="first-name" class="form-control-label">
+                                        Tên khách hàng</label>
+                                    <input id="first-name" name="name" placeholder="Tên" type="text" required="required"
+                                        class="form-control" style="margin-top: 10px"
+                                        v-model="userInfomation.first_name" />
+                                    <!-- <div data-v-3a213b80="" class="invalid-feedback">
                 Vui lòng nhập Tên
               </div> -->
-                        </div>
-                        <div class="col-6 d-flex flex-column align-items-start name-input">
-                            <label for="last-name" class="form-control-label invisible">.</label>
-                            <input id="last-name" name="number" placeholder="Họ" type="text" required="required" class="form-control" style="margin-top: 10px" v-model="userInfomation.last_name" />
-                            <!-- <div data-v-3a213b80="" class="invalid-feedback">
+                                </div>
+                                <div class="col-6 d-flex flex-column align-items-start name-input">
+                                    <label for="last-name" class="form-control-label invisible">.</label>
+                                    <input id="last-name" name="number" placeholder="Họ" type="text" required="required"
+                                        class="form-control" style="margin-top: 10px"
+                                        v-model="userInfomation.last_name" />
+                                    <!-- <div data-v-3a213b80="" class="invalid-feedback">
                 Vui lòng nhập Họ
               </div> -->
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="phone-number" class="form-control-label" style="display: flex">Số điện thoại</label>
-                        <input id="phone-number" name="phone-number" type="text" disabled="disabled" class="form-control" v-model="userInfomation.mobile_no" />
-                    </div>
-                    <div class="form-group row">
-                        <label for="vueDatepicker" style="display: flex">
-                            Sinh nhật</label>
-                        <input class="form-control" placeholder="DD-MM-YYYY" id="vueDatepicker" type="datetime-local" v-model="userInfomation.birth">
-                        <!--            <span class="date">-->
-                        <!--              <datepicker placeholder="DD-MM-YYYY"  id="vueDatepicker" v-model="userInfomation.birth"  ></datepicker>-->
-                        <!--            </span>-->
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="phone-number" class="form-control-label" style="display: flex">Số điện
+                                    thoại</label>
+                                <input id="phone-number" name="phone-number" type="text" disabled="disabled"
+                                    class="form-control" v-model="userInfomation.mobile_no" />
+                            </div>
+                            <div class="form-group row">
+                                <label for="vueDatepicker" style="display: flex">
+                                    Sinh nhật</label>
+                                <input class="form-control" placeholder="DD-MM-YYYY" id="vueDatepicker"
+                                    type="datetime-local" v-model="userInfomation.birth">
+                                <!--            <span class="date">-->
+                                <!--              <datepicker placeholder="DD-MM-YYYY"  id="vueDatepicker" v-model="userInfomation.birth"  ></datepicker>-->
+                                <!--            </span>-->
 
-                    </div>
-                    <div class="form-group row">
-                        <label for="email" class="form-control-label" style="display: flex">Email</label>
-                        <input id="email" name="email" type="text" class="form-control" v-model="userInfomation.email" />
-                    </div>
-                    <div class="d-flex justify-content-start">
-                        <div class="custom-control card-product-option-item custom-radio mb-0 cursor-pointer">
-                            <input type="radio" name="gender-mapping" id="1" class="custom-control-input" value="Nam" v-model="userInfomation.gender" />
-                            <label for="1" class=" custom-control-label card-product-option-label tch-custom-radio">
-                                <div class="card-product-option-value">
-                                    <span class="text card-product-option-size">Nam</span>
+                            </div>
+                            <div class="form-group row">
+                                <label for="email" class="form-control-label" style="display: flex">Email</label>
+                                <input id="email" name="email" type="text" class="form-control"
+                                    v-model="userInfomation.email" />
+                            </div>
+                            <div class="d-flex justify-content-start">
+                                <div class="custom-control card-product-option-item custom-radio mb-0 cursor-pointer">
+                                    <input type="radio" name="gender-mapping" id="1" class="custom-control-input"
+                                        value="Nam" v-model="userInfomation.gender" />
+                                    <label for="1"
+                                        class=" custom-control-label card-product-option-label tch-custom-radio">
+                                        <div class="card-product-option-value">
+                                            <span class="text card-product-option-size">Nam</span>
+                                        </div>
+                                    </label>
                                 </div>
-                            </label>
-                        </div>
-                        <div class=" custom-control card-product-option-item custom-radio mb-0 cursor-pointer">
-                            <input type="radio" name="gender-mapping" id="2" class="custom-control-input" value="Nữ" v-model="userInfomation.gender" />
-                            <label for="2" class=" custom-control-label card-product-option-label tch-custom-radio">
-                                <div class="card-product-option-value">
-                                    <span class="text card-product-option-size">Nữ</span>
+                                <div class=" custom-control card-product-option-item custom-radio mb-0 cursor-pointer">
+                                    <input type="radio" name="gender-mapping" id="2" class="custom-control-input"
+                                        value="Nữ" v-model="userInfomation.gender" />
+                                    <label for="2"
+                                        class=" custom-control-label card-product-option-label tch-custom-radio">
+                                        <div class="card-product-option-value">
+                                            <span class="text card-product-option-size">Nữ</span>
+                                        </div>
+                                    </label>
                                 </div>
-                            </label>
-                        </div>
+                            </div>
+                            <div class="row d-flex justify-content-end">
+                                <button class="btn btn--orange btn-update" @click.prevent="handleUpdate">Cập
+                                    nhật</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="row d-flex justify-content-end">
-                        <button class="btn btn--orange btn-update" @click.prevent="handleUpdate">Cập nhật</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </section>
         </div>
-    </section>
-</div>
-</div>
+    </div>
 </template>
 
 <script>
-import axios from "axios";
-// import Datepicker from "vuejs-datepicker"
+import { updateInfo } from "@/api/user";
 export default {
     name: "accountUser",
     data() {
@@ -110,40 +123,34 @@ export default {
     },
 
     methods: {
-        // dateSelected(){
-        //   window.externalJquery
-        // },
-        handleUpdate() {
+        async handleUpdate() {
             // luu vao localStorage
-            console.log("user: ", this.userInfomation)
             localStorage.setItem('user', JSON.stringify(this.userInfomation))
-            // send data to BE
-            axios
-                .put("http://127.0.0.1:8000/api/v1/user/info/updateInfo", {
-                    id: this.userInfomation.id,
-                    last_name: this.userInfomation.last_name,
-                    first_name: this.userInfomation.first_name,
-                    mobile_no: this.userInfomation.mobile_no,
-                    birth: this.userInfomation.birth,
-                    email: this.userInfomation.email,
-                    gender: this.userInfomation.gender,
-                })
-                .then((response) => {
-                    console.log(response)
-                    alert("Cập nhật thành công")
-                    this.$router.push({ name: "Mainpage" });
-                })
-                .catch((error) => {
-                    console.log("Start\n");
-                    console.log(error.response)
-                    console.log("END\n");
-                });
-
+            try {
+                const response = await updateInfo(
+                    {
+                        id: this.userInfomation.id,
+                        last_name: this.userInfomation.last_name,
+                        first_name: this.userInfomation.first_name,
+                        mobile_no: this.userInfomation.mobile_no,
+                        birth: this.userInfomation.birth,
+                        email: this.userInfomation.email,
+                        gender: this.userInfomation.gender,
+                    }
+                )
+                console.log(response)
+                alert("Cập nhật thành công")
+                this.$router.push({ name: "Mainpage" });
+            } catch (error) {
+                console.log("Start\n");
+                console.log(error.response)
+                console.log("END\n");
+            }
         }
     },
 
     components: {
-      userHeader: () => import("@/layouts/header/userHeader"),
+        userHeader: () => import("@/layouts/header/userHeader"),
     },
 
 }

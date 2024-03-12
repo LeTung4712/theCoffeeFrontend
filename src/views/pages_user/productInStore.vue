@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <userHeader :dialog="false" />
+        <user_Header />
         <div class="productStore_Infor">
             <div class="prodcutStore_Wrap" style="margin-top: 3rem;">
                 <v-row>
@@ -176,7 +176,7 @@ import { getProductInfo,getAllProducts } from "@/api/product";
 export default {
     name: "productInStore",
     components: {
-        userHeader: () => import("@/layouts/header/userHeader"),
+        user_Header: () => import("@/layouts/header/userHeader"),
     },
     data() {
         return {

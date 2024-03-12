@@ -35,8 +35,14 @@ const routes = [
         path: "collections/:category_name",
         component: () => import("@/components/productComponents/menuMenu"),
       },
+      {
+        name: 'ThanhToan',
+        path: 'thanh-toan',
+        component: () => import('@/views/pages_user/ThanhToan'),
+      },
     ],
   },
+  
 ];
 
 const router = new VueRouter({

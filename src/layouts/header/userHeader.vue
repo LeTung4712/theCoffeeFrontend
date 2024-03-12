@@ -147,7 +147,7 @@
           <span class="user-name" style="margin-right: 37px" v-if="logged == 1">{{ this.user.last_name }}</span>
           <span style="margin-right: 37px"></span>
           <!-- icon thanh toan -->
-          <a href="/thanh-toan" style="text-decoration: none">
+          <a @click="handelClickCart" style="text-decoration: none">
             <!---->
             <div style="
                 background-color: #fff;
@@ -203,7 +203,7 @@
                   <img
                     src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxOSAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMgMTZINVYxOEgxN1YySDVWNEgzVjFDMyAwLjczNDc4NCAzLjEwNTM2IDAuNDgwNDMgMy4yOTI4OSAwLjI5Mjg5M0MzLjQ4MDQzIDAuMTA1MzU3IDMuNzM0NzggMCA0IDBIMThDMTguMjY1MiAwIDE4LjUxOTYgMC4xMDUzNTcgMTguNzA3MSAwLjI5Mjg5M0MxOC44OTQ2IDAuNDgwNDMgMTkgMC43MzQ3ODQgMTkgMVYxOUMxOSAxOS4yNjUyIDE4Ljg5NDYgMTkuNTE5NiAxOC43MDcxIDE5LjcwNzFDMTguNTE5NiAxOS44OTQ2IDE4LjI2NTIgMjAgMTggMjBINEMzLjczNDc4IDIwIDMuNDgwNDMgMTkuODk0NiAzLjI5Mjg5IDE5LjcwNzFDMy4xMDUzNiAxOS41MTk2IDMgMTkuMjY1MiAzIDE5VjE2Wk01IDlIMTJWMTFINVYxNEwwIDEwTDUgNlY5WiIgZmlsbD0iI0M0QzRDNCIvPgo8L3N2Zz4K"
                     alt="" />
-                  <a href="#" class="show-more">
+                  <a class="show-more">
                     <span @click="logout" class="text-authen">Thoát</span>
                   </a>
                 </li>
@@ -282,9 +282,9 @@ export default {
   methods: {
     logout() {
       localStorage.removeItem("user");
-      // localStorage.removeItem("oldAddress")
       //chuyen ve trang chu
-      this.$router.push("/");
+      this.$router.push("/mainpage");
+
 
     },
     handleDeleteAddress() {
@@ -301,6 +301,9 @@ export default {
     },
     handelClickMenu() {
       this.$router.push("/collections/menu");
+    },
+    handelClickCart() {
+      this.$router.push("/thanh-toan");
     },
     handelClickInfo(param) {
       this.$router.push({

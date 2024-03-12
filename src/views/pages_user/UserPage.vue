@@ -1,8 +1,6 @@
 <template>
     <div>
-        <header>
-            <userHeader :dialog="false"/>
-        </header>
+        <userHeader/>
         <div>
         <userInfo/>
         </div>

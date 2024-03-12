@@ -93,13 +93,10 @@
 </template>
 
 <script>
-import axios from "axios";
-// import router from "@/router";
+import {loginByMobileNo, verifyOtp} from "@/api/user";
 export default {
   name: "AuthenticationUser",
-  setup() {
 
-  },
   data: () => {
     return {
       dialog: false,
@@ -144,50 +141,43 @@ export default {
       inputs.forEach((input) => {
         otp += input.value;
         this.data.otp = otp;
-        console.log(otp)
+        //console.log(otp)
       })
     },
 
-
-
-    sendPhoneNumber() {
+    async sendPhoneNumber() {
       this.data.mobile_no = "+84".concat(this.data.mobile_no.slice(1))
-      console.log("Gia tri truyen di: ", this.data.mobile_no)
-      axios.post("http://127.0.0.1:8000/api/v1/user/auth/login", {
-        mobile_no: this.data.mobile_no //vd http://127.0.0.1:8000/api/v1/user/auth/login?mobile_no=+84123456789
-      }).then((response) => {
-        console.log("Gia tri tra ve: ", response)
-      })
-        .catch((error) => {
-          console.log("ERR")
-          console.log(error.response);
-        });
+      //console.log("Gia tri truyen di: ", this.data.mobile_no)
+      try {
+        const response = await loginByMobileNo(
+          {
+            mobile_no: this.data.mobile_no
+          }
+        )
+        //console.log("Gia tri tra ve: ", response)
+      } catch (error) {
+        console.log("ERR")
+        console.log(error.response);
+      }
     },
-    sendOTP() {
-      console.log("Data send OTP: ", this.data)
-      axios
-        .post("http://127.0.0.1:8000/api/v1/user/auth/checkOtp", this.data)
-        .then((response) => {
-          // let id = response.data.id;
-          // Need to check
-          console.log(response.data)
-          if (response.data.userInfo == null) {
-            // Neef to do stthg else
-            alert("Khong thanh cong!")
-          }
-          else {
-            this.user = response.data.userInfo
-            localStorage.setItem('user', JSON.stringify(this.user));
-            // localStorage.setItem('oldAddress', JSON.stringify(this.user.address))
-            this.$router.push('/userAcount')
-          }
-          // this.$store.dispatch('setAuth',true);
-        })
-        .catch((error) => {
-          console.log("Start\n");
-          console.log(error.response)
-          // this.$store.dispatch('setAuth',false);
-        });
+
+    async sendOTP() {
+      //console.log("Data send OTP: ", this.data)
+      try {
+        const response = await verifyOtp(this.data)
+        //console.log("Gia tri tra ve: ", response.data)
+        if (response.data.userInfo == null) {
+          alert("Khong thanh cong!")
+        }
+        else {
+          this.user = response.data.userInfo;
+          localStorage.setItem('user', JSON.stringify(this.user));
+          this.$router.push('/userAcount')
+        }
+      } catch (error) {
+        console.log("Start\n");
+        console.log(error.response)
+      }
     }
   },
 }

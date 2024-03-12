@@ -1,6 +1,6 @@
 <template>
   <v-container rounded-0 fluid style="margin-top: 42px">
-    <userHeader :dialog="openAddress" />
+    <userHeader />
     <template style="board">
       <v-carousel cycle hide-delimiter-background show-arrows>
         <v-carousel-item v-for="(url_header, i) in urls_header" :key="i">

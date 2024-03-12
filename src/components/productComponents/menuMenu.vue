@@ -1,6 +1,6 @@
 <template>
 <v-container>
-    <userHeader />
+    <userHeader :dialog="false"/>
     <v-row>
         <v-col cols="12" md="4" lg="3" style="margin: 30px 0">
             <v-treeview v-model="selection" :open="initiallyOpen" :items="menuItems" activatable item-key="name" open-on-click transition @input="categoryType = items.id" @update:open="clickParent" @update:active="clickParentActive">
