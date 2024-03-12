@@ -4,7 +4,6 @@
       <headerIntro></headerIntro>
       <v-container rounded-0 class="fill-height" fluid>
         <router-view />
-
       </v-container>
     </v-content>
     <Footer></Footer>
@@ -14,15 +13,14 @@
 <script>
 
 import { mapState, mapMutations } from "vuex";
-import headerIntro from "./header/headerIntro";
-import Footer from "./footer/Footer";
+
 
 export default {
   name: "Layout",
 
   components: {
-    headerIntro,
-    Footer
+    headerIntro: () => import("@/layouts/header/headerIntro"),
+    Footer : () => import("@/layouts/footer/Footer")
   },
 
   props: {

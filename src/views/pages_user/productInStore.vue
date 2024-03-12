@@ -176,7 +176,7 @@ import { getProductInfo,getAllProducts } from "@/api/product";
 export default {
     name: "productInStore",
     components: {
-        //userHeader: () => import("@/layouts/header/userHeader"),
+        userHeader: () => import("@/layouts/header/userHeader"),
     },
     data() {
         return {
