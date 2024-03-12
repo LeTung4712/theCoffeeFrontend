@@ -16,6 +16,11 @@ const routes = [
             path: 'mainpage',
             component: () => import('@/views/pages_user/Mainpage'),
         },
+        {
+          name: 'productInfo',
+          path: 'products/:product_name_convert',
+          component: () => import('@/views/pages_user/productInStore'),
+        },
       ],
   },
   
