@@ -28,7 +28,9 @@
 </template>
 
 <script>
-import axios from "axios";
+import { removeVietnameseTones } from "@/utils/format";
+import { getAllCategories } from "@/api/category";
+import { getAllProducts,getProductsByCategoryId } from "@/api/product";
 export default {
     name: "menuCategory",
     components: {
@@ -40,8 +42,6 @@ export default {
         menuType: String,
     },
 
-    //  set up data base on menuType from backend
-    // this data below is manually set up, neet to get from backend when have a api
     data() {
         return {
             categoryType: 0,
@@ -81,28 +81,6 @@ export default {
             this.children_type = e
         },
 
-        // bo het dau trong tieng Viet
-        removeVietnameseTones(str) {
-            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
-            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
-            str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
-            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
-            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
-            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
-            str = str.replace(/đ/g, "d");
-            str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
-            str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
-            str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
-            str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
-            str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
-            str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
-            str = str.replace(/Đ/g, "D");
-            // Some system encode vietnamese combining accent as individual utf-8 characters
-            // Một vài bộ encode coi các dấu mũ, dấu chữ như một kí tự riêng biệt nên thêm hai dòng này
-            str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // ̀ ́ ̃ ̉ ̣  huyền, sắc, ngã, hỏi, nặng
-            str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // ˆ ̆ ̛  Â, Ê, Ă, Ơ, Ư
-            return str;
-        },
         // Get id of category by name of that category in this.categories
         getIDByNameCatgory(name) {
             for (let index in this.categories) {
@@ -119,7 +97,7 @@ export default {
             for (let index in this.categories) {
                 const category = this.categories[index]
                 if (category.id == id) {
-                    return this.removeVietnameseTones(category.name).replaceAll(' ', '-').toLowerCase()
+                    return removeVietnameseTones(category.name).replaceAll(' ', '-').toLowerCase()
                 }
             }
             return 0
@@ -128,8 +106,8 @@ export default {
             console.log("input path: ", path)
             for (let index in this.categories) {
                 const category = this.categories[index]
-                console.log(this.removeVietnameseTones(category.name).replaceAll(' ', '-').toLowerCase())
-                if (this.removeVietnameseTones(category.name).replaceAll(' ', '-').toLowerCase() == path) {
+                console.log(removeVietnameseTones(category.name).replaceAll(' ', '-').toLowerCase())
+                if (removeVietnameseTones(category.name).replaceAll(' ', '-').toLowerCase() == path) {
                     return category.id
                 }
             }
@@ -201,10 +179,6 @@ export default {
                         id: tmp_category.id,
                         children: tmp_category.children,
                     })
-                    // this.menuItems = this.appendObjTo(this.menuItems, tmp_category)
-                    // console.log("<><> menuItems luc nay:")
-                    // console.log(this.menuItems)
-                    // // console.log(this.menuItems[1].children[0], this.menuItems.children[1])
                     tmp_category.children = []
                     // // console.log(this.menuItems[1].children[0], this.menuItems.children[1])
                 }
@@ -214,55 +188,43 @@ export default {
         },
 
         // get all categories from database => this.categories
-        getCategories() {
-            axios
-                .get("http://127.0.0.1:8000/api/v1/category/index")
-                .then((response) => {
-                    this.categories = response.data.categories;
-                    console.log('cate',this.categories)
-                    // console.log("DONE CATEGORIES with length:", this.categories.length);
-                    this.makeMenuItem();
-                    this.handlePath()
-                    // console.log("END\n");
-                })
-                .catch((error) => {
-                    console.log(error.response);
-                });
-            // const response = await abc();
+        async getCategories () {
+            try {
+                const response = await getAllCategories()
+                this.categories = response.data.categories
+                console.log('cate',this.categories)
+                this.makeMenuItem()
+                this.handlePath()
+            } catch (error) {
+                console.log(error.response)
+            }
         },
 
         // get all items from database => this.items
-        getItems() {
-            axios
-                .get("http://127.0.0.1:8000/api/v1/product/index")
-                .then((response) => {
-                    this.items = response.data.products;
-                })
-                .catch((error) => {
-                    console.log(error.response);
-                });
-            // const response = await abc();
+        async getItems() {
+            try {
+                const response = await getAllProducts()
+                this.items = response.data.products
+            } catch (error) {
+                console.log(error.response)
+            }
+        },
+        
+        async getItemsbyCategoryId() {
+            try {
+                const response = await getProductsByCategoryId(
+                    {
+                        params: {
+                            category_id: this.categoryType
+                        }
+                    }
+                )
+                this.items = response.data.products
+            } catch (error) {
+                console.log(error.response)
+            }
         },
 
-        getItemsbyProduct() {
-            axios
-                .get("http://127.0.0.1:8000/api/v1/product/indexByCategoryId", {
-                    params: {
-                        category_id: this.categoryType
-                    }
-                    //category_id: this.categoryType
-                })
-                .then((response) => {
-                    this.items = response.data.products;
-                    // console.log(response);
-                })
-                .catch((error) => {
-                    // console.log("Start\n");
-                    console.log(error.response)
-                    // console.log("END\n");
-                });
-            // localStorage.setItem("items", this.items)
-        },
         onUpdate(selection) {
             console.log(selection)
         },
@@ -286,7 +248,7 @@ export default {
     },
     computed: {
         product_name_convert_computed() {
-            return this.removeVietnameseTones(this.product_name).replaceAll(' ', '-').toLowerCase()
+            return removeVietnameseTones(this.product_name).replaceAll(' ', '-').toLowerCase()
         }
     },
     watch: {
@@ -320,7 +282,7 @@ export default {
             if (this.categoryType == 0) {
                 this.getItems()
             } else
-                this.getItemsbyProduct()
+                this.getItemsbyCategoryId()
             this.categoryName = this.getNameByIDCatgory(this.categoryType)
             console.log(this.categoryName)
             this.$router.push({
