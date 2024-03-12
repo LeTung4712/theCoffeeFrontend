@@ -126,25 +126,9 @@
                                         <span class="card-product-option-topping-price">+ {{ separator(topping_item.price)}}đ</span>
                                     </div>
 
-                                    <div class="card-product-quantity-config " style="display: flex;justify-content: space-between">
-                                        <div style="cursor: pointer">
-                                            <v-icon color="#e4e4e4" @click="countProductsDecrea_Top(topping_item)" style="cursor: pointer">
-                                                mdi-minus-circle
-                                                <v-btn class="card-product-decrease
-                             quantity-product add-to-cart">
-                                                </v-btn>
-                                            </v-icon>
-                                        </div>
-                                        <span class="card-product-quantity">{{ topping_item.count }}</span>
-                                        <div style="cursor: pointer">
-                                            <v-icon color="#e4e4e4" @click="countProductsIncrea_Top(topping_item)" style="cursor: pointer">
-                                                mdi-plus-circle
-                                                <v-btn class="card-product-decrease
-                             quantity-product add-to-cart ">
-                                                </v-btn>
-                                            </v-icon>
-                                        </div>
-                                    </div>
+                                    <v-checkbox v-model="checked_topping" 
+                                        :value="topping_item"
+                                    ></v-checkbox>
                                 </div>
 
                             </div>
@@ -190,8 +174,16 @@ export default {
         return {
             dialog: false,
             note: "",
+            product: {
+                id: 0,
+                name: "",
+                description: "",
+                price: 0,
+                image_url: "",
+            },
             count_topping: Array(8).fill(0),
-            topping_counts: [0, 0, 0, 0, 0],
+            topping_counts: [],
+            checked_topping: [],
             product_items: [{
                     id: "",
                     image_url: "https://minio.thecoffeehouse.com/image/admin/1670897221_a_400x400.png",
@@ -211,25 +203,16 @@ export default {
     },
 
     created() {
-        if (this.isInProductListing == 0) {
+        if (this.isInProductListing == 0) { //nếu  
             console.log("local: ", localStorage)
 
             this.note = JSON.parse(localStorage.getItem("note"));
             console.log("note: ", this.note)
-            // localStorage.removeItem("order")
-            // if (localStorage['info_size']) {
-            //     this.size = localStorage.getItem('info_size')
-            //     console.log("size: ", localStorage.getItem('info_size'))
-            // }
+
             if (localStorage['topping_counts']) {
-                // console.log("topping_counts: ",localStorage.getItem('topping_counts'))
                 this.topping_counts = JSON.parse(localStorage.getItem('topping_counts'))
             }
 
-            // for (let i in this.topping_items) {
-            //     this.topping_items[i].count = this.topping_counts[i]
-            // }
-        
             this.topping_items[0].count = this.topping_1
             this.topping_items[1].count = this.topping_2
             this.topping_items[2].count = this.topping_3
@@ -273,7 +256,7 @@ export default {
                         }
                     }
                 );
-
+                this.product = response.data.product;
                 this.topping_items = response.data.toppings;
                 
                 console.log("topping: ", this.topping_items)
@@ -287,13 +270,27 @@ export default {
             }
         },
         handleChoseItem() {
+            
+            for (let i in this.topping_items) {
+                let topping_item = this.topping_items[i]
+                //check trong mảng checked_topping có phần tử nào trùng với topping_item không
+                for (let j in this.checked_topping) {
+                    if (topping_item.id == this.checked_topping[j].id) {
+                        topping_item.count = 1
+                    }
+                }
+                if (topping_item.count == true) {
+                    this.topping_counts.push(1)
+                } else {
+                    this.topping_counts.push(0)
+                }
+            }
             this.product_items[0].id = this.id
             this.product_items[0].image_url = this.image_url
             this.product_items[0].name = this.name
             this.product_items[0].description = this.description
             this.product_items[0].price = this.price
-            // console.log("name: ", this.product_items.name)
-            // Parse any JSON previously stored in allEntries
+
             var order = JSON.parse(localStorage.getItem("order"));
             if (order == null) order = [];
             var entry = {
@@ -325,9 +322,9 @@ export default {
             for (let index in this.topping_items) {
                 this.topping_items[index].count = 0
             }
-            this.topping_counts = [0, 0, 0, 0, 0]
+            this.topping_counts = []
             localStorage.setItem('info_size', 'S')
-            localStorage.setItem('topping_counts', JSON.stringify([0, 0, 0, 0, 0]))
+            localStorage.setItem('topping_counts', JSON.stringify([]))
             console.log("NEW localStorage: ", localStorage)
         },
         countProductsIncrea() {
@@ -341,26 +338,12 @@ export default {
             }
         },
 
-        countProductsIncrea_Top(item) {
-            if (item.count >= 2) {
-                item.count = 2;
-            } else
-                item.count += 1;
-        },
-        countProductsDecrea_Top(item) {
-            if (item.count > 0) {
-                item.count -= 1;
-            } else if (item.count <= 0) {
-                item.count = 0;
-            }
-        },
         check_price() {
-            let price_topp = 0;
-            for (let i = 0; i < this.topping_items.length; i++) {
-                price_topp = price_topp + this.topping_items[i].count * parseInt(this.topping_items[i].price);
+            let topping_price = 0;
+            for (let i in this.checked_topping) {
+                topping_price += parseInt(this.checked_topping[i].price);
             }
-            // console.log(this.count)
-            let price = (parseInt(this.price) + price_topp) * this.count;
+            let price = (parseInt(this.product.price)+ topping_price) * this.count;
             if (this.size === 'L') {
                 price += 10000 * this.count;
             } else if (this.size === 'M') {

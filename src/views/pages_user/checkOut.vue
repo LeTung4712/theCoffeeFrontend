@@ -358,7 +358,7 @@
                       <div class="tch_checkout_cus_deli">
                         <h4 class="checkout_delivery_text">Các món đã chọn</h4>
                         <a
-                          href="product-list"
+                          @click="handleClickMainpage()"
                           style="text-decoration: none; color: black"
                         >
                           <p class="checkout_delivery_btn">Thêm món</p>
@@ -764,255 +764,257 @@ export default {
         });
     },
 
-    methods: {
-
-
-
-        handleDeleteOne(order) {
-            if (confirm("Bạn muốn xóa item này?")) {
-                this.orders = this.orders.filter(function (el) {
-                    return el != order;
-                })
-                localStorage.setItem("order", JSON.stringify(this.orders))
-                //alert("Xóa thành công")
-                this.get_totalprice()
-                this.get_moneypay() 
-                window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
-                    detail: {
-                        storage: localStorage.getItem('order')
-                        
-                    }
-                    
-                }));
-            }
-        },
-
-        separator(numb) {
-            var str = numb.toString().split(".");
-            str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            return str.join(".");
-        },
-
-        handleDeleteTotal() {
-            if (confirm("Bạn muốn hủy toàn bộ đơn hàng?")) {
-                alert("Xóa thành công")
-                this.products_info = []
-                this.orders = []
-                localStorage.removeItem("order")
-                window.open("/mainpage", "_self")
-            }
-        },
-
-        getProductPrice(order) {
-            
-            let topping_price = 0;
-            let total_product_price = 0;
-            //tính giá của topping = giá của mỗi topping * số lượng topping đó
-            order.topping_items.forEach((topping_item) => {
-                topping_price += Number(topping_item.price) * topping_item.count 
-            })
-            //tính giá của sản phẩm = (giá của sản phẩm + giá của topping) * số lượng sản phẩm
-            total_product_price += (Number(order.product_item[0].price)+ topping_price) * order.count
-            //nếu size của sản phẩm là M thì cộng thêm 6000 * số lượng sản phẩm
-            if (order.size == "M") {
-                total_product_price += 6000 * order.count
-            } else if (order.size == "L") {
-                total_product_price += 10000 * order.count
-            }
-            return this.separator(total_product_price);
-        },
-
-        get_totalprice() {
-            let price = 15000;
-            if (this.orders) {
-                if (this.orders.length != 0) {
-                    this.orders.forEach((order) => {
-                        order.product_item.forEach((product) => {
-                            price += parseInt(product.price) * order.count;
-                        });
-                        order.topping_items.forEach((topping_item) => {
-                            price += Number(topping_item.price) * topping_item.count
-                        });
-
-                        if (order.size == "M") {
-                            price += 6000
-                        } else if (order.size == "L") {
-                            price += 10000
-                        }
-                    });
-
-                    this.total_price = this.separator(price)
-                    return this.separator(price);
-                } else {
-                    return "0"
-                }
-            }
-        },
-        get_moneypay() {
-            console.log("money pay: ", this.money_pay)
-            console.log("total price: ", this.total_price)
-            console.log("voucher price: ", this.voucher_price)
-            let price = Number(this.get_totalprice()) * 1000 
-            if (this.voucher_price > price) { 
-                this.money_pay = 0
-            } else {
-
-                price = price - this.voucher_price
-
-            }
-            this.total_price = this.separator(price)
-            this.money_pay = this.separator(price)
-            console.log("money pay: ", this.money_pay)
-            console.log("total price: ", this.total_price)
-            return this.money_pay
-        },
-
-        chooseVoucher(voucherList) {
-            this.voucher_des = voucherList.description
-            this.voucher_price = voucherList.max_discount_amount
-            this.dialog2 = false
-            this.get_moneypay()
-
-        },
-
-        getVoucher() {
-            axios
-                .get("http://localhost:8000/api/v1/admin/voucher/index ", {
-                    user_id: this.user.id
-                })
-                .then((response) => {
-                    this.voucherList = response.data.vouchers
-                    console.log("voucherList: ", this.voucherList)
-                })
-        },
-        getProductsInfo() {
-            if (this.orders) {
-                if (this.orders.length != 0) {
-                    console.log("In checkOut, this.orders: ", this.orders)
-                    for (let product of this.orders) {
-                        let productInfo = {
-                            product_id: product.id,
-                            product_count: product.count,
-                            size: product.size,
-                            price: product.product_item[0].price,
-                            topping_id: [],
-                            topping_count: [],
-                        }
-                        let topping_id = []
-                        let topping_count = []
-                        for (let topping_item of product.topping_items) {
-                            topping_id.push(topping_item.id)
-                            topping_count.push(topping_item.count)
-                        }
-
-                        productInfo.topping_id = JSON.parse(JSON.stringify(topping_id))
-                        productInfo.topping_count = JSON.parse(JSON.stringify(topping_count))
-                        this.products_info.push(JSON.parse(JSON.stringify(productInfo)))
-                    }
-                    console.log("In checkOut, products_info: ", this.products_info)
-                }
-            }
-        },
-
-        handleDatHang() {
-
-            // send this.orders ve BE
-            if (this.logged == 0) {
-                alert("Bạn cần đăng nhập để tiếp tục")
-            } else {
-
-                console.log("PaymentOptions: ", this.paymentOptions)
-                console.log("old Address: ", this.oldAddress)
-                // console.log("total price: ", Number(this.total_price))
-                if (this.paymentOptions == 'cod') { // neu chon thanh toan tien mat
-                    axios // đây là đoạn code để gửi dữ liệu lên BE để lưu vào database 
-                        .post("http://127.0.0.1:8000/api/v1/admin/order/addOrder", {
-                            user_id: this.user.id,
-                            user_name: this.name,
-                            mobile_no: this.phone,
-                            address: this.oldAddress,
-                            note: this.myInput,
-                            total_price: Number(this.money_pay) * 1000,
-                            payment_method: this.paymentOptions,
-                            products: JSON.parse(JSON.stringify(this.products_info))
-                        })
-                        .then((response) => {
-                            console.log("RES:\n")
-                            console.log("respon1: ", response);
-                            console.log("END RES\n")
-                            // this.order_id = response.data.order_id
-                            // console.log("orrderid: ", this.order_id)
-                            alert("Bạn đã đặt hàng thành công")
-                            this.products_info = []
-                            this.orders = []
-                            localStorage.removeItem("order")
-                            window.open("/mainpage", "_self")
-                        })
-                        .catch((error) => {
-                            console.log("ERR1")
-                            console.log(error);
-                        });
-
-                    // alert("Bạn đã đặt hàng thành công")
-                } else { // neu chon thanh toan online
-
-                    axios
-                        .post("http://127.0.0.1:8000/api/v1/admin/order/addOrder", {
-                            user_id: this.user.id,
-                            user_name: this.name,
-                            mobile_no: this.phone,
-                            address: this.oldAddress,
-                            note: this.myInput,
-                            total_price: Number(this.money_pay) * 1000,
-                            payment_method: this.paymentOptions,
-                            products: JSON.parse(JSON.stringify(this.products_info))
-                        })
-                        .then((response) => {
-                            console.log("RES:\n")
-                            console.log("respon1: ", response);
-                            console.log("this total price: ", Number(this.money_pay) * 1000)
-                            console.log("END RES\n")
-                            this.order_id = response.data.order_id
-                            console.log("orrderid: ", this.order_id)
-                            axios //
-                                .post("http://127.0.0.1:8000/api/v1/payment/" + this.paymentOptions, {
-                                    order_id: this.order_id,
-                                    total_price: Number(this.money_pay) * 1000
-                                })
-                                .then((response2) => {
-                                    console.log("respon2: ", response2)
-                                    axios
-                                        .post("http://127.0.0.1:8000/api/v1/admin/order/paidOrder", { // update trang thai don hang thanh da thanh toan
-                                            order_id: this.order_id
-                                        })
-                                        .then((response) => {
-                                            console.log(response)
-                                            this.products_info = []
-                                            this.orders = []
-                                            localStorage.removeItem("order")
-                                            window.open(response2.data, "_self") // chuyen den trang thanh toan online
-                                            //sau khi thanh toan thanh cong thi chuyen den trang mainpage thi
-                                        })
-                                        .catch((error) => {
-                                            console.log("Start\n");
-                                            console.log(error.response)
-                                            console.log("END\n");
-                                        });
-                                })
-                                .catch((error2) => {
-                                    console.log("Start errr2\n");
-                                    console.log(error2)
-                                    console.log("END\n");
-                                });
-                        })
-                        .catch((error) => {
-                            console.log("ERR1")
-                            console.log(error);
-                        });
-                }
-            }
-        }
+  methods: {
+    handleClickMainpage() {
+      this.$router.push("/");
     },
+
+
+    handleDeleteOne(order) {
+      if (confirm("Bạn muốn xóa item này?")) {
+        this.orders = this.orders.filter(function (el) {
+          return el != order;
+        })
+        localStorage.setItem("order", JSON.stringify(this.orders))
+        //alert("Xóa thành công")
+        this.get_totalprice()
+        this.get_moneypay()
+        window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
+          detail: {
+            storage: localStorage.getItem('order')
+
+          }
+
+        }));
+      }
+    },
+
+    separator(numb) {
+      var str = numb.toString().split(".");
+      str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return str.join(".");
+    },
+
+    handleDeleteTotal() {
+      if (confirm("Bạn muốn hủy toàn bộ đơn hàng?")) {
+        alert("Xóa thành công")
+        this.products_info = []
+        this.orders = []
+        localStorage.removeItem("order")
+        window.open("/mainpage", "_self")
+      }
+    },
+
+    getProductPrice(order) {
+
+      let topping_price = 0;
+      let total_product_price = 0;
+      //tính giá của topping = giá của mỗi topping * số lượng topping đó
+      order.topping_items.forEach((topping_item) => {
+        topping_price += Number(topping_item.price) * topping_item.count
+      })
+      //tính giá của sản phẩm = (giá của sản phẩm + giá của topping) * số lượng sản phẩm
+      total_product_price += (Number(order.product_item[0].price) + topping_price) * order.count
+      //nếu size của sản phẩm là M thì cộng thêm 6000 * số lượng sản phẩm
+      if (order.size == "M") {
+        total_product_price += 6000 * order.count
+      } else if (order.size == "L") {
+        total_product_price += 10000 * order.count
+      }
+      return this.separator(total_product_price);
+    },
+
+    get_totalprice() {
+      let price = 15000;
+      if (this.orders) {
+        if (this.orders.length != 0) {
+          this.orders.forEach((order) => {
+            order.product_item.forEach((product) => {
+              price += parseInt(product.price) * order.count;
+            });
+            order.topping_items.forEach((topping_item) => {
+              price += Number(topping_item.price) * topping_item.count
+            });
+
+            if (order.size == "M") {
+              price += 6000
+            } else if (order.size == "L") {
+              price += 10000
+            }
+          });
+
+          this.total_price = this.separator(price)
+          return this.separator(price);
+        } else {
+          return "0"
+        }
+      }
+    },
+    get_moneypay() {
+      console.log("money pay: ", this.money_pay)
+      console.log("total price: ", this.total_price)
+      console.log("voucher price: ", this.voucher_price)
+      let price = Number(this.get_totalprice()) * 1000
+      if (this.voucher_price > price) {
+        this.money_pay = 0
+      } else {
+
+        price = price - this.voucher_price
+
+      }
+      this.total_price = this.separator(price)
+      this.money_pay = this.separator(price)
+      console.log("money pay: ", this.money_pay)
+      console.log("total price: ", this.total_price)
+      return this.money_pay
+    },
+
+    chooseVoucher(voucherList) {
+      this.voucher_des = voucherList.description
+      this.voucher_price = voucherList.max_discount_amount
+      this.dialog2 = false
+      this.get_moneypay()
+
+    },
+
+    getVoucher() {
+      axios
+        .get("http://localhost:8000/api/v1/admin/voucher/index ", {
+          user_id: this.user.id
+        })
+        .then((response) => {
+          this.voucherList = response.data.vouchers
+          console.log("voucherList: ", this.voucherList)
+        })
+    },
+    getProductsInfo() {
+      if (this.orders) {
+        if (this.orders.length != 0) {
+          console.log("In checkOut, this.orders: ", this.orders)
+          for (let product of this.orders) {
+            let productInfo = {
+              product_id: product.id,
+              product_count: product.count,
+              size: product.size,
+              price: product.product_item[0].price,
+              topping_id: [],
+              topping_count: [],
+            }
+            let topping_id = []
+            let topping_count = []
+            for (let topping_item of product.topping_items) {
+              topping_id.push(topping_item.id)
+              topping_count.push(topping_item.count)
+            }
+
+            productInfo.topping_id = JSON.parse(JSON.stringify(topping_id))
+            productInfo.topping_count = JSON.parse(JSON.stringify(topping_count))
+            this.products_info.push(JSON.parse(JSON.stringify(productInfo)))
+          }
+          console.log("In checkOut, products_info: ", this.products_info)
+        }
+      }
+    },
+
+    handleDatHang() {
+
+      // send this.orders ve BE
+      if (this.logged == 0) {
+        alert("Bạn cần đăng nhập để tiếp tục")
+      } else {
+
+        console.log("PaymentOptions: ", this.paymentOptions)
+        console.log("old Address: ", this.oldAddress)
+        // console.log("total price: ", Number(this.total_price))
+        if (this.paymentOptions == 'cod') { // neu chon thanh toan tien mat
+          axios // đây là đoạn code để gửi dữ liệu lên BE để lưu vào database 
+            .post("http://127.0.0.1:8000/api/v1/admin/order/addOrder", {
+              user_id: this.user.id,
+              user_name: this.name,
+              mobile_no: this.phone,
+              address: this.oldAddress,
+              note: this.myInput,
+              total_price: Number(this.money_pay) * 1000,
+              payment_method: this.paymentOptions,
+              products: JSON.parse(JSON.stringify(this.products_info))
+            })
+            .then((response) => {
+              console.log("RES:\n")
+              console.log("respon1: ", response);
+              console.log("END RES\n")
+              // this.order_id = response.data.order_id
+              // console.log("orrderid: ", this.order_id)
+              alert("Bạn đã đặt hàng thành công")
+              this.products_info = []
+              this.orders = []
+              localStorage.removeItem("order")
+              window.open("/mainpage", "_self")
+            })
+            .catch((error) => {
+              console.log("ERR1")
+              console.log(error);
+            });
+
+          // alert("Bạn đã đặt hàng thành công")
+        } else { // neu chon thanh toan online
+
+          axios
+            .post("http://127.0.0.1:8000/api/v1/admin/order/addOrder", {
+              user_id: this.user.id,
+              user_name: this.name,
+              mobile_no: this.phone,
+              address: this.oldAddress,
+              note: this.myInput,
+              total_price: Number(this.money_pay) * 1000,
+              payment_method: this.paymentOptions,
+              products: JSON.parse(JSON.stringify(this.products_info))
+            })
+            .then((response) => {
+              console.log("RES:\n")
+              console.log("respon1: ", response);
+              console.log("this total price: ", Number(this.money_pay) * 1000)
+              console.log("END RES\n")
+              this.order_id = response.data.order_id
+              console.log("orrderid: ", this.order_id)
+              axios //
+                .post("http://127.0.0.1:8000/api/v1/payment/" + this.paymentOptions, {
+                  order_id: this.order_id,
+                  total_price: Number(this.money_pay) * 1000
+                })
+                .then((response2) => {
+                  console.log("respon2: ", response2)
+                  axios
+                    .post("http://127.0.0.1:8000/api/v1/admin/order/paidOrder", { // update trang thai don hang thanh da thanh toan
+                      order_id: this.order_id
+                    })
+                    .then((response) => {
+                      console.log(response)
+                      this.products_info = []
+                      this.orders = []
+                      localStorage.removeItem("order")
+                      window.open(response2.data, "_self") // chuyen den trang thanh toan online
+                      //sau khi thanh toan thanh cong thi chuyen den trang mainpage thi
+                    })
+                    .catch((error) => {
+                      console.log("Start\n");
+                      console.log(error.response)
+                      console.log("END\n");
+                    });
+                })
+                .catch((error2) => {
+                  console.log("Start errr2\n");
+                  console.log(error2)
+                  console.log("END\n");
+                });
+            })
+            .catch((error) => {
+              console.log("ERR1")
+              console.log(error);
+            });
+        }
+      }
+    }
+  },
 }
 </script>
 

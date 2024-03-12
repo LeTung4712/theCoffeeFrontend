@@ -215,9 +215,7 @@
                 </div>
                 <div class="form-group row">
                   <label for="birth" style="display: flex">Sinh nhật</label>
-                  <label for="vueDatepicker" style="display: flex">
-                    Sinh nhật</label
-                  >
+                  
                   <input
                     id="birth"
                     type="text"
