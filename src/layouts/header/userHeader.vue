@@ -648,9 +648,6 @@ li > .menu-list-item:hover {
   width: fit-content;
 }
 
-.link-avatar {
-  /* border-radius: 50%; */
-}
 
 .modal {
   display: flex;

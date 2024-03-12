@@ -1,22 +1,16 @@
 <template>
   <v-container rounded-0 fluid style="margin-top: 42px">
-    
-
-    <div>
-      <template style="board">
-        <v-carousel cycle hide-delimiter-background show-arrows>
-          <v-carousel-item v-for="(url_header, i) in urls_header" :key="i">
-            <div>
-              <a href="#">
-                <img class = "banner" :src="url_header" alt="" />
-              </a>
-            </div>
-          </v-carousel-item>
-        </v-carousel>
-      </template>
-    </div>
-    
-    <div></div>
+    <template style="board">
+      <v-carousel cycle hide-delimiter-background show-arrows>
+        <v-carousel-item v-for="(url_header, i) in urls_header" :key="i">
+          <div>
+            <a href="#">
+              <img class="banner" :src="url_header" alt="" />
+            </a>
+          </div>
+        </v-carousel-item>
+      </v-carousel>
+    </template>
     <!-- <mainHeader/> -->
   </v-container>
 </template>
@@ -40,7 +34,6 @@ export default {
   },
 
   components: {
-    //userHeader: () => import("@/layouts/header/userHeader"),
     //productListing: () => import("@/components/userComponents/productListing"),
   },
 
@@ -63,6 +56,7 @@ export default {
 .banner {
   width: 100%;
 }
+
 .fill-height {
   align-items: start !important;
   margin-top: 42px;
