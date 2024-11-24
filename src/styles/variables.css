@@ -1,0 +1,30 @@
+:root {
+  /* Colors */
+  --tch-primary: #ff9f4b;
+  --tch-secondary: #fef7e6;
+  --tch-accent: #b5313a;
+  --tch-background: #ffffff;
+
+  /* Text colors */
+  --tch-text-primary: rgba(0, 0, 0, 0.87);
+  --tch-text-secondary: rgba(0, 0, 0, 0.6);
+
+  /* Border colors */
+  --tch-border-color: rgba(0, 0, 0, 0.12);
+
+  /* Spacing */
+  --tch-header-height: 64px;
+  --tch-spacing-xs: 4px;
+  --tch-spacing-sm: 8px;
+  --tch-spacing-md: 16px;
+  --tch-spacing-lg: 24px;
+
+  /* Border radius */
+  --tch-border-radius: 8px;
+
+  /* Transitions */
+  --tch-transition: all 0.2s ease;
+
+  /* Shadows */
+  --tch-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

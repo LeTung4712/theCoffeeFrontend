@@ -1,0 +1,505 @@
+<template>
+  <div>
+    <v-dialog v-model="dialogVisible" :width="$vuetify.display.mobile ? '100%' : '530'" persistent>
+      <!-- Activator -->
+      <template v-slot:activator="{ props }">
+        <v-btn
+          v-bind="props"
+          icon="mdi-plus-circle"
+          color="#fa8c16"
+          variant="text"
+          size="x-large"
+          title="thêm vào giỏ hàng"
+          class="scale-button"
+        />
+      </template>
+
+      <!-- Dialog Content -->
+      <v-card class="rounded-lg dialog-card">
+        <!-- Header -->
+        <v-card-title class="d-flex align-center py-3 px-4 bg-white border-bottom">
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            density="comfortable"
+            @click="closeDialog"
+            class="mr-2"
+          />
+          <span class="mx-auto text-subtitle-1 font-weight-bold text-warning-darken-2">Thêm món mới</span>
+        </v-card-title>
+
+        <!-- Body -->
+        <v-card-text class="pa-4 bg-white mobile-card-content">
+          <!-- Product Info -->
+          <v-row no-gutters class="rounded-lg pa-3 border">
+            <v-col cols="5" sm="5">
+              <v-img
+                :src="image_url"
+                :height="$vuetify.display.mobile ? '150' : '204'"
+                :width="$vuetify.display.mobile ? '150' : '204'"
+                cover
+                class="rounded-lg bg-grey-lighten-3 mx-auto"
+              />
+            </v-col>
+
+            <v-col cols="7" sm="7" class="pl-4">
+              <div class="d-flex flex-column h-100">
+                <div class="text-subtitle-1 font-weight-bold mb-1">{{ name }}</div>
+                <div class="text-body-2 text-grey-darken-1 mb-auto">{{ description }}</div>
+                
+                <div class="d-flex justify-space-between align-center mt-2">
+                  <span class="text-subtitle-1 font-weight-bold">{{ formatPrice(price) }}đ</span>
+                  <v-btn-group variant="outlined" color="warning" rounded="lg" class="quantity-group">
+                    <v-btn
+                      icon="mdi-minus"
+                      variant="text"
+                      @click="decreaseQuantity"
+                      :disabled="quantity <= 1"
+                      density="comfortable"
+                    />
+                    <v-card-text class="quantity-text">
+                      {{ quantity }}
+                    </v-card-text>
+                    <v-btn
+                      icon="mdi-plus"
+                      variant="text"
+                      @click="increaseQuantity"
+                      density="comfortable"
+                    />
+                  </v-btn-group>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
+
+          <!-- Note -->
+          <v-text-field
+            v-model="note"
+            placeholder="Ghi chú thêm cho món này"
+            variant="outlined"
+            density="comfortable"
+            prepend-inner-icon="mdi-note-text"
+            class="mt-6"
+            hide-details
+            bg-color="grey-lighten-4"
+          />
+
+          <!-- Size Selection -->
+          <template v-if="hasToppings">
+            <div class="text-overline mt-6 mb-2 font-weight-medium">
+              CHỌN SIZE (BẮT BUỘC)
+            </div>
+            <v-radio-group
+              v-model="size"
+              inline
+              mandatory
+              class="mt-0 d-flex justify-space-between px-4" 
+              density="comfortable"
+            >
+              <v-radio
+                v-for="option in sizeOptions"
+                :key="option.value"
+                :value="option.value"
+                color="warning"
+                class="flex-grow-1 mx-4"
+              >
+                <template v-slot:label>
+                  <div class="d-flex flex-column">
+                    <span class="font-weight-medium">{{ option.label }}</span>
+                    <span class="text-caption text-grey-darken-1">
+                      + {{ formatPrice(option.price) }}đ
+                    </span>
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
+          </template>
+
+          <!-- Toppings -->
+          <template v-if="hasToppings">
+            <div class="text-overline mt-6 mb-2 font-weight-medium">
+              CHỌN TOPPING (TÙY CHỌN)
+            </div>
+            <v-checkbox
+              v-for="topping in topping_items"
+              :key="topping.id"
+              v-model="checked_topping"
+              :value="topping"
+              color="warning"
+              density="comfortable"
+              hide-details
+              class="mb-2"
+            >
+              <template v-slot:label>
+                <div class="d-flex flex-column">
+                  <span class="font-weight-medium">{{ topping.name }}</span>
+                  <span class="text-caption text-grey-darken-1">
+                    + {{ formatPrice(topping.price) }}đ
+                  </span>
+                </div>
+              </template>
+            </v-checkbox>
+          </template>
+        </v-card-text>
+
+        <!-- Footer -->
+        <v-card-actions class="pa-4 bg-white border-top">
+          <v-btn
+            block
+            color="warning-darken-2"
+            :height="$vuetify.display.mobile ? '48' : '52'"
+            rounded="pill"
+            class="text-capitalize font-weight-bold text-white"
+            :style="{ backgroundColor: '#d46b08' }"
+            @click="addToCart"
+          >
+            {{ formatPrice(calculateTotalPrice()) }}đ - Thêm vào giỏ hàng
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
+<script>
+import { productAPI } from "@/api/product";
+
+export default {
+  name: "CardProductDialog",
+  
+  props: {
+    currentID: String,
+    id: Number,
+    image_url: String,
+    name: String,
+    description: String, 
+    price: String,
+    dialog: {
+      type: Boolean,
+      default: false
+    },
+    isInProductListing: Number
+  },
+
+  data() {
+    return {
+      dialogVisible: false,
+      quantity: 1,
+      note: "",
+      product: {
+        id: 0,
+        name: "",
+        description: "",
+        price: 0,
+        image_url: "",
+      },
+      size: 'S',
+      checked_topping: [],
+      topping_items: [],
+      sizeOptions: [
+        { label: 'Lớn', value: 'L', price: 10000 },
+        { label: 'Vừa', value: 'M', price: 6000 },
+        { label: 'Nhỏ', value: 'S', price: 0 }
+      ]
+    }
+  },
+
+  computed: {
+    hasToppings() {
+      return this.topping_items.length > 1
+    }
+  },
+
+  watch: {
+    dialogVisible: {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.fetchProductInfo()
+        }
+      }
+    }
+  },
+
+  methods: {
+    async fetchProductInfo() {
+      if (!this.id) return;
+      
+      try {
+        const response = await productAPI.getInfo({
+          params: { product_id: this.id }
+        });
+        const data = response.data;
+        //console.log('product', this.id);
+        //console.log('data', data);
+        this.product = {
+          ...data.product,
+          price: this.price
+        };
+        this.topping_items = data.toppings.map(topping => ({
+          ...topping,
+          count: 0
+        }));
+      } catch (error) {
+        console.error("Failed to fetch product info:", error);
+        this.product = {
+          id: this.id,
+          name: this.name,
+          description: this.description,
+          price: this.price,
+          image_url: this.image_url
+        };
+      }
+    },
+
+    increaseQuantity() {
+      this.quantity++
+    },
+
+    decreaseQuantity() {
+      if (this.quantity > 1) {
+        this.quantity--
+      }
+    },
+
+    calculateTotalPrice() {
+      const basePrice = parseInt(this.price || 0);
+      const toppingPrice = this.checked_topping.reduce((sum, topping) => 
+        sum + parseInt(topping.price), 0);
+      const sizePrice = this.sizeOptions.find(opt => opt.value === this.size)?.price || 0;
+      
+      return (basePrice + toppingPrice + sizePrice) * this.quantity;
+    },
+
+    formatPrice(price) {
+      return price?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+
+    addToCart() {
+      const entry = {
+        id: this.id,
+        product_item: {
+          id: this.id,
+          image_url: this.image_url,
+          name: this.name,
+          description: this.description,
+          price: this.price
+        },
+        size: this.size,
+        count: this.quantity,
+        topping_items: this.topping_items.map(topping => ({
+          ...topping,
+          count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
+        })),
+        note: this.note
+      };
+
+      // Update localStorage
+      const order = JSON.parse(localStorage.getItem("order") || "[]");
+      order.push(entry);
+      localStorage.setItem("order", JSON.stringify(order));
+      localStorage.setItem("entry", JSON.stringify(entry));
+
+      // Dispatch event
+      window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
+        detail: { storage: localStorage.getItem('order') }
+      }));
+
+      this.resetForm();
+    },
+
+    resetForm() {
+      this.dialogVisible = false;
+      this.quantity = 1;
+      this.size = 'S';
+      this.note = '';
+      this.checked_topping = [];
+      localStorage.setItem('info_size', 'S');
+      localStorage.setItem('topping_counts', JSON.stringify([0, 0, 0, 0, 0]));
+    },
+
+    closeDialog() {
+      this.dialogVisible = false;
+      this.resetForm();
+    }
+  }
+}
+</script>
+
+<style scoped>
+.v-dialog > .v-card {
+  overflow: hidden !important;
+}
+
+/* Thêm hiệu ứng hover cho các nút */
+.v-btn:hover {
+  opacity: 0.9;
+}
+
+/* Custom scrollbar cho dialog content */
+.v-card-text {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #fa8c16 #f5f5f5;
+}
+
+.v-card-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.v-card-text::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.v-card-text::-webkit-scrollbar-thumb {
+  background-color: #fa8c16;
+  border-radius: 3px;
+}
+
+/* Animation cho dialog */
+.v-dialog-transition-enter-active,
+.v-dialog-transition-leave-active {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.v-dialog-transition-enter-from,
+.v-dialog-transition-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+/* Thêm các styles mới */
+.v-dialog {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+}
+
+.v-card {
+  border: none !important;
+  background-color: white !important;
+}
+
+.v-btn-group {
+  border: 1px solid #fa8c16 !important;
+}
+
+.v-text-field :deep(.v-field__outline) {
+  border-radius: 12px !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.border-top {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.border {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Style cho nút thêm vào giỏ hàng */
+.v-btn.v-btn--size-large {
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+}
+
+.v-btn.v-btn--size-large:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(212, 107, 8, 0.2);
+}
+
+.v-btn.v-btn--size-large:active {
+  transform: translateY(0);
+}
+
+/* Thêm các style mới cho mobile */
+.dialog-card {
+  margin: 0;
+  height: 100%;
+}
+
+@media (max-width: 600px) {
+  .v-dialog {
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+    max-height: 90vh !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  .mobile-card-content {
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+  }
+
+  .quantity-group {
+    transform: scale(0.9);
+  }
+
+  /* Điều chỉnh padding và margin cho mobile */
+  .v-card-title {
+    font-size: 1.1rem !important;
+  }
+
+  .v-card-text {
+    padding: 12px !important;
+  }
+
+  .border {
+    padding: 8px !important;
+  }
+
+  /* Tối ưu scrolling trên mobile */
+  .v-card-text::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+
+/* Animation cho bottom sheet trên mobile */
+@media (max-width: 600px) {
+  .v-dialog-transition-enter-active,
+  .v-dialog-transition-leave-active {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .v-dialog-transition-enter-from,
+  .v-dialog-transition-leave-to {
+    transform: translateY(100%);
+  }
+}
+
+.quantity-group {
+  border: 1px solid #fa8c16 !important;
+  height: 40px;
+}
+
+.quantity-text {
+  min-width: 40px;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87) !important;
+  font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+  .quantity-group {
+    height: 36px;
+  }
+
+  .quantity-text {
+    min-width: 36px;
+    font-size: 0.95rem;
+  }
+}
+
+.scale-button {
+  transform: scale(1.9);
+}
+</style>

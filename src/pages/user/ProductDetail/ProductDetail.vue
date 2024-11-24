@@ -1,0 +1,418 @@
+<template>
+    <v-container>
+        <template v-if="isLoading">
+            <v-row>
+                <v-col cols="12" md="6" lg="6">
+                    <v-skeleton-loader type="image" height="400" />
+                </v-col>
+                <v-col cols="12" md="6">
+                    <v-skeleton-loader type="article" />
+                </v-col>
+            </v-row>
+
+            <v-row class="mt-8">
+                <v-col cols="12">
+                    <v-skeleton-loader type="text" class="mb-4" />
+                    <v-skeleton-loader type="paragraph" class="mb-4" />
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col cols="12">
+                    <v-skeleton-loader type="text" class="mb-4" />
+                </v-col>
+                <v-col v-for="n in 4" :key="n" cols="12" sm="6" md="4" lg="3">
+                    <v-skeleton-loader type="card" />
+                </v-col>
+            </v-row>
+        </template>
+
+        <div v-else class="productStore_Infor">
+            <div class="prodcutStore_Wrap" style="margin-top: 3rem;">
+                <v-row>
+                    <v-col cols="12" md="6" lg="6">
+                        <div class="product-carousel">
+                            <v-img :src="product.image_url" :aspect-ratio="1" cover class="product-image" />
+                            <div class="thumb-carousel">
+                                <v-img :src="product.image_url" width="75" height="75" class="thumb mt-3" />
+                            </div>
+                        </div>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <div class="product-info">
+                            <h2 class="text-h4 font-weight-medium mb-4">{{ product.name }}</h2>
+                            <div class="text-h5 font-weight-bold primary-text mb-6">
+                                {{ formattedTotalPrice }} đ
+                            </div>
+
+                            <v-row align="center" class="mb-6">
+                                <v-col cols="auto">
+                                    <v-btn icon="mdi-minus" color="primary" variant="text" @click="decreaseQuantity" />
+                                </v-col>
+                                <v-col cols="auto">
+                                    <span class="text-h6">{{ count }}</span>
+                                </v-col>
+                                <v-col cols="auto">
+                                    <v-btn icon="mdi-plus" color="primary" variant="text" @click="increaseQuantity" />
+                                </v-col>
+                            </v-row>
+
+                            <div v-if="hasToppings" class="mb-6">
+                                <div class="text-subtitle-1 mb-3">Chọn size (bắt buộc)</div>
+                                <v-row>
+                                    <v-col cols="auto">
+                                        <v-btn :color="selectedSize === 'S' ? 'primary' : 'grey-darken-1'"
+                                            :variant="selectedSize === 'S' ? 'flat' : 'outlined'"
+                                            @click="selectedSize = 'S'" class="text-none" height="48">
+                                            Nhỏ +0đ
+                                        </v-btn>
+                                    </v-col>
+                                    <v-col cols="auto">
+                                        <v-btn :color="selectedSize === 'M' ? 'primary' : 'grey-darken-1'"
+                                            :variant="selectedSize === 'M' ? 'flat' : 'outlined'"
+                                            @click="selectedSize = 'M'" class="text-none" height="48">
+                                            Vừa +6.000đ
+                                        </v-btn>
+                                    </v-col>
+                                    <v-col cols="auto">
+                                        <v-btn :color="selectedSize === 'L' ? 'primary' : 'grey-darken-1'"
+                                            :variant="selectedSize === 'L' ? 'flat' : 'outlined'"
+                                            @click="selectedSize = 'L'" class="text-none" height="48">
+                                            Lớn +10.000đ
+                                        </v-btn>
+                                    </v-col>
+                                </v-row>
+                            </div>
+
+                            <div v-if="hasToppings" class="mb-6">
+                                <div class="text-subtitle-1 mb-3">Topping</div>
+                                <v-row>
+                                    <v-col v-for="topping in topping_items" :key="topping.id" cols="auto">
+                                        <v-btn :color="isSelectedTopping(topping) ? 'primary' : 'grey-darken-1'"
+                                            :variant="isSelectedTopping(topping) ? 'flat' : 'outlined'"
+                                            @click="toggleTopping(topping)" class="text-none" height="48">
+                                            {{ topping.name }} +{{ formatPrice(topping.price) }}đ
+                                        </v-btn>
+                                    </v-col>
+                                </v-row>
+                            </div>
+
+                            <v-row>
+                                <v-col cols="12" sm="6">
+                                    <v-btn block color="primary" height="48" @click="handleAddCart">
+                                        <v-icon start>mdi-cart</v-icon>
+                                        Thêm vào giỏ hàng
+                                    </v-btn>
+                                </v-col>
+                                <v-col cols="12" sm="6">
+                                    <v-btn block color="primary" variant="outlined" height="48" @click="handleBuyNow">
+                                        <v-icon start>mdi-truck-delivery</v-icon>
+                                        Đặt giao tận nơi
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                        </div>
+                    </v-col>
+                </v-row>
+            </div>
+        </div>
+
+        <div class="product_describe">
+            <div class="product_des_wrap">
+                <v-row>
+                    <v-col cols="12" sm="12" lg="12" md="12">
+                        <hr>
+                        <div>
+                            <h4 class="product_des_title">Mô tả sản phẩm</h4>
+                            <p class="des_detail"> {{ product.description }}</p>
+                        </div>
+                        <hr>
+                    </v-col>
+                </v-row>
+                <div id="product_des_title">
+                    <h4 class="product_des_title">Sản phẩm liên quan</h4>
+                    <v-row>
+                        <v-col 
+                            v-for="product in product_relations" 
+                            :key="product.id"
+                            cols="12" sm="6" md="4" lg="3"
+                            class="mobile-card-height"
+                        >
+                            <ProductCard 
+                                :product="product"
+                                :currentID="product.id"
+                                :dialog="false"
+                            />
+                        </v-col>
+                    </v-row>
+                </div>
+
+            </div>
+
+        </div>
+    </v-container>
+</template>
+
+<script>
+import { removeVietnameseTones } from "@/utils/format";
+import { productAPI } from "@/api/product";
+import ProductCard from '@/components/Products/ProductCard.vue'
+
+export default {
+    name: "ProductDetail",
+
+    components: {
+        ProductCard
+    },
+
+    data() {
+        return {
+            count: 1,
+            product_id: null,
+            checked_topping: [],
+            selectedSize: 'S',
+            products: [
+                {
+                    id: 1,
+                    name: "The Coffee House Sữa Đá",
+                    category_id: 1,
+                    description: "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
+                    price: 39000,
+                    image_url: "https://product.hstatic.net/1000075078/product/1696220615_bg-product-1_927a4fb05e4f445586c85486ac2549dd_large.jpg",
+                },
+                // Thêm các sản phẩm mẫu khác...
+            ],
+            product: {
+                id: 1,
+                name: "The Coffee House Sữa Đá",
+                category_id: 1,
+                description: "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
+                price: 39000,
+                image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
+            },
+            product_relations: [
+                {
+                    id: 1,
+                    name: "The Coffee Sữa Đá",
+                    category_id: 1,
+                    description: "Thức uống giúp tỉnh táo tức thì ",
+                    price: 39000,
+                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
+                },
+                {
+                    id: 1,
+                    name: "The Đá",
+                    category_id: 1,
+                    description: "Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
+                    price: 39000,
+                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
+                },
+            ],
+            topping_items: [
+                {
+                    id: 1,
+                    name: "Sữa tươi",
+                    price: 10000,
+                },
+                {
+                    id: 2,
+                    name: "Sữa bánh flan",
+                    price: 10000,
+                },
+                {
+                    id: 3,
+                    name: "Sữa tươi bánh flan",
+                    price: 10000,
+                }
+            ],
+            isLoading: false,
+        }
+    },
+
+    computed: {
+        hasToppings() {
+            return this.topping_items.length > 1
+        },
+
+        formattedTotalPrice() {
+            return this.formatPrice(this.calculateTotalPrice())
+        },
+
+        productNameFromRoute() {
+            return this.$route.params.product_name_convert
+        },
+    },
+
+    watch: {
+        productNameFromRoute: {
+            handler(newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+                this.isLoading = true;
+                this.loadProductData().finally(() => {
+                    this.isLoading = false;
+                });
+            },
+            immediate: true
+        }
+    },
+
+    methods: {
+        formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN').format(price)
+        },
+
+        calculateTotalPrice() {
+            const basePrice = parseInt(this.product.price)
+            const toppingPrice = this.checked_topping.reduce((sum, topping) =>
+                sum + parseInt(topping.price), 0)
+
+            const sizePrice = this.selectedSize === 'M' ? 6000 :
+                this.selectedSize === 'L' ? 10000 : 0
+
+            return (basePrice + toppingPrice + sizePrice) * this.count
+        },
+
+        async loadProductData() {
+            try {
+                const { data: { products } } = await productAPI.getAll()
+                this.products = products || []
+
+                const productId = this.findProductIdByName(this.productNameFromRoute)
+                if (!productId) {
+                    console.warn('Không tìm thấy sản phẩm')
+                    return
+                }
+
+                const { data } = await productAPI.getInfo(productId)
+                if (data) {
+                    this.product = data.product || this.product
+                    this.topping_items = data.toppings || []
+                    this.product_relations = data.same_products || []
+                }
+            } catch (error) {
+                console.error('Failed to load product data:', error)
+            }
+        },
+
+        findProductIdByName(nameInUrl) {
+            const product = this.products.find(p =>
+                this.formatProductName(p.name) === nameInUrl
+            )
+            return product?.id
+        },
+
+        formatProductName(name) {
+            return removeVietnameseTones(name)
+                .replaceAll(' ', '-')
+                .toLowerCase()
+        },
+
+        increaseQuantity() {
+            if (this.count < 100) this.count++
+            else alert("Số lượng sản phẩm tối đa là 100")
+        },
+
+        decreaseQuantity() {
+            if (this.count > 1) this.count--
+        },
+
+        handleAddCart() {
+            const entry = {
+                id: this.product.id,
+                product_item: [{
+                    ...this.product,
+                    id: this.product.id
+                }],
+                size: this.selectedSize,
+                count: this.count,
+                topping_items: this.topping_items.map(topping => ({
+                    ...topping,
+                    count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
+                }))
+            }
+
+            const orders = JSON.parse(localStorage.getItem('order') || '[]')
+            orders.push(entry)
+
+            localStorage.setItem('order', JSON.stringify(orders))
+            this.resetForm()
+
+            window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
+                detail: { storage: localStorage.getItem('order') }
+            }))
+        },
+
+        resetForm() {
+            this.count = 1
+            this.selectedSize = 'S'
+            this.checked_topping = []
+        },
+
+        handleBuyNow() {
+            this.handleAddCart()
+            this.$router.push('/thanh-toan')
+        },
+
+        isSelectedTopping(topping) {
+            return this.checked_topping.some(t => t.id === topping.id)
+        },
+
+        toggleTopping(topping) {
+            const index = this.checked_topping.findIndex(t => t.id === topping.id)
+            if (index === -1) {
+                this.checked_topping.push(topping)
+            } else {
+                this.checked_topping.splice(index, 1)
+            }
+        }
+    }
+}
+</script>
+
+<style scoped>
+.menu__item_related {
+    padding: 8px;
+    text-align: center;
+}
+
+.menu__item_img img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.product-title {
+    font-size: 14px;
+    margin: 8px 0;
+    line-height: 1.2;
+}
+
+.product-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.item__price {
+    font-weight: bold;
+    color: #D62300;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    .mobile-card-height :deep(.v-card) {
+        max-height: 120px; /* hoặc giá trị phù hợp khác */
+        display: flex;
+    }
+    
+    .mobile-card-height :deep(.v-img) {
+        max-width: 120px;
+        height: 100%;
+    }
+}
+</style>

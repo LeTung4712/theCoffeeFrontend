@@ -2,16 +2,21 @@ import httpClient from './index';
 
 const PREFIX = '/voucher';
 
-export function createVoucher(data) {
-    return httpClient.post(`${PREFIX}/create`, data);
-}
-export function updateVoucher(data) {
-    return httpClient.put(`${PREFIX}/update`, data);
-}
-export function deleteVoucher(data) {
-    return httpClient.delete(`${PREFIX}/delete`, data);
-}
-export function getAllVouchers() {
+export const voucherAPI = {
+  getAll() {
     return httpClient.get(`${PREFIX}/index`);
-}
+  },
+
+  create(data) {
+    return httpClient.post(`${PREFIX}/create`, data);
+  },
+
+  update(data) {
+    return httpClient.put(`${PREFIX}/update`, data);
+  },
+
+  delete(params) {
+    return httpClient.delete(`${PREFIX}/delete`, { params });
+  }
+};
 
