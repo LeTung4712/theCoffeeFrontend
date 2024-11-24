@@ -131,7 +131,7 @@
                                         {{ separator(product_search.price) }}
                                       </div>
                                       <Card_User_Order
-                                        style="z-index: 999"
+                                        style="z-index: 998"
                                         :currentID="product_search.id"
                                         :dialog="dialog"
                                         :id="product_search.id"
@@ -228,7 +228,7 @@
                         <!-- Nut + -->
   
                         <Card_User_Order
-                          style="z-index: 999"
+                          style="z-index: 998"
                           :currentID="currentID"
                           :dialog="dialog"
                           :id="product.id"

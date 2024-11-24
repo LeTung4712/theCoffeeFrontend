@@ -1,160 +1,173 @@
 <template>
-<div>
-    <v-row justify="center">
-        <v-dialog v-model="dialog" open-on-click width="400px" height="100px">
-            <template v-slot:activator="{ on, attrs }">
-                <div style="width: 10px;height: 10px">
-                    <v-icon small color="#fa8c16" 
-                        title="Chỉnh sửa"
-                        style="cursor:pointer;
+    <div>
+        <v-row justify="center">
+            <v-dialog v-model="dialog" open-on-click width="400px" height="100px">
+                <template v-slot:activator="{ on, attrs }">
+                    <div style="width: 10px;height: 10px">
+                        <v-icon small color="#fa8c16" title="Chỉnh sửa" style="cursor:pointer;
                          align-items:center;
                          font-size:1.2rem;
                          line-height:1; 
-                         margin-top:20px;"
-                        class="fix_icon tch-order-card__icon" v-bind="attrs" v-on="on"
-                    >
-                        mdi-pencil
-                        <v-btn class="card-product-decrease
+                         margin-top:20px;" class="fix_icon tch-order-card__icon" v-bind="attrs" v-on="on">
+                            mdi-pencil
+                            <v-btn class="card-product-decrease
                              quantity-product add-to-cart ">
-                        </v-btn>
-                    </v-icon>
-                </div>
-
-            </template>
-            <v-card>
-                <div style="display: flex;padding: 16px;align-items: center;justify-content: flex-start;border-bottom: 1px solid #dee2e6">
-                    <div>
-                        <v-icon large color=" darken-1" style="padding: 1px 15px; line-height: 1.5rem" @click="dialog = false">
-                            mdi-close
+                            </v-btn>
                         </v-icon>
                     </div>
-                    <div style="margin: 0 auto">
-                        <span style="font-size: 0.8375rem;font-weight: 500 ;line-height: 24px;color: #262626;">Thêm món mới</span>
-                    </div>
-                </div>
-                <!--              thân của dialog-->
-                <div class="modal_body">
-                    <div class="card_product">
-                        <div class="card_product_infor">
-                            <v-row class="ma-0">
-                                <v-col cols="12" md="5" lg="5" sm="5">
-                                    <div style="border-radius: 0.5rem">
-                                        <img style="height: 8.75rem;width: 8.75rem;" :src="image_url" alt="">
-                                    </div>
-                                </v-col>
 
-                                <v-col cols="12" md="7" lg="7" sm="7">
-                                    <div style="display: flex; flex-direction: column">
-                                        <span class="card_product_name">{{ name}}</span>
-                                        <span class="card-product-description">{{description }}
-                                        </span>
-                                        <div class="card-product-footer" style="display: flex;justify-content: space-between;align-items: center;margin-top: 1.25rem">
-                                            <span class="card-product-price">{{ separator(price) }}đ</span>
-                                            <div class="card-product-quantity-config " style="display: flex">
-                                                <v-icon color="#fa8c16" large style="cursor: pointer" @click="countProductsDecrea">
-                                                    mdi-minus-circle
-                                                    <v-btn class="card-product-decrease
+                </template>
+                <v-card>
+                    <div
+                        style="display: flex;padding: 16px;align-items: center;justify-content: flex-start;border-bottom: 1px solid #dee2e6">
+                        <div>
+                            <v-icon large color=" darken-1" style="padding: 1px 15px; line-height: 1.5rem"
+                                @click="dialog = false">
+                                mdi-close
+                            </v-icon>
+                        </div>
+                        <div style="margin: 0 auto">
+                            <span style="font-size: 0.8375rem;font-weight: 500 ;line-height: 24px;color: #262626;">Thêm
+                                món mới</span>
+                        </div>
+                    </div>
+                    <!--              thân của dialog-->
+                    <div class="modal_body">
+                        <div class="card_product">
+                            <div class="card_product_infor">
+                                <v-row class="ma-0">
+                                    <v-col cols="12" md="5" lg="5" sm="5">
+                                        <div style="border-radius: 0.5rem">
+                                            <img style="height: 8.75rem;width: 8.75rem;" :src="image_url" alt="">
+                                        </div>
+                                    </v-col>
+
+                                    <v-col cols="12" md="7" lg="7" sm="7">
+                                        <div style="display: flex; flex-direction: column">
+                                            <span class="card_product_name">{{ name }}</span>
+                                            <span class="card-product-description">{{ description }}
+                                            </span>
+                                            <div class="card-product-footer"
+                                                style="display: flex;justify-content: space-between;align-items: center;margin-top: 1.25rem">
+                                                <span class="card-product-price">{{ separator(price) }}đ</span>
+                                                <div class="card-product-quantity-config " style="display: flex">
+                                                    <v-icon color="#fa8c16" large style="cursor: pointer"
+                                                        @click="countProductsDecrea">
+                                                        mdi-minus-circle
+                                                        <v-btn class="card-product-decrease
                              quantity-product add-to-cart  ">
-                                                    </v-btn>
-                                                </v-icon>
-                                                <span class="card-product-quantity">{{ count }}</span>
-                                                <v-icon color="#fa8c16" large style="cursor: pointer" @click="countProductsIncrea">
-                                                    mdi-plus-circle
-                                                    <v-btn class="card-product-decrease
+                                                        </v-btn>
+                                                    </v-icon>
+                                                    <span class="card-product-quantity">{{ count }}</span>
+                                                    <v-icon color="#fa8c16" large style="cursor: pointer"
+                                                        @click="countProductsIncrea">
+                                                        mdi-plus-circle
+                                                        <v-btn class="card-product-decrease
                              quantity-product add-to-cart ">
-                                                    </v-btn>
-                                                </v-icon>
+                                                        </v-btn>
+                                                    </v-icon>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </v-col>
-                            </v-row>
-                        </div>
-                        <!----------------Ghi chú -->
-                        <div class="card-product-note-item">
-                            <img style="    width: 18px;height: 20px;margin: 12px 11px;" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxOCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3IDIwSDFDMC43MzQ3ODQgMjAgMC40ODA0MyAxOS44OTQ2IDAuMjkyODkzIDE5LjcwNzFDMC4xMDUzNTcgMTkuNTE5NiAwIDE5LjI2NTIgMCAxOVYxQzAgMC43MzQ3ODQgMC4xMDUzNTcgMC40ODA0MyAwLjI5Mjg5MyAwLjI5Mjg5M0MwLjQ4MDQzIDAuMTA1MzU3IDAuNzM0Nzg0IDAgMSAwSDE3QzE3LjI2NTIgMCAxNy41MTk2IDAuMTA1MzU3IDE3LjcwNzEgMC4yOTI4OTNDMTcuODk0NiAwLjQ4MDQzIDE4IDAuNzM0Nzg0IDE4IDFWMTlDMTggMTkuMjY1MiAxNy44OTQ2IDE5LjUxOTYgMTcuNzA3MSAxOS43MDcxQzE3LjUxOTYgMTkuODk0NiAxNy4yNjUyIDIwIDE3IDIwWk01IDVWN0gxM1Y1SDVaTTUgOVYxMUgxM1Y5SDVaTTUgMTNWMTVIMTBWMTNINVoiIGZpbGw9IiNFNEU0RTQiLz4KPC9zdmc+Cg==" alt="">
-                            <input type="text" placeholder="Ghi chú thêm cho món này" class="card-product-text" v-model="note">
-                        </div>
-                        <!--              chọn size -->
-                        <div v-if="topping_items.length > 1">
-                            <div class="card-product-option">
-                                <span class="card-product-option-text">CHỌN SIZE (BẮT BUỘC)</span>
+                                    </v-col>
+                                </v-row>
                             </div>
-                            <div class="card-product-option-size-item" style="display: flex;justify-content: space-between;align-items: center">
-                                <div class="custom-control card-product-option-item mb-0">
-                                    <input type="radio" name="size-product" id="L" class="custom-control-input" value="L" v-model="size">
-                                    <label for="L" class="custom-control-label card-product-option-label  tch-custom-radio">
-                                        <div class="card-product-option-value">
-                                            <span class="text card-product-option-size">Lớn</span>
-                                            <span>+ 10.000đ</span>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                <div class="custom-control card-product-option-item mb-0">
-                                    <input type="radio" name="size-product" id="M" class="custom-control-input" value="M" v-model="size">
-                                    <label for="M" class="custom-control-label card-product-option-label  tch-custom-radio">
-                                        <div class="card-product-option-value">
-                                            <span class="text card-product-option-size">Vừa</span>
-                                            <span>+ 6.000đ</span>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                <div class=" custom-control card-product-option-item mb-0">
-                                    <input type="radio" name="size-product" id='S' class="custom-control-input" value='S' v-model="size">
-                                    <label for='S' class="custom-control-label card-product-option-label  tch-custom-radio">
-                                        <div class="card-product-option-value">
-                                            <span class="text card-product-option-size">Nhỏ</span>
-                                            <span>+ 0đ</span>
-                                        </div>
-                                    </label>
-                                </div>
+                            <!----------------Ghi chú -->
+                            <div class="card-product-note-item">
+                                <img style="    width: 18px;height: 20px;margin: 12px 11px;"
+                                    src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxOCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3IDIwSDFDMC43MzQ3ODQgMjAgMC40ODA0MyAxOS44OTQ2IDAuMjkyODkzIDE5LjcwNzFDMC4xMDUzNTcgMTkuNTE5NiAwIDE5LjI2NTIgMCAxOVYxQzAgMC43MzQ3ODQgMC4xMDUzNTcgMC40ODA0MyAwLjI5Mjg5MyAwLjI5Mjg5M0MwLjQ4MDQzIDAuMTA1MzU3IDAuNzM0Nzg0IDAgMSAwSDE3QzE3LjI2NTIgMCAxNy41MTk2IDAuMTA1MzU3IDE3LjcwNzEgMC4yOTI4OTNDMTcuODk0NiAwLjQ4MDQzIDE4IDAuNzM0Nzg0IDE4IDFWMTlDMTggMTkuMjY1MiAxNy44OTQ2IDE5LjUxOTYgMTcuNzA3MSAxOS43MDcxQzE3LjUxOTYgMTkuODk0NiAxNy4yNjUyIDIwIDE3IDIwWk01IDVWN0gxM1Y1SDVaTTUgOVYxMUgxM1Y5SDVaTTUgMTNWMTVIMTBWMTNINVoiIGZpbGw9IiNFNEU0RTQiLz4KPC9zdmc+Cg=="
+                                    alt="">
+                                <input type="text" placeholder="Ghi chú thêm cho món này" class="card-product-text"
+                                    v-model="note">
                             </div>
-                        </div>
-
-                        <!--               Chọn topping -->
-                        <div class="card-product-topping" v-if="topping_items.length > 1">
-                            <div class="card-product-option">
-                                <span class="card-product-option-text">CHỌN topping (TÙY CHỌN)</span>
-                            </div>
-
-                            <div class="card-product-option-topping-item" style="margin: 0 16px;" v-for="(topping_item) in topping_items" :key=topping_item.id>
-                                <div class="card-product-option-topping" style="display: flex">
-                                    <div class="left-col">
-                                        <span class="card-product-option-topping-name">{{topping_item.name}}</span>
-                                        <span class="card-product-option-topping-price">+ {{ separator(topping_item.price)}}đ</span>
+                            <!--              chọn size -->
+                            <div v-if="topping_items.length > 1">
+                                <div class="card-product-option">
+                                    <span class="card-product-option-text">CHỌN SIZE (BẮT BUỘC)</span>
+                                </div>
+                                <div class="card-product-option-size-item"
+                                    style="display: flex;justify-content: space-between;align-items: center">
+                                    <div class="custom-control card-product-option-item mb-0">
+                                        <input type="radio" name="size-product" id="L" class="custom-control-input"
+                                            value="L" v-model="size">
+                                        <label for="L"
+                                            class="custom-control-label card-product-option-label  tch-custom-radio">
+                                            <div class="card-product-option-value">
+                                                <span class="text card-product-option-size">Lớn</span>
+                                                <span>+ 10.000đ</span>
+                                            </div>
+                                        </label>
                                     </div>
 
-                                    <v-checkbox v-model="checked_topping" 
-                                        :value="topping_item"
-                                    ></v-checkbox>
+                                    <div class="custom-control card-product-option-item mb-0">
+                                        <input type="radio" name="size-product" id="M" class="custom-control-input"
+                                            value="M" v-model="size">
+                                        <label for="M"
+                                            class="custom-control-label card-product-option-label  tch-custom-radio">
+                                            <div class="card-product-option-value">
+                                                <span class="text card-product-option-size">Vừa</span>
+                                                <span>+ 6.000đ</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class=" custom-control card-product-option-item mb-0">
+                                        <input type="radio" name="size-product" id='S' class="custom-control-input"
+                                            value='S' v-model="size">
+                                        <label for='S'
+                                            class="custom-control-label card-product-option-label  tch-custom-radio">
+                                            <div class="card-product-option-value">
+                                                <span class="text card-product-option-size">Nhỏ</span>
+                                                <span>+ 0đ</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--               Chọn topping -->
+                            <div class="card-product-topping" v-if="topping_items.length > 1">
+                                <div class="card-product-option">
+                                    <span class="card-product-option-text">CHỌN topping (TÙY CHỌN)</span>
                                 </div>
 
+                                <div class="card-product-option-topping-item" style="margin: 0 16px;"
+                                    v-for="(topping_item) in topping_items" :key=topping_item.id>
+                                    <div class="card-product-option-topping" style="display: flex">
+                                        <div class="left-col">
+                                            <span class="card-product-option-topping-name">{{ topping_item.name }}</span>
+                                            <span class="card-product-option-topping-price">+ {{
+                separator(topping_item.price) }}đ</span>
+                                        </div>
+
+                                        <v-checkbox v-model="checked_topping" :value="topping_item"></v-checkbox>
+                                    </div>
+
+                                </div>
                             </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn-add-item" @click="handleChoseItem">{{ check_price() }}đ - Chỉnh
+                                sửa</button>
                         </div>
 
                     </div>
 
-                    <div class="modal-footer">
-                        <button class="btn-add-item" @click="handleChoseItem">{{ check_price() }}đ - Chỉnh sửa</button>
-                    </div>
-
-                </div>
-
-            </v-card>
-        </v-dialog>
-    </v-row>
-</div>
+                </v-card>
+            </v-dialog>
+        </v-row>
+    </div>
 </template>
 
 <script>
-import {getProductInfo} from "@/api/product";
+import { getProductInfo } from "@/api/product";
 export default {
     name: "Card_Fix",
     props: {
-        currentID: String,
-        id: String,
+        currentID: Number,
+        id: Number,
         image_url: String,
         name: String,
         description: String,
@@ -162,11 +175,6 @@ export default {
         dialog: Boolean,
         isInProductListing: Number,
         size: String,
-        // topping_1: Number,
-        // topping_2: Number,
-        // topping_3: Number,
-        // topping_4: Number,
-        // topping_5: Number,
         index: Number,
         count: Number,
     },
@@ -185,29 +193,29 @@ export default {
             topping_counts: [],
             checked_topping: [],
             product_items: [{
-                    id: "",
-                    image_url: "https://minio.thecoffeehouse.com/image/admin/1670897221_a_400x400.png",
-                    name: "CloudTea Very Berry Mochi",
-                    description: "CloudTea Very Berry Mochi với với mochi Phúc Bồn Tử cùng lớp foam cheese beo béo, vụn bánh quy phô mai giòn tan. Đặc biệt, trà sữa Lài thơm ngát hoà quyện cùng dâu tây ngọt ngào *Lưu ý: - Mochi có thể bị chìm do ảnh hưởng trong quá trình vận chuyển. - SẢN PHẨM KHÔNG ÁP DỤNG ĐỂ ĐÁ RIÊNG HOẶC KHÔNG ĐÁ",
-                    price: "69000",
-                },
+                id: "",
+                image_url: "https://minio.thecoffeehouse.com/image/admin/1670897221_a_400x400.png",
+                name: "CloudTea Very Berry Mochi",
+                description: "CloudTea Very Berry Mochi với với mochi Phúc Bồn Tử cùng lớp foam cheese beo béo, vụn bánh quy phô mai giòn tan. Đặc biệt, trà sữa Lài thơm ngát hoà quyện cùng dâu tây ngọt ngào *Lưu ý: - Mochi có thể bị chìm do ảnh hưởng trong quá trình vận chuyển. - SẢN PHẨM KHÔNG ÁP DỤNG ĐỂ ĐÁ RIÊNG HOẶC KHÔNG ĐÁ",
+                price: "69000",
+            },
 
             ],
             topping_items: [{
-                    id: "1",
-                    name: "Kem Phô Mai Macchiato",
-                    price: "10000",
-                    count: 0,
-                }],
+                id: "1",
+                name: "Kem Phô Mai Macchiato",
+                price: "10000",
+                count: 0,
+            }],
         }
     },
 
     created() {
         if (this.isInProductListing == 0) { //nếu  
-            console.log("local: ", localStorage)
+            //console.log("local: ", localStorage)
 
             this.note = JSON.parse(localStorage.getItem("note"));
-            console.log("note: ", this.note)
+            //console.log("note: ", this.note)
 
             if (localStorage['topping_counts']) {
                 this.topping_counts = JSON.parse(localStorage.getItem('topping_counts'))
@@ -218,8 +226,8 @@ export default {
             this.topping_items[2].count = this.topping_3
             this.topping_items[3].count = this.topping_4
             this.topping_items[4].count = this.topping_5
-            console.log("size_code: ", this.size)
-            console.log("topping_counts: ", this.topping_counts)
+            //console.log("size_code: ", this.size)
+            //console.log("topping_counts: ", this.topping_counts)
         }
         this.product_items[0].id = this.id
         this.product_items[0].image_url = this.image_url
@@ -227,20 +235,20 @@ export default {
         this.product_items[0].description = this.description
         this.product_items[0].price = this.price
 
-        console.log("This id: ", this.id)
+        //console.log("This id: ", this.id)
         if (this.id == this.currentID) {
-            console.log("This current id: ", this.currentID)
-            console.log("This dialog: ", this.dialog)
+            //console.log("This current id: ", this.currentID)
+            //console.log("This dialog: ", this.dialog)
             // this.dialog = !this.dialog
         } else {
-            console.log("Not this id: ", this.id)
+            //console.log("Not this id: ", this.id)
             this.dialog = false
-            console.log("This dialog: ", this.dialog)
+            //console.log("This dialog: ", this.dialog)
 
         }
     },
     watch: {
-        dialog (val) {
+        dialog(val) {
             if (val) {
                 this.getProductInfo()
             }
@@ -258,8 +266,8 @@ export default {
                 );
                 this.product = response.data.product;
                 this.topping_items = response.data.toppings;
-                
-                console.log("topping: ", this.topping_items)
+
+                //console.log("topping: ", this.topping_items)
                 for (let index in this.topping_items) {
                     let topping_item = this.topping_items[index];
                     topping_item.count = 0;
@@ -270,7 +278,7 @@ export default {
             }
         },
         handleChoseItem() {
-            
+
             for (let i in this.topping_items) {
                 let topping_item = this.topping_items[i]
                 //check trong mảng checked_topping có phần tử nào trùng với topping_item không
@@ -325,7 +333,7 @@ export default {
             this.topping_counts = []
             localStorage.setItem('info_size', 'S')
             localStorage.setItem('topping_counts', JSON.stringify([]))
-            console.log("NEW localStorage: ", localStorage)
+            //console.log("NEW localStorage: ", localStorage)
         },
         countProductsIncrea() {
             this.count += 1;
@@ -343,7 +351,7 @@ export default {
             for (let i in this.checked_topping) {
                 topping_price += parseInt(this.checked_topping[i].price);
             }
-            let price = (parseInt(this.product.price)+ topping_price) * this.count;
+            let price = (parseInt(this.product.price) + topping_price) * this.count;
             if (this.size === 'L') {
                 price += 10000 * this.count;
             } else if (this.size === 'M') {
@@ -371,6 +379,7 @@ export default {
     line-height: 1;
     color: #fa8c16;
 }
+
 .card_product_name {
     font-weight: 600;
     font-size: 1.125rem;

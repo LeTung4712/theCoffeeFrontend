@@ -1,14 +1,20 @@
 <template>
-<v-app id="inspire">
-    <v-content>
-        <v-container rounded-0 class="fill-height" fluid>
-            <router-view />
-        </v-container>
-    </v-content>
-</v-app>
+    <v-app id="inspire">
+        <Sidebar 
+            :expand-on-hover.sync="expandOnHover" 
+            :class="{ notActiveLogged: !loggin }"
+        ></Sidebar>
+        
+        <v-content>
+            <v-container rounded-0 class="fill-height" fluid>
+                <router-view />
+            </v-container>
+        </v-content>
+    </v-app>
 </template>
 
 <script>
+
 import {
     mapState,
     mapMutations
@@ -17,7 +23,8 @@ export default {
     name: "LayoutAdmin",
 
     components: {
-       
+        Sidebar: () => import('@/components/adminComponents/Sidebar'),
+        
     },
 
     props: {
@@ -48,7 +55,7 @@ export default {
             console.log("Thanh cong")
             this.loggin = true
         } else {
-          console.log("That bai")
+            console.log("That bai")
             this.loggin = false
         }
     },
@@ -69,11 +76,11 @@ export default {
 };
 </script>
 
-<style>
-
+<style scoped>
 .notActiveLogged {
-  display: none;
+    display: none;
 }
+
 .fill-height {
     align-items: start !important;
     margin-top: 42px;

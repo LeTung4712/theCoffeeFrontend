@@ -483,23 +483,6 @@ export default {
     justify-content: center;
 }
 
-/*.custom-control-label:focus{*/
-/*  top: 36px;*/
-/*  left: -25px;*/
-/*  width: 10px;*/
-/*  height: 10px;*/
-/*  background: 50%/50% 50% no-repeat;*/
-/*  position: absolute;*/
-/*  -webkit-box-sizing: border-box;*/
-/*  box-sizing: border-box;*/
-/*  display: block;*/
-/*  content: "";*/
-/*  background-image: unset;*/
-/*  background-color: orange;*/
-/*  border-radius: 100%;*/
-
-/*}*/
-
 .card-product-option-size {
     padding-bottom: 8px;
 }

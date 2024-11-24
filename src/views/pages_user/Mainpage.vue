@@ -12,6 +12,7 @@
         </v-carousel-item>
       </v-carousel>
     </template>
+    <Product_Recommend />
     <productListing />
   </v-container>
 </template>
@@ -35,6 +36,7 @@ export default {
   },
 
   components: {
+    Product_Recommend: () => import("@/components/productComponents/product_Recommend"),
     productListing: () => import("@/components/productComponents/productListing"),
     userHeader: () => import("@/layouts/header/userHeader"),
   },

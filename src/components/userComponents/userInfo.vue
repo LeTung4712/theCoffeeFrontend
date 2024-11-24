@@ -722,200 +722,200 @@
 import { getOrdersUser } from "@/api/order";
 import { getAddressNote, updateInfo } from "@/api/user";
 export default {
-    name: "userInfo",
-    data() {
-        return {
-            persent: 0,
-            select: 1,
-            active1: true, active2: false, active3: false, active4: false, active5: false,
-            currentPath: this.$route.path,
-            search: '',
-            list: [],
-            bean: 0,
-            rank: '',
-            userInfomation: {
-                id: "",
-                last_name: "Lee ",
-                first_name: "Thanh Tung",
-                mobile_no: "0828035636",
-                birth: "01/10/2001",
-                email: "iamrobotdiy@gmail.com",
-                gender: "male",
-            },
-            state: '',
-            listOrders: [],
-            listAddresses: [],
-        };
-    },
-    created() {
-        this.persent = this.bean / 5000
-        if (localStorage.getItem('user') == null) {
-            this.$route.push('#')
-        } else {
-            this.handleChange();
-            // load userinfo from localStorage
-            // Can check dinh dang
-            //console.log("user info: ", this.userInfomation)
-            this.userInfomation = JSON.parse(localStorage.getItem('user'))
-            //console.log("from local: ", this.userInfomation)
-            // NEED get data order from BE
-            this.getAddresses()
-            this.getOrders()
-        }
-
-    },
-
-    computed: {
-        filteredList() {
-            return this.listOrders.filter(listOrder => {
-                return listOrder.order_id.match(this.search)
-            })
-        },
-
-    },
-
-    methods: {
-
-        async getOrders() {
-            try {
-                const response = await getOrdersUser(
-                    {
-                        params: {
-                            user_id: this.userInfomation.id
-                        }
-                    }
-                )
-                for (let order_index in response.data.productsOfOrder) {
-                    let product_tmp = []
-                    let order = response.data.productsOfOrder[order_index]
-                    //console.log("At ", order[0].order_id)
-                    for (let order_item_index in order) {
-                        let order_item = order[order_item_index]
-                        //console.log("Push: ", order_item.product_id.name)
-                        product_tmp.push({
-                            name: order_item.product_id.name,
-                            topping: JSON.parse(JSON.stringify([order_item.topping_id, order_item.topping_count]))
-                        })
-                    }
-                    this.listOrders.push({
-                        order_id: order[0].order_id,
-                        payment_method: response.data.orders[order_index].payment_method,
-                        state: response.data.orders[order_index].state,
-                        product: JSON.parse(JSON.stringify(product_tmp)),
-                        total_price: response.data.orders[order_index].total_price,
-                        order_time_day: response.data.orders[order_index].order_time.split(" ")[0],
-                        order_time_clock: response.data.orders[order_index].order_time.split(" ")[1]
-                    })
-                }
-                //console.log(this.listOrders)
-                //tính bean
-                this.bean = 0
-                for (let listOrder of this.listOrders) {
-                    this.bean += this.checkBean(listOrder.total_price)
-                }
-                this.persent = this.bean / 3000 * 100
-            } catch (error) {
-                console.error(error);
-            }
-        },
-
-        async getAddresses() {
-            try {
-                const response = await getAddressNote({ user_id: this.userInfomation.id })
-                //console.log('address: ', response.data.address_note)
-                this.listAddresses = response.data.address_note
-
-            } catch (error) {
-                console.error(error);
-            }
-        },
-
-        async handleUpdate() {
-            if (confirm('Bạn có chắc muốn update không?')) {
-                alert('Update thành công');
-
-                // luu vao localStorage
-                localStorage.setItem('user', JSON.stringify(this.userInfomation))
-                try {
-                    const response = await updateInfo(
-                        {
-                            id: this.userInfomation.id,
-                            last_name: this.userInfomation.last_name,
-                            first_name: this.userInfomation.first_name,
-                            email: this.userInfomation.email,
-                            gender: this.userInfomation.gender,
-
-                        }
-                    )
-                    console.log('update thanh cong lastname :', response.data.userInfo.last_name);
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        },
-
-        checkBean(price) {
-            let price_bean = parseInt(price); //lay phan nguyen
-            return Math.round(Math.round(price_bean * 10) / 100000) * 6
-        },
-        separator(numb) {
-            var str = numb.toString().split(".");
-            str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            return str.join(".");
-        },
-        handleClick1() {
-            this.select = 1;
-            this.$router.push({
-                name: 'user',
-                params: {
-                    name: 'user-info'
-                }
-            });
-            // this.$router.push({path: `/user/user-info`});
-        },
-        handleClick2() {
-            this.select = 2;
-            this.$router.push({
-                name: 'user',
-                params: {
-                    name: 'so-dia-chi'
-                }
-            });
-            // this.$router.push({path: `/user/so-dia-chi`});
-        },
-        handleClick3() {
-            this.select = 3;
-            this.$router.push({
-                name: 'user',
-                params: {
-                    name: 'quyen-loi-thanh-vien'
-                }
-            });
-            // this.$router.push({path: `/user/quyen-loi-thanh-vien`});
-        },
-        handleClick4() {
-            this.select = 4;
-            this.$router.push({
-                name: 'user',
-                params: {
-                    name: 'lich-su'
-                }
-            });
-            // this.$router.push({path: `/user/lich-su`});
-        },
-        handleChange() {
-            if (this.currentPath == "/user/user-info") {
-                this.select = 1;
-                // console.log(this.select)
-            } else if (this.currentPath == "/user/so-dia-chi") {
-                this.select = 2;
-            } else if (this.currentPath == "/user/quyen-loi-thanh-vien") {
-                this.select = 3;
-            } else if (this.currentPath == "/user/lich-su") {
-                this.select = 4;
-            }
-        }
+  name: "userInfo",
+  data() {
+    return {
+      persent: 0,
+      select: 1,
+      active1: true, active2: false, active3: false, active4: false, active5: false,
+      currentPath: this.$route.path,
+      search: '',
+      list: [],
+      bean: 0,
+      rank: '',
+      userInfomation: {
+        id: "",
+        last_name: "Lee ",
+        first_name: "Thanh Tung",
+        mobile_no: "0828035636",
+        birth: "01/10/2001",
+        email: "iamrobotdiy@gmail.com",
+        gender: "male",
+      },
+      state: '',
+      listOrders: [],
+      listAddresses: [],
+    };
+  },
+  created() {
+    this.persent = this.bean / 5000
+    if (localStorage.getItem('user') == null) {
+      this.$route.push('#')
+    } else {
+      this.handleChange();
+      // load userinfo from localStorage
+      // Can check dinh dang
+      //console.log("user info: ", this.userInfomation)
+      this.userInfomation = JSON.parse(localStorage.getItem('user'))
+      //console.log("from local: ", this.userInfomation)
+      // NEED get data order from BE
+      this.getAddresses()
+      this.getOrders()
     }
+
+  },
+
+  computed: {
+    filteredList() {
+      return this.listOrders.filter(listOrder => {
+        return listOrder.order_id.match(this.search)
+      })
+    },
+
+  },
+
+  methods: {
+
+    async getOrders() {
+      try {
+        const response = await getOrdersUser(
+          {
+            params: {
+              user_id: this.userInfomation.id
+            }
+          }
+        )
+        for (let order_index in response.data.productsOfOrder) {
+          let product_tmp = []
+          let order = response.data.productsOfOrder[order_index]
+          //console.log("At ", order[0].order_id)
+          for (let order_item_index in order) {
+            let order_item = order[order_item_index]
+            //console.log("Push: ", order_item.product_id.name)
+            product_tmp.push({
+              name: order_item.product_id.name,
+              topping: JSON.parse(JSON.stringify([order_item.topping_id, order_item.topping_count]))
+            })
+          }
+          this.listOrders.push({
+            order_id: order[0].order_id,
+            payment_method: response.data.orders[order_index].payment_method,
+            state: response.data.orders[order_index].state,
+            product: JSON.parse(JSON.stringify(product_tmp)),
+            total_price: response.data.orders[order_index].total_price,
+            order_time_day: response.data.orders[order_index].order_time.split(" ")[0],
+            order_time_clock: response.data.orders[order_index].order_time.split(" ")[1]
+          })
+        }
+        //console.log(this.listOrders)
+        //tính bean
+        this.bean = 0
+        for (let listOrder of this.listOrders) {
+          this.bean += this.checkBean(listOrder.total_price)
+        }
+        this.persent = this.bean / 3000 * 100
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getAddresses() {
+      try {
+        const response = await getAddressNote({ user_id: this.userInfomation.id })
+        //console.log('address: ', response.data.address_note)
+        this.listAddresses = response.data.address_note
+
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async handleUpdate() {
+      if (confirm('Bạn có chắc muốn update không?')) {
+        alert('Update thành công');
+
+        // luu vao localStorage
+        localStorage.setItem('user', JSON.stringify(this.userInfomation))
+        try {
+          const response = await updateInfo(
+            {
+              id: this.userInfomation.id,
+              last_name: this.userInfomation.last_name,
+              first_name: this.userInfomation.first_name,
+              email: this.userInfomation.email,
+              gender: this.userInfomation.gender,
+
+            }
+          )
+          console.log('update thanh cong lastname :', response.data.userInfo.last_name);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+
+    checkBean(price) {
+      let price_bean = parseInt(price); //lay phan nguyen
+      return Math.round(Math.round(price_bean * 10) / 100000) * 6
+    },
+    separator(numb) {
+      var str = numb.toString().split(".");
+      str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return str.join(".");
+    },
+    handleClick1() {
+      this.select = 1;
+      this.$router.push({
+        name: 'user',
+        params: {
+          name: 'user-info'
+        }
+      });
+      // this.$router.push({path: `/user/user-info`});
+    },
+    handleClick2() {
+      this.select = 2;
+      this.$router.push({
+        name: 'user',
+        params: {
+          name: 'so-dia-chi'
+        }
+      });
+      // this.$router.push({path: `/user/so-dia-chi`});
+    },
+    handleClick3() {
+      this.select = 3;
+      this.$router.push({
+        name: 'user',
+        params: {
+          name: 'quyen-loi-thanh-vien'
+        }
+      });
+      // this.$router.push({path: `/user/quyen-loi-thanh-vien`});
+    },
+    handleClick4() {
+      this.select = 4;
+      this.$router.push({
+        name: 'user',
+        params: {
+          name: 'lich-su'
+        }
+      });
+      // this.$router.push({path: `/user/lich-su`});
+    },
+    handleChange() {
+      if (this.currentPath == "/user/user-info") {
+        this.select = 1;
+        // console.log(this.select)
+      } else if (this.currentPath == "/user/so-dia-chi") {
+        this.select = 2;
+      } else if (this.currentPath == "/user/quyen-loi-thanh-vien") {
+        this.select = 3;
+      } else if (this.currentPath == "/user/lich-su") {
+        this.select = 4;
+      }
+    }
+  }
 }
 </script>
 

@@ -36,13 +36,54 @@ const routes = [
         component: () => import("@/components/productComponents/menuMenu"),
       },
       {
-        name: 'ThanhToan',
-        path: 'thanh-toan',
-        component: () => import('@/views/pages_user/ThanhToan'),
+        name: "ThanhToan",
+        path: "thanh-toan",
+        component: () => import("@/views/pages_user/ThanhToan"),
       },
     ],
   },
-  
+  {
+    path: '/admin',
+    redirect: 'admin/pages/profile',
+    component: () => import('@/layouts/LayoutAdmin'),
+    children: [
+        // Components
+        {
+            name: 'OrderDetails',
+            path: 'order-detail/:order_detail_id',
+            component: () => import('@/views/pages_admin/OrderDetails'),
+        },
+
+        {
+            name: 'Profile',
+            path: 'pages/profile',
+            component: () => import('@/views/pages_admin/Profile'),
+        },
+
+        {
+            name: 'Icons',
+            path: 'pages/icons',
+            component: () => import('@/views/pages_admin/Icons'),
+        },
+
+        {
+            name: 'NewOrders',
+            path: 'pages/new-orders',
+            component: () => import('@/views/pages_admin/NewOrders'),
+        },
+        {
+            name: 'PaymentHistory',
+            path: 'pages/payment-history',
+            component: () => import('@/views/pages_admin/PaymentHistory'),
+        },
+        {
+            name: 'Login',
+            path: '/pages/login',
+            component: () => import('@/views/pages_admin/Login'),
+        }
+    ]
+
+},
 ];
 
 const router = new VueRouter({
