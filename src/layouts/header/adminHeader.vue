@@ -47,6 +47,7 @@ export default {
             window.dispatchEvent(new CustomEvent('admin-logged-in', {
                 detail: {
                     logged_in: false
+                
                 }
             }));
             this.$router.push('/pages/login') // đăng xuất xong quay về trang login

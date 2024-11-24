@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^1.6.7",
+    "bootstrap-vue": "^2.23.1",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
@@ -47,9 +48,12 @@
       "parser": "babel-eslint"
     },
     "rules": {
-        "eqeqeq": "off",
-        "curly": "error",
-        "quotes": ["error", "double"]
+      "eqeqeq": "off",
+      "curly": "error",
+      "quotes": [
+        "error",
+        "double"
+      ]
     }
   },
   "browserslist": [
