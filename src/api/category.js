@@ -2,18 +2,24 @@ import httpClient from './index';
 
 const PREFIX = '/category';
 
-export function getCategoriesByParentId(data) {
-    return httpClient.get(`${PREFIX}/indexByParentId`, data);
-}
-export function getAllCategories() {
+export const categoryAPI = {
+  getAll() {
     return httpClient.get(`${PREFIX}/index`);
-}
-export function createCategory(data) {
+  },
+
+  getByParentId(params) {
+    return httpClient.get(`${PREFIX}/indexByParentId`, { params });
+  },
+
+  create(data) {
     return httpClient.post(`${PREFIX}/create`, data);
-}
-export function updateCategory(data) {
+  },
+
+  update(data) {
     return httpClient.put(`${PREFIX}/update`, data);
-}
-export function deleteCategory(data) {
-    return httpClient.delete(`${PREFIX}/delete`, data);
-}
+  },
+
+  delete(params) {
+    return httpClient.delete(`${PREFIX}/delete`, { params });
+  }
+};

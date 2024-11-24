@@ -2,10 +2,12 @@ import httpClient from './index';
 
 const PREFIX = '/admin/auth';
 
-export function login(data) {
+export const adminAPI = {
+  login(data) {
     return httpClient.post(`${PREFIX}/login`, data);
-}
-//logout
-export function logout() {
+  },
+  
+  logout() {
     return httpClient.post(`${PREFIX}/logout`);
-}
+  }
+};

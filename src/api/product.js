@@ -1,21 +1,31 @@
 import httpClient from './index';
 
 const PREFIX = '/product';
-export function createProduct(data) {
-    return httpClient.post(`${PREFIX}/create`, data);
-}
-export function updateProduct(data) {
-    return httpClient.put(`${PREFIX}/update`, data);
-}
-export function deleteProduct(data) {
-    return httpClient.delete(`${PREFIX}/delete`, data);
-}
-export function getAllProducts() {
+
+export const productAPI = {
+  // Lấy danh sách
+  getAll() {
     return httpClient.get(`${PREFIX}/index`);
-}
-export function getProductInfo(data) {
-    return httpClient.get(`${PREFIX}/getProductInfo`, data);
-}
-export function getProductsByCategoryId(data) {
-    return httpClient.get(`${PREFIX}/indexByCategoryId`, data);
-}
+  },
+  
+  getByCategory(categoryId) {
+    return httpClient.get(`${PREFIX}/indexByCategoryId`, { params: { category_id: categoryId } });
+  },
+  
+  getInfo(productId) {
+    return httpClient.get(`${PREFIX}/getProductInfo`, { params: { product_id: productId } });
+  },
+
+  // Thao tác CRUD
+  create(data) {
+    return httpClient.post(`${PREFIX}/create`, data);
+  },
+  
+  update(data) {
+    return httpClient.put(`${PREFIX}/update`, data);
+  },
+  
+  delete(id) {
+    return httpClient.delete(`${PREFIX}/delete`, { params: { id } });
+  }
+};

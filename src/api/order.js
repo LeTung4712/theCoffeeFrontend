@@ -2,33 +2,38 @@ import httpClient from './index';
 
 const PREFIX = '/order';
 
-export function addOrder(data) {
+export const orderAPI = {
+  // Lấy thông tin đơn hàng
+  getOrders(params) {
+    return httpClient.get(`${PREFIX}/getOrders`, { params });
+  },
+
+  getOrderInfo(params) {
+    return httpClient.get(`${PREFIX}/getOrderInfo`, { params });
+  },
+
+  getSuccessOrders(params) {
+    return httpClient.get(`${PREFIX}/getSuccessOrders`, { params });
+  },
+
+  getUnsuccessOrders(params) {
+    return httpClient.get(`${PREFIX}/getUnsuccessOrders`, { params });
+  },
+
+  // Thao tác với đơn hàng
+  create(data) {
     return httpClient.post(`${PREFIX}/addOrder`, data);
-}
-export function getOrdersUser(data) {
-    return httpClient.get(`${PREFIX}/getOrders`, data);
-}
-//accept order
-export function acceptOrder(data) {
+  },
+
+  accept(data) {
     return httpClient.put(`${PREFIX}/acceptOrder`, data);
-}
-//paid order là
-export function paidOrder(data) {
+  },
+
+  markAsPaid(data) {
     return httpClient.put(`${PREFIX}/paidOrder`, data);
-}
-//cancel order
-export function cancelOrder(data) {
+  },
+
+  cancel(data) {
     return httpClient.put(`${PREFIX}/cancelOrder`, data);
-}
-//get order info
-export function getOrderInfo(data) {
-    return httpClient.get(`${PREFIX}/getOrderInfo`, data);
-}
-// get success order
-export function getSuccessOrders(data) {
-    return httpClient.get(`${PREFIX}/getSuccessOrders`, data);
-}
-//get unsuccess order
-export function getUnsuccessOrders(data) {
-    return httpClient.get(`${PREFIX}/getUnsuccessOrders`, data);
-}
+  }
+};
