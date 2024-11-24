@@ -45,7 +45,12 @@
             <v-col cols="7" sm="7" class="pl-4">
               <div class="d-flex flex-column h-100">
                 <div class="text-subtitle-1 font-weight-bold mb-1">{{ name }}</div>
-                <div class="text-body-2 text-grey-darken-1 mb-auto">{{ description }}</div>
+                <div class="text-body-2 text-grey-darken-1 mb-auto description-container">
+                  <div :class="{'truncated': !showFullDescription}" ref="descriptionText">{{ description }}</div>
+                  <div v-if="isDescriptionLong" @click="toggleDescription" class="read-more-btn">
+                    {{ showFullDescription ? 'Thu gọn' : 'Xem thêm' }}
+                  </div>
+                </div>
                 
                 <div class="d-flex justify-space-between align-center mt-2">
                   <span class="text-subtitle-1 font-weight-bold">{{ formatPrice(price) }}đ</span>
@@ -93,7 +98,7 @@
               v-model="size"
               inline
               mandatory
-              class="mt-0 d-flex justify-space-between px-4" 
+              class="mt-0 size-radio-group" 
               density="comfortable"
             >
               <v-radio
@@ -152,8 +157,15 @@
             class="text-capitalize font-weight-bold text-white"
             :style="{ backgroundColor: '#d46b08' }"
             @click="addToCart"
+            :loading="isLoading"
+            :disabled="isLoading"
           >
-            {{ formatPrice(calculateTotalPrice()) }}đ - Thêm vào giỏ hàng
+            <template v-if="!isLoading">
+              {{ formatPrice(calculateTotalPrice()) }}đ - Thêm vào giỏ hàng
+            </template>
+            <template v-else>
+              Đang tải...
+            </template>
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -200,7 +212,10 @@ export default {
         { label: 'Lớn', value: 'L', price: 10000 },
         { label: 'Vừa', value: 'M', price: 6000 },
         { label: 'Nhỏ', value: 'S', price: 0 }
-      ]
+      ],
+      showFullDescription: false,
+      isDescriptionLong: false,
+      isLoading: false,
     }
   },
 
@@ -221,17 +236,27 @@ export default {
     }
   },
 
+  mounted() {
+    this.$nextTick(() => {
+      if (this.$refs.descriptionText) {
+        const lineHeight = parseInt(window.getComputedStyle(this.$refs.descriptionText).lineHeight);
+        const height = this.$refs.descriptionText.offsetHeight;
+        this.isDescriptionLong = height > (lineHeight * 4);
+      }
+    });
+  },
+
   methods: {
     async fetchProductInfo() {
       if (!this.id) return;
+      
+      this.isLoading = true;
       
       try {
         const response = await productAPI.getInfo({
           params: { product_id: this.id }
         });
         const data = response.data;
-        //console.log('product', this.id);
-        //console.log('data', data);
         this.product = {
           ...data.product,
           price: this.price
@@ -249,6 +274,8 @@ export default {
           price: this.price,
           image_url: this.image_url
         };
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -321,7 +348,11 @@ export default {
     closeDialog() {
       this.dialogVisible = false;
       this.resetForm();
-    }
+    },
+
+    toggleDescription() {
+      this.showFullDescription = !this.showFullDescription;
+    },
   }
 }
 </script>
@@ -501,5 +532,61 @@ export default {
 
 .scale-button {
   transform: scale(1.9);
+}
+
+.description-container {
+  position: relative;
+}
+
+.truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-more-btn {
+  color: #fa8c16;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.read-more-btn:hover {
+  text-decoration: underline;
+}
+
+/* Điều chỉnh style cho radio group trên mobile */
+@media (max-width: 600px) {
+  .size-radio-group {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    padding: 0 8px !important;
+    margin: 0 -8px !important;
+  }
+
+  .size-radio-group :deep(.v-radio) {
+    margin: 0 10px !important;
+    padding: 0 !important;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .size-radio-group :deep(.v-radio .v-label) {
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .size-radio-group :deep(.v-radio .v-selection-control) {
+    margin-inline-end: 4px !important;
+  }
+}
+
+/* Thêm style cho trạng thái loading */
+.v-btn--loading {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 </style>

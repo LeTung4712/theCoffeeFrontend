@@ -20,36 +20,48 @@
         class="px-0"
       >
         <div class="d-flex justify-space-between align-center w-100">
-          <div>
-            <!-- Tên sản phẩm -->
-            <div class="text-body-1 font-weight-medium" v-if="getProductName(order)">
-              {{ order.count || 1 }} x {{ getProductName(order) }}
-            </div>
-            
-            <!-- Size -->
-            <div class="text-subtitle-2" v-if="order.size">
-              Size: {{ order.size }}
-            </div>
-            
-            <!-- Toppings -->
-            <div 
-              v-for="(topping, tIndex) in filterToppings(order)"
-              :key="`${order.id}-${tIndex}`"
-              class="text-subtitle-2"
-            >
-              + {{ topping.name }} (x{{ topping.count || 1 }})
-            </div>
-
+          <div class="d-flex align-start">
+            <!-- Thêm nút edit -->
             <v-btn
+              icon="mdi-pencil"
               size="small"
-              color="error"
               variant="text"
               density="compact"
-              class="mt-1"
-              @click="$emit('delete-item', order)"
-            >
-              Xóa
-            </v-btn>
+              class="me-2 mt-1"
+              @click="openEditDialog(order)"
+            ></v-btn>
+            
+            <div>
+              <!-- Tên sản phẩm -->
+              <div class="text-body-1 font-weight-medium" v-if="getProductName(order)">
+                {{ order.count || 1 }} x {{ getProductName(order) }}
+              </div>
+              
+              <!-- Size -->
+              <div class="text-subtitle-2" v-if="order.size">
+                Size: {{ order.size }}
+              </div>
+              
+              <!-- Toppings -->
+              <div 
+                v-for="(topping, tIndex) in filterToppings(order)"
+                :key="`${order.id}-${tIndex}`"
+                class="text-subtitle-2"
+              >
+                + {{ topping.name }} (x{{ topping.count || 1 }})
+              </div>
+
+              <v-btn
+                size="small"
+                color="error"
+                variant="text"
+                density="compact"
+                class="mt-1"
+                @click="$emit('delete-item', order)"
+              >
+                Xóa
+              </v-btn>
+            </div>
           </div>
 
           <div class="text-right">
@@ -93,13 +105,25 @@
         </template>
       </v-list-item>
     </v-list>
+    <!-- Thêm EditOrderDialog -->
+  <EditOrderDialog
+    v-model="showEditDialog"
+    :order="selectedOrder"
+    @save="handleEditComplete"
+  />
   </v-card-text>
 </template>
 
 <script>
+import EditOrderDialog from './EditOrderDialog.vue'
+
 export default {
   name: 'OrderSummary',
   
+  components: {
+    EditOrderDialog
+  },
+
   data() {
     return {
       orders: [],
@@ -108,7 +132,9 @@ export default {
       voucher: {
         description: "Xem thêm khuyến mãi",
         discount: 0
-      }
+      },
+      showEditDialog: false,
+      selectedOrder: null
     }
   },
 
@@ -133,7 +159,7 @@ export default {
         this.orders = orderData.map(order => ({
           ...order,
           count: order.count || 1,
-          product_item: [order.product_item], // Wrap product_item trong array
+          product_item: order.product_item,
           topping_items: Array.isArray(order.topping_items) ? order.topping_items : []
         }))
 
@@ -150,17 +176,17 @@ export default {
     },
 
     getProductName(order) {
-      if (!order?.product_item?.[0]?.name) {
+      if (!order?.product_item?.name) {
         console.warn('Không tìm thấy tên sản phẩm:', order)
         return 'Sản phẩm không xác định'
       }
-      return order.product_item[0].name
+      return order.product_item.name
     },
 
     getProductPrice(order) {
-      if (!order?.product_item?.[0]) return 0
+      if (!order?.product_item) return 0
       
-      const basePrice = Number(order.product_item[0].price) * (order.count || 1)
+      const basePrice = Number(order.product_item.price) * (order.count || 1)
       const toppingPrice = this.calculateToppingPrice(order.topping_items)
       const sizePrice = this.calculateSizePrice(order.size, order.count || 1)
       
@@ -209,6 +235,24 @@ export default {
       }
 
       this.$emit('update-total-price', this.totalPrice)
+    },
+
+    openEditDialog(order) {
+      this.selectedOrder = { ...order }  // Clone order để tránh thay đổi trực tiếp
+      this.showEditDialog = true
+    },
+
+    handleEditComplete(updatedOrder) {
+      // Cập nhật order trong danh sách
+      const index = this.orders.findIndex(o => o.id === updatedOrder.id)
+      if (index !== -1) {
+        this.orders.splice(index, 1, updatedOrder)
+        // Lưu lại vào localStorage
+        localStorage.setItem('order', JSON.stringify(this.orders))
+        // Tính toán lại tổng tiền
+        this.calculateTotalPrice()
+      }
+      this.showEditDialog = false
     }
   }
 }

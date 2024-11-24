@@ -3,7 +3,7 @@
     <v-container class="pa-0 d-flex align-center" style="height: 100%">
       <v-row align="center" justify="space-between" no-gutters style="height: 100%">
         <!-- Logo - Chỉ hiện trên desktop -->
-        <v-col cols="auto" class="pl-4 d-none d-sm-flex">
+        <v-col cols="auto" class="pl-0 d-none d-sm-flex">
           <v-btn variant="text" href="/" class="pa-0">
             <v-img :src="logo" width="180" height="60" />
           </v-btn>
@@ -11,7 +11,7 @@
 
         <!-- Delivery Button -->
         <v-col cols="auto" class="ml-2 ml-sm-4 py-2">
-          <delivery-address-button v-model="oldAddress" />
+          <delivery-address-button v-model="oldAddress" @update:modelValue="handleAddressChange" />
         </v-col>
 
         <!-- Navigation Menu - Chỉ hiện trên desktop -->
@@ -99,7 +99,6 @@
 </template>
 
 <script>
-import { ROUTES } from '@/constants/routes'
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
 
@@ -188,7 +187,11 @@ export default {
     },
 
     handelClickCart() {
-      this.$router.push(ROUTES.CHECKOUT)
+      this.$router.push('/thanh-toan')
+    },
+
+    handleAddressChange(newAddress) {
+      this.oldAddress = newAddress
     }
   },
 

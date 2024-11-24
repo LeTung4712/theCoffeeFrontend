@@ -84,17 +84,24 @@
 </template>
 
 <script>
+import { useAddressStore } from '@/stores/address'
+
 export default {
     name: 'DeliveryAddressButton',
 
     props: {
         modelValue: {
             type: String,
-            default: '...'
+            default: ''
         }
     },
 
     emits: ['update:modelValue'],
+
+    setup() {
+        const addressStore = useAddressStore()
+        return { addressStore }
+    },
 
     data() {
         return {
@@ -103,16 +110,14 @@ export default {
             searchResults: [],
             savedAddresses: [
                 {
-                    id: 1,
                     type: 'home',
                     name: 'Nhà riêng',
-                    fullAddress: '123 Nguyễn Văn Linh, Quận 7, TP.HCM'
+                    fullAddress: '123 Đường ABC, Quận 1, TP.HCM'
                 },
                 {
-                    id: 2,
                     type: 'office',
                     name: 'Văn phòng',
-                    fullAddress: '456 Điện Biên Phủ, Quận 3, TP.HCM'
+                    fullAddress: '456 Đường XYZ, Quận 2, TP.HCM'
                 }
             ]
         }
@@ -121,45 +126,36 @@ export default {
     computed: {
         address: {
             get() {
-                return this.modelValue
+                return this.addressStore.address
             },
             set(value) {
-                this.$emit('update:modelValue', value)
+                this.addressStore.updateAddress(value)
             }
         }
     },
 
     methods: {
-        async handleSearchAddress() {
-            if (!this.searchAddress) {
-                this.searchResults = []
-                return
-            }
+        closeDialog() {
+            this.showDialog = false
+            this.searchAddress = ''
+            this.searchResults = []
+        },
 
-            // Giả lập API tìm kiếm địa chỉ
-            this.searchResults = [
-                {
-                    mainText: this.searchAddress + ' - Quận 1',
-                    secondaryText: 'Quận 1, TP.HCM'
-                },
-                {
-                    mainText: this.searchAddress + ' - Quận 7',
-                    secondaryText: 'Quận 7, TP.HCM'
-                }
-            ]
+        handleSearchAddress() {
+            this.searchResults = []
         },
 
         selectAddress(address) {
             this.address = address.fullAddress
-            localStorage.setItem('oldAddress', JSON.stringify(address.fullAddress))
-            this.showDialog = false
+            this.$emit('update:modelValue', address.fullAddress)
+            this.closeDialog()
         },
 
         selectSearchResult(result) {
             const fullAddress = `${result.mainText}, ${result.secondaryText}`
             this.address = fullAddress
-            localStorage.setItem('oldAddress', JSON.stringify(fullAddress))
-            this.showDialog = false
+            this.$emit('update:modelValue', fullAddress)
+            this.closeDialog()
         }
     }
 }
