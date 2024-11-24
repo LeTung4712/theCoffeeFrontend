@@ -1,10 +1,18 @@
+# Hệ điều hành
 .DS_Store
-node_modules
-/dist
+Thumbs.db
 
-# local env files
+# Thư mục/Files node_modules và build
+node_modules/
+dist/
+build/
+
+# Tệp cấu hình môi trường cục bộ
+.env
 .env.local
-.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Log files
 npm-debug.log*
@@ -12,11 +20,54 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Editor directories and files
-.idea
-.vscode
+# IDE/Editor files
+.idea/
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Tệp cache
+.cache/
+coverage/
+tmp/
+
+# Tệp liên quan đến Hệ thống hoặc Các công cụ
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+
+# Thư mục cục bộ (không liên quan đến dự án)
+local/
+*.bak
+*.old
+
+# Tệp lock cho package managers (nếu không cần theo dõi)
+# yarn.lock
+# package-lock.json
+# pnpm-lock.yaml
+
+# Ignoring tệp test output
+*.out
+*.spec.js
+*.test.js
+*.test.ts
+*.test.tsx
+jest.config.js
+
+# Ignoring storybook artifacts (nếu dùng Storybook)
+storybook-static/
+
+# Ignoring tệp máy chủ (nếu không cần thiết)
+logs/
+*.key
+*.crt
+*.pem
