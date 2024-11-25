@@ -157,6 +157,7 @@
 import { removeVietnameseTones } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import ProductCard from '@/components/Products/ProductCard.vue'
+import { useNotificationStore } from '@/stores/notification'
 
 export default {
     name: "ProductDetail",
@@ -322,29 +323,37 @@ export default {
         },
 
         handleAddCart() {
-            const entry = {
-                id: this.product.id,
-                product_item: [{
-                    ...this.product,
-                    id: this.product.id
-                }],
-                size: this.selectedSize,
-                count: this.count,
-                topping_items: this.topping_items.map(topping => ({
-                    ...topping,
-                    count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
+            const notificationStore = useNotificationStore()
+
+            try {
+                const entry = {
+                    id: this.product.id,
+                    product_item: {
+                        ...this.product,
+                        id: this.product.id
+                    },
+                    size: this.selectedSize,
+                    count: this.count,
+                    topping_items: this.topping_items.map(topping => ({
+                        ...topping,
+                        count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
+                    }))
+                }
+
+                const orders = JSON.parse(localStorage.getItem('order') || '[]')
+                orders.push(entry)
+
+                localStorage.setItem('order', JSON.stringify(orders))
+                this.resetForm()
+
+                window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
+                    detail: { storage: localStorage.getItem('order') }
                 }))
+
+                notificationStore.success(`Đã thêm "${this.product.name}" vào giỏ hàng`, 3000)
+            } catch (error) {
+                notificationStore.error('Không thể thêm vào giỏ hàng: ' + error.message)
             }
-
-            const orders = JSON.parse(localStorage.getItem('order') || '[]')
-            orders.push(entry)
-
-            localStorage.setItem('order', JSON.stringify(orders))
-            this.resetForm()
-
-            window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
-                detail: { storage: localStorage.getItem('order') }
-            }))
         },
 
         resetForm() {
@@ -391,22 +400,66 @@ export default {
     font-size: 14px;
     margin: 8px 0;
     line-height: 1.2;
+    color: rgb(var(--v-theme-text-primary));
 }
 
 .product-title a {
-    color: #333;
+    color: rgb(var(--v-theme-text-primary));
     text-decoration: none;
 }
 
 .item__price {
     font-weight: bold;
-    color: #D62300;
+    color: rgb(var(--v-theme-accent));
     font-size: 14px;
 }
 
+/* .product-info {
+    .text-h4 {
+        color: rgb(var(--v-theme-text-primary));
+    }
+    
+    .primary-text {
+        color: rgb(var(--v-theme-primary)) !important;
+    }
+} */
+
+.product_des_title {
+    color: rgb(var(--v-theme-text-primary));
+    margin: 1rem 0;
+}
+
+.des_detail {
+    color: rgb(var(--v-theme-text-secondary));
+    line-height: 1.6;
+}
+
+hr {
+    border-color: rgb(var(--v-theme-border-color));
+    opacity: 0.12;
+}
+
+/* .product-carousel {
+    .product-image {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .thumb {
+        border-radius: 4px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+        
+        &:hover {
+            border-color: rgb(var(--v-theme-primary));
+        }
+    }
+} */
+
 @media (max-width: 600px) {
     .mobile-card-height :deep(.v-card) {
-        max-height: 120px; /* hoặc giá trị phù hợp khác */
+        max-height: 120px;
         display: flex;
     }
     
@@ -415,4 +468,32 @@ export default {
         height: 100%;
     }
 }
+
+/* .v-btn.v-btn--variant-outlined {
+    border-color: rgb(var(--v-theme-border-color));
+    
+    &:hover {
+        border-color: rgb(var(--v-theme-primary));
+    }
+} */
+
+.v-btn.v-btn--variant-flat {
+    background-color: rgb(var(--v-theme-primary));
+    color: rgb(var(--v-theme-background)) !important;
+}
+
+:deep(.v-skeleton-loader) {
+    background-color: rgb(var(--v-theme-surface-variant));
+}
+
+.productStore_Infor {
+    background-color: rgb(var(--v-theme-background));
+}
+
+.product_describe {
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background-color: rgb(var(--v-theme-surface));
+}
 </style>
+

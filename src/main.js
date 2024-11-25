@@ -6,8 +6,6 @@ import { createApp } from 'vue'
 // Plugins
 import { registerPlugins } from '@/plugins'
 
-// Styles
-import '@/styles/variables.css'
 
 const app = createApp(App)
 

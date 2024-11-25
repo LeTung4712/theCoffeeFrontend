@@ -1,9 +1,9 @@
 <template>
-  <v-app-bar id="myHeader" class="header-user" :elevation="0">
+  <v-app-bar id="myHeader" class="header-user" :elevation="0" color="primary">
     <v-container class="pa-0 d-flex align-center" style="height: 100%">
       <v-row align="center" justify="space-between" no-gutters style="height: 100%">
         <!-- Logo - Chỉ hiện trên desktop -->
-        <v-col cols="auto" class="pl-4 d-none d-sm-flex">
+        <v-col cols="auto" class="pl-0 d-none d-sm-flex">
           <v-btn variant="text" href="/" class="pa-0">
             <v-img :src="logo" width="180" height="60" />
           </v-btn>
@@ -11,7 +11,7 @@
 
         <!-- Delivery Button -->
         <v-col cols="auto" class="ml-2 ml-sm-4 py-2">
-          <delivery-address-button v-model="oldAddress" />
+          <delivery-address-button v-model="oldAddress" @update:modelValue="handleAddressChange" />
         </v-col>
 
         <!-- Navigation Menu - Chỉ hiện trên desktop -->
@@ -86,9 +86,9 @@
                   offset-y="0"
                   v-if="itemCount > 0"
                 >
-                  <v-icon color="primary" size="32">mdi-cart</v-icon>
+                  <v-icon size="32" color="background">mdi-cart</v-icon>
                 </v-badge>
-                <v-icon v-else color="primary" size="32">mdi-cart</v-icon>
+                <v-icon v-else size="32" color="white">mdi-cart</v-icon>
               </v-btn>
             </v-col>
           </v-row>
@@ -99,7 +99,6 @@
 </template>
 
 <script>
-import { ROUTES } from '@/constants/routes'
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
 
@@ -188,7 +187,11 @@ export default {
     },
 
     handelClickCart() {
-      this.$router.push(ROUTES.CHECKOUT)
+      this.$router.push('/thanh-toan')
+    },
+
+    handleAddressChange(newAddress) {
+      this.oldAddress = newAddress
     }
   },
 
@@ -201,9 +204,8 @@ export default {
 
 <style scoped>
 .header-user {
-  background-color: var(--tch-primary);
   height: 75px;
-  border-bottom: 1px solid var(--tch-border-color);
+  border-bottom: 1px solid var(--v-border-color-base);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -219,8 +221,8 @@ export default {
 .v-btn {
   text-transform: none !important;
   letter-spacing: 0;
-  color: var(--tch-text-primary) !important;
-  transition: var(--tch-transition);
+  color: var(--v-text-primary-base) !important;
+  transition: 0.3s ease-in-out;
   height: auto !important;
   display: flex;
   align-items: center;
@@ -231,14 +233,14 @@ export default {
 }
 
 .v-menu {
-  background-color: var(--tch-background);
-  border-radius: var(--tch-border-radius);
-  box-shadow: var(--tch-shadow);
+  background-color: var(--v-background-base);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .v-badge__badge {
   font-size: 12px;
-  padding: var(--tch-spacing-xs);
+  padding: 4px;
 }
 
 .v-avatar, .v-icon {

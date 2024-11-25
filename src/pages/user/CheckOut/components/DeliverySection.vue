@@ -13,8 +13,8 @@
       <v-img src="https://minio.thecoffeehouse.com/images/tch-web-order/Delivery2.png" 
              width="40" class="mr-4"/>
       <div class="flex-grow-1">
-        <div class="text-subtitle-1">{{ userData.address }}</div>
-        <div class="text-body-2">{{ userData.address }}</div>
+        <div class="text-subtitle-1">{{ address }}</div>
+        <div class="text-body-2">{{ address }}</div>
       </div>
       <v-icon>mdi-chevron-right</v-icon>
     </v-card>
@@ -28,7 +28,7 @@
         </v-card-title>
         <v-card-text>
           <v-text-field
-            v-model="userData.address"
+            v-model="addressStore.address"
             placeholder="Vui lòng nhập địa chỉ"
             variant="outlined"
             density="comfortable"
@@ -97,15 +97,21 @@
 </template>
 
 <script>
+import { useAddressStore } from '@/stores/address'
+
 export default {
   name: 'DeliverySection',
   
+  setup() {
+    const addressStore = useAddressStore()
+    return { addressStore }
+  },
+
   data() {
     return {
       userData: {
         name: '',
         phone: '',
-        address: '',
         isLogged: false
       },
       noteDelivery: '',
@@ -117,43 +123,19 @@ export default {
     this.loadUserData()
   },
 
-  mounted() {
-    // Thêm event listener để lắng nghe thay đổi localStorage
-    window.addEventListener('storage', this.handleStorageChange)
-  },
-
-  beforeDestroy() {
-    // Cleanup event listener
-    window.removeEventListener('storage', this.handleStorageChange)
-  },
-
   methods: {
     loadUserData() {
       try {
-        // Lấy địa chỉ đã lưu trước
-        let savedAddress = ''
-        try {
-          const addressData = localStorage.getItem("oldAddress")
-          console.log('Địa chỉ đã lưu:', addressData)
-          if (addressData) {
-            savedAddress = JSON.parse(addressData)
-          }
-        } catch (e) {
-          console.error('Lỗi khi parse oldAddress:', e)
-        }
-
         // Lấy thông tin user nếu có
         const userData = JSON.parse(localStorage.getItem("user"))
         if (userData) {
           this.userData = {
             name: `${userData.last_name} ${userData.first_name}`,
             phone: userData.mobile_no,
-            address: userData.address || savedAddress || '',
             isLogged: true
           }
         } else {
           this.initGuestUser()
-          this.userData.address = savedAddress || "Chưa có địa chỉ giao hàng"
         }
         
         this.$emit('delivery-info-loaded', this.userData)
@@ -167,22 +149,14 @@ export default {
       this.userData = {
         name: "Tên người nhận",
         phone: "Số điện thoại",
-        address: "Chưa có địa chỉ giao hàng",
         isLogged: false
       }
-    },
+    }
+  },
 
-    handleStorageChange(event) {
-      if (event.key === 'oldAddress') {
-        try {
-          const newAddress = JSON.parse(event.newValue)
-          if (!this.userData.address || this.userData.address === "Chưa có địa chỉ giao hàng") {
-            this.userData.address = newAddress
-          }
-        } catch (e) {
-          console.error('Lỗi khi cập nhật địa chỉ mới:', e)
-        }
-      }
+  computed: {
+    address() {
+      return this.addressStore.address
     }
   }
 }
