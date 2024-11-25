@@ -191,6 +191,20 @@ export default {
     }
   },
 
+  mounted() {
+    window.scrollTo(0, 0) // Cuộn lên đầu trang khi component được render
+
+    // Kiểm tra nếu giỏ hàng trống
+    const currentOrders = JSON.parse(localStorage.getItem('order') || '[]');
+    if (!currentOrders.length) {
+      const notificationStore = useNotificationStore();
+      notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000);
+      setTimeout(() => {
+        this.$router.push('/mainpage'); // Chuyển về trang chính sau 3 giây
+      }, 3000);
+    }
+  },
+
   computed: {
     isValidCheckout() {
       return this.orderData?.items?.length > 0 && 
@@ -289,8 +303,10 @@ export default {
       try {
         localStorage.removeItem('order')
         this.showConfirmDialog = false
-        notificationStore.success('Đã xóa toàn bộ đơn hàng')
-        await this.$router.push('/mainpage')
+        notificationStore.success('Đã xóa toàn bộ đơn hàng', 3000)
+        setTimeout(() => {
+          this.$router.push('/mainpage'); // Chuyển về trang chính sau 3 giây
+        }, 3000);
       } catch (error) {
         notificationStore.error('Lỗi khi xóa đơn hàng: ' + error.message)
       } finally {
@@ -312,7 +328,15 @@ export default {
           }
         })
 
-        notificationStore.success(`Đã xóa "${item.product_item.name}" khỏi giỏ hàng`, 3000)
+        // Kiểm tra nếu không còn item nào trong đơn hàng
+        if (updatedOrders.length === 0) {
+          notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000);
+          setTimeout(() => {
+            this.$router.push('/mainpage'); // Chuyển về trang chính sau 3 giây
+          }, 3000);
+        } else {
+          notificationStore.success(`Đã xóa "${item.product_item.name}" khỏi giỏ hàng`, 3000)
+        }
       } catch (error) {
         notificationStore.error('Lỗi khi xóa sản phẩm: ' + error.message)
       }
