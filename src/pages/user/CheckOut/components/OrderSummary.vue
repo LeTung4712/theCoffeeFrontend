@@ -154,7 +154,7 @@ export default {
         const orderData = JSON.parse(localStorage.getItem("order"))
         if (!orderData) return
         
-        console.log('orderData trước khi map:', orderData)
+        //console.log('orderData trước khi map:', orderData)
         
         this.orders = orderData.map(order => ({
           ...order,
@@ -163,7 +163,7 @@ export default {
           topping_items: Array.isArray(order.topping_items) ? order.topping_items : []
         }))
 
-        console.log('orders sau khi map:', this.orders)
+        //console.log('orders sau khi map:', this.orders)
         this.calculateTotalPrice()
         this.$emit('order-loaded', {
           orders: this.orders,

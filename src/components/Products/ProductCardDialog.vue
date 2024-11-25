@@ -175,9 +175,10 @@
 
 <script>
 import { productAPI } from "@/api/product";
+import { useNotificationStore } from '@/stores/notification'
 
 export default {
-  name: "CardProductDialog",
+  name: "ProductCardDialog",
   
   props: {
     currentID: String,
@@ -207,18 +208,7 @@ export default {
       },
       size: 'S',
       checked_topping: [],
-      topping_items: [
-        {
-          id: 1,
-          name: "Topping 1",
-          price: 10000
-        },
-        {
-          id: 2,
-          name: "Topping 2",
-          price: 15000
-        }
-      ],
+      topping_items: [],
       sizeOptions: [
         { label: 'Lớn', value: 'L', price: 10000 },
         { label: 'Vừa', value: 'M', price: 6000 },
@@ -314,36 +304,46 @@ export default {
     },
 
     addToCart() {
-      const entry = {
-        id: this.id,
-        product_item: {
+      const notificationStore = useNotificationStore()
+
+      try {
+        const entry = {
           id: this.id,
-          image_url: this.image_url,
-          name: this.name,
-          description: this.description,
-          price: this.price
-        },
-        size: this.size,
-        count: this.quantity,
-        topping_items: this.topping_items.map(topping => ({
-          ...topping,
-          count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
-        })),
-        note: this.note
-      };
+          product_item: {
+            id: this.id,
+            image_url: this.image_url,
+            name: this.name,
+            description: this.description,
+            price: this.price
+          },
+          size: this.size,
+          count: this.quantity,
+          topping_items: this.topping_items.map(topping => ({
+            ...topping,
+            count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
+          })),
+          note: this.note
+        };
 
-      // Update localStorage
-      const order = JSON.parse(localStorage.getItem("order") || "[]");
-      order.push(entry);
-      localStorage.setItem("order", JSON.stringify(order));
-      localStorage.setItem("entry", JSON.stringify(entry));
+        // Update localStorage
+        const order = JSON.parse(localStorage.getItem("order") || "[]");
+        order.push(entry);
+        localStorage.setItem("order", JSON.stringify(order));
+        localStorage.setItem("entry", JSON.stringify(entry));
 
-      // Dispatch event
-      window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
-        detail: { storage: localStorage.getItem('order') }
-      }));
+        // Dispatch event
+        window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
+          detail: { storage: localStorage.getItem('order') }
+        }));
 
-      this.resetForm();
+        // Thêm thông báo thành công
+        notificationStore.success(`Đã thêm "${this.name}" vào giỏ hàng`, 3000)
+
+        this.resetForm();
+      } catch (error) {
+        // Thêm thông báo lỗi
+        notificationStore.error('Không thể thêm vào giỏ hàng: ' + error.message)
+      }
     },
 
     resetForm() {

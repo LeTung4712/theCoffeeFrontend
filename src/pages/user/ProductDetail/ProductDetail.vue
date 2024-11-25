@@ -157,6 +157,7 @@
 import { removeVietnameseTones } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import ProductCard from '@/components/Products/ProductCard.vue'
+import { useNotificationStore } from '@/stores/notification'
 
 export default {
     name: "ProductDetail",
@@ -322,29 +323,37 @@ export default {
         },
 
         handleAddCart() {
-            const entry = {
-                id: this.product.id,
-                product_item: {
-                    ...this.product,
-                    id: this.product.id
-                },
-                size: this.selectedSize,
-                count: this.count,
-                topping_items: this.topping_items.map(topping => ({
-                    ...topping,
-                    count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
+            const notificationStore = useNotificationStore()
+
+            try {
+                const entry = {
+                    id: this.product.id,
+                    product_item: {
+                        ...this.product,
+                        id: this.product.id
+                    },
+                    size: this.selectedSize,
+                    count: this.count,
+                    topping_items: this.topping_items.map(topping => ({
+                        ...topping,
+                        count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
+                    }))
+                }
+
+                const orders = JSON.parse(localStorage.getItem('order') || '[]')
+                orders.push(entry)
+
+                localStorage.setItem('order', JSON.stringify(orders))
+                this.resetForm()
+
+                window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
+                    detail: { storage: localStorage.getItem('order') }
                 }))
+
+                notificationStore.success(`Đã thêm "${this.product.name}" vào giỏ hàng`, 3000)
+            } catch (error) {
+                notificationStore.error('Không thể thêm vào giỏ hàng: ' + error.message)
             }
-
-            const orders = JSON.parse(localStorage.getItem('order') || '[]')
-            orders.push(entry)
-
-            localStorage.setItem('order', JSON.stringify(orders))
-            this.resetForm()
-
-            window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
-                detail: { storage: localStorage.getItem('order') }
-            }))
         },
 
         resetForm() {

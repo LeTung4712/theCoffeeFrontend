@@ -165,7 +165,7 @@
 
 <script>
 import { productAPI } from "@/api/product";
-
+import { useNotificationStore } from '@/stores/notification'
 export default {
   name: 'EditOrderDialog',
   
@@ -278,7 +278,7 @@ export default {
 
     async saveChanges() {
       this.isLoading = true;
-
+      const notificationStore = useNotificationStore()
       try {
         const updatedOrder = {
           ...this.order,
@@ -293,6 +293,7 @@ export default {
         };
 
         this.$emit('save', updatedOrder);
+        notificationStore.success('Cập nhật thành công!', 3000)
         this.closeDialog();
       } catch (error) {
         console.error("Lỗi khi cập nhật:", error);

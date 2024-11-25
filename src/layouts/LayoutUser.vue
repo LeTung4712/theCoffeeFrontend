@@ -3,6 +3,7 @@
         <div class="headers-wrapper">
             <HeaderIntro class="header-intro" :class="{ 'hide-intro': isScrolled }" />
             <UserHeader class="user-header" :class="{ 'header-scrolled': isScrolled }" />
+            <notification-list />
         </div>
 
         <v-main class="bg-white main-content">
@@ -16,6 +17,7 @@
 <script>
 import HeaderIntro from '@/components/Header/HeaderIntro.vue'
 import UserHeader from '@/components/Header/UserHeader.vue'
+import NotificationList from '@/components/Notifications/NotificationList.vue'
 import Footer from '@/components/Footer/Footer.vue'
 import MobileNavBar from '@/components/Navigation/MobileNavBar.vue'
 
@@ -24,6 +26,7 @@ export default {
     components: {
         HeaderIntro,
         UserHeader,
+        NotificationList,
         Footer,
         MobileNavBar
     },
