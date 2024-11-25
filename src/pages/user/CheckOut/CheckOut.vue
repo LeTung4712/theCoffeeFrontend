@@ -15,22 +15,15 @@
           <v-row>
             <!-- Left Column -->
             <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 1 : 2">
-              <delivery-section
-                @delivery-info-loaded="handleDeliveryInfoLoaded"
-              />
-              <payment-methods
-                @payment-method-changed="handlePaymentMethodChanged"
-              />
-              
+              <DeliverySection @delivery-info-loaded="handleDeliveryInfoLoaded" />
+              <PaymentMethods @payment-method-changed="handlePaymentMethodChanged" />
+
               <!-- Thêm checkbox điều khoản -->
               <v-card flat class="pa-4 bg-grey-lighten-4">
-                <v-checkbox
-                  v-model="agreedToTerms"
-                  color="primary"
-                >
+                <v-checkbox v-model="agreedToTerms" color="primary">
                   <template #label>
                     <span>
-                      Đồng ý với các 
+                      Đồng ý với các
                       <a href="#" class="text-primary text-decoration-underline">điều khoản và điều kiện</a>
                       mua hàng của The Coffee House
                     </span>
@@ -40,13 +33,7 @@
 
               <!-- Nút xóa đơn hàng -->
               <v-card-actions class="pa-4 bg-grey-lighten-4">
-                <v-btn
-                  block
-                  color="error"
-                  variant="outlined"
-                  prepend-icon="mdi-delete"
-                  @click="handleDeleteOrder"
-                >
+                <v-btn block color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteOrder">
                   Xóa toàn bộ đơn hàng
                 </v-btn>
               </v-card-actions>
@@ -55,13 +42,12 @@
             <!-- Right Column -->
             <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 2 : 1">
               <v-card elevation="4" rounded="lg" class="pa-0">
-                <order-summary
-                  ref="orderSummary"
+                <OrderSummary 
+                  ref="orderSummary" 
                   @order-loaded="handleOrderLoaded"
-                  @add-more="$router.push('/mainpage')"
-                  @delete-item="handleDeleteItem"
+                  @add-more="$router.push('/mainpage')" 
                 />
-                
+
                 <!-- Desktop footer giữ nguyên -->
                 <v-card-actions class="bg-primary pa-4 desktop-footer">
                   <v-row no-gutters align="center">
@@ -73,19 +59,10 @@
                         </div>
                       </div>
                     </v-col>
-                    
+
                     <v-col class="text-right">
-                      <v-btn
-                        color="white"
-                        size="x-large"
-                        rounded
-                        variant="elevated"
-                        :loading="isLoading"
-                        :elevation="3"
-                        prepend-icon="mdi-cart-check"
-                        class="order-button"
-                        @click="validateAndCheckout"
-                      >
+                      <v-btn color="white" size="x-large" rounded variant="elevated" :loading="isLoading" :elevation="3"
+                        prepend-icon="mdi-cart-check" class="order-button" @click="validateAndCheckout">
                         Đặt hàng
                       </v-btn>
                     </v-col>
@@ -107,19 +84,10 @@
                 </div>
               </div>
             </v-col>
-            
+
             <v-col class="text-right">
-              <v-btn
-                color="white"
-                size="x-large"
-                rounded
-                variant="elevated"
-                :loading="isLoading"
-                :elevation="3"
-                prepend-icon="mdi-cart-check"
-                class="order-button"
-                @click="validateAndCheckout"
-              >
+              <v-btn color="white" size="x-large" rounded variant="elevated" :loading="isLoading" :elevation="3"
+                prepend-icon="mdi-cart-check" class="order-button" @click="validateAndCheckout">
                 Đặt hàng
               </v-btn>
             </v-col>
@@ -132,26 +100,17 @@
             <v-card-title class="text-h6 pa-4">
               Xác nhận xóa
             </v-card-title>
-            
+
             <v-card-text class="pa-4">
               Bạn có chắc muốn xóa toàn bộ đơn hàng?
             </v-card-text>
-            
+
             <v-card-actions class="pa-4">
               <v-spacer></v-spacer>
-              <v-btn
-                color="grey-darken-1"
-                variant="text"
-                @click="showConfirmDialog = false"
-              >
+              <v-btn color="grey-darken-1" variant="text" @click="showConfirmDialog = false">
                 Hủy
               </v-btn>
-              <v-btn
-                color="error"
-                variant="elevated"
-                @click="confirmDeleteOrder"
-                :loading="isDeleting"
-              >
+              <v-btn color="error" variant="elevated" @click="confirmDeleteOrder" :loading="isDeleting">
                 Xóa đơn hàng
               </v-btn>
             </v-card-actions>
@@ -169,10 +128,11 @@ import DeliverySection from './components/DeliverySection.vue'
 import PaymentMethods from './components/PaymentMethods.vue'
 import OrderSummary from './components/OrderSummary.vue'
 import { useNotificationStore } from '@/stores/notification'
+import { useCartStore } from '@/stores/cart'
 
 export default {
   name: 'CheckOut',
-  
+
   components: {
     DeliverySection,
     PaymentMethods,
@@ -208,10 +168,10 @@ export default {
 
   computed: {
     isValidCheckout() {
-      return this.orderData?.items?.length > 0 && 
-             this.deliveryInfo?.isLogged &&
-             this.deliveryInfo?.address &&
-             this.deliveryInfo.address !== "Chưa có địa chỉ giao hàng"
+      return this.orderData?.items?.length > 0 &&
+        this.deliveryInfo?.isLogged &&
+        this.deliveryInfo?.address &&
+        this.deliveryInfo.address !== "Chưa có địa chỉ giao hàng"
     }
   },
 
@@ -234,7 +194,7 @@ export default {
 
     async handleCheckout() {
       const notificationStore = useNotificationStore()
-      
+
       try {
         const orderData = this.prepareOrderData()
         const { data: { order_id } } = await orderAPI.create(orderData)
@@ -268,7 +228,7 @@ export default {
 
     async handleCodPayment() {
       const notificationStore = useNotificationStore()
-      
+
       try {
         localStorage.removeItem('order')
         notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
@@ -280,7 +240,7 @@ export default {
 
     async handleOnlinePayment(orderId) {
       const notificationStore = useNotificationStore()
-      
+
       try {
         const paymentData = {
           order_id: orderId,
@@ -299,60 +259,20 @@ export default {
 
     async confirmDeleteOrder() {
       const notificationStore = useNotificationStore()
+      const cartStore = useCartStore()
       this.isDeleting = true
-      
+
       try {
-        localStorage.removeItem('order')
+        cartStore.clearCart()
         this.showConfirmDialog = false
         notificationStore.success('Đã xóa toàn bộ đơn hàng', 3000)
         setTimeout(() => {
-          this.$router.push('/mainpage'); // Chuyển về trang chính sau 3 giây
-        }, 3000);
+          this.$router.push('/mainpage')
+        }, 3000)
       } catch (error) {
         notificationStore.error('Lỗi khi xóa đơn hàng: ' + error.message)
       } finally {
         this.isDeleting = false
-      }
-    },
-
-    async handleDeleteItem(item) {
-      if (this.isProcessingDelete) return // Prevent multiple simultaneous deletions
-      
-      const notificationStore = useNotificationStore()
-      this.isProcessingDelete = true
-      
-      try {
-        if (!item || !item.id) {
-          console.error('Item hoặc item.id không hợp lệ:', item)
-          return
-        }
-
-        const currentOrders = JSON.parse(localStorage.getItem('order') || '[]')
-        const updatedOrders = currentOrders.filter(order => order.id !== item.id)
-        
-        await new Promise(resolve => {
-          localStorage.setItem('order', JSON.stringify(updatedOrders))
-          resolve()
-        })
-
-        await this.$nextTick()
-        if (this.$refs.orderSummary) {
-          await this.$refs.orderSummary.loadOrderData()
-        }
-
-        if (updatedOrders.length === 0) {
-          notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000)
-          setTimeout(() => {
-            this.$router.push('/mainpage')
-          }, 3000)
-        } else {
-          notificationStore.success(`Đã xóa "${item.product_item.name}" khỏi giỏ hàng`, 3000)
-        }
-      } catch (error) {
-        console.error('Chi tiết lỗi:', error)
-        notificationStore.error('Lỗi khi xóa sản phẩm: ' + error.message)
-      } finally {
-        this.isProcessingDelete = false
       }
     },
 
@@ -374,8 +294,8 @@ export default {
         return
       }
 
-      if (!this.deliveryInfo?.address || 
-          this.deliveryInfo.address === "Chưa có địa chỉ giao hàng") {
+      if (!this.deliveryInfo?.address ||
+        this.deliveryInfo.address === "Chưa có địa chỉ giao hàng") {
         notificationStore.warning('Vui lòng nhập địa chỉ giao hàng', 3000)
         return
       }

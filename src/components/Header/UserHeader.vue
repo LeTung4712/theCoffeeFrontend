@@ -86,13 +86,13 @@
             <v-col cols="auto" class="ml-2 ml-sm-6">
               <v-btn icon variant="text" @click="handelClickCart" height="48">
                 <v-badge
-                  :content="itemCount"
+                  :content="cartStore.itemCount"
                   color="error"
                   location="bottom start"
                   :dot="false"
                   offset-x="0"
                   offset-y="0"
-                  v-if="itemCount > 0"
+                  v-if="cartStore.itemCount > 0"
                 >
                   <v-icon size="32" color="background">mdi-cart</v-icon>
                 </v-badge>
@@ -110,6 +110,7 @@
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
 import LoginPopup from '@/pages/user/Auth/LoginPopup.vue'
+import { useCartStore } from '@/stores/cart'
 
 export default {
   name: "UserHeader",
@@ -119,12 +120,18 @@ export default {
     LoginPopup
   },
 
+  setup() {
+    const cartStore = useCartStore()
+    return { cartStore }
+  },
+
   data() {
     return {
       oldAddress: "...",
       logged: false,
       user: {},
-      itemCount: 0,
+      drawer: false,
+      group: null,
       displayClick: false,
       menuItems: [
         { title: 'Menu', to: '/collections/menu' },
@@ -150,26 +157,11 @@ export default {
     }
   },
 
-  created() {
-    this.initializeData()
-  },
-
   mounted() {
     this.setupEventListeners()
   },
 
   methods: {
-    initializeData() {
-      const order = localStorage.getItem("order")
-      this.itemCount = order ? JSON.parse(order).length : 0
-
-      const user = localStorage.getItem("user") 
-      if (user) {
-        this.user = JSON.parse(user)
-        this.logged = true
-      }
-    },
-
     setupEventListeners() {
       window.addEventListener("order-localstorage-changed", this.handleOrderChange)
       window.addEventListener("scroll", this.handleScroll)

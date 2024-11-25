@@ -176,6 +176,7 @@
 <script>
 import { productAPI } from "@/api/product";
 import { useNotificationStore } from '@/stores/notification'
+import { useCartStore } from '@/stores/cart'
 
 export default {
   name: "ProductCardDialog",
@@ -305,19 +306,11 @@ export default {
 
     addToCart() {
       const notificationStore = useNotificationStore()
+      const cartStore = useCartStore()
 
       try {
-        // Lấy order hiện tại từ localStorage
-        let order = JSON.parse(localStorage.getItem("order") || "[]");
-        
-        // Tìm ID lớn nhất hiện tại
-        const maxId = order.length > 0 
-          ? Math.max(...order.map(item => item.id))
-          : 0;
-        
-        // Tạo entry mới với ID tăng dần
+        // Tạo entry mới
         const entry = {
-          id: maxId + 1, // ID mới sẽ là maxId + 1
           product_item: {
             id: this.id,
             image_url: this.image_url,
@@ -334,22 +327,14 @@ export default {
           note: this.note
         };
 
-        // Update localStorage
-        order.push(entry);
-        localStorage.setItem("order", JSON.stringify(order));
-        localStorage.setItem("entry", JSON.stringify(entry));
+        // Sử dụng cartStore thay vì localStorage
+        cartStore.addItem(entry)
 
-        // Dispatch event
-        window.dispatchEvent(new CustomEvent('order-localstorage-changed', {
-          detail: { storage: localStorage.getItem('order') }
-        }));
-
-        // Thêm thông báo thành công
+        // Thông báo thành công
         notificationStore.success(`Đã thêm "${this.name}" vào giỏ hàng`, 3000)
 
         this.resetForm();
       } catch (error) {
-        // Thêm thông báo lỗi
         notificationStore.error('Không thể thêm vào giỏ hàng: ' + error.message)
       }
     },

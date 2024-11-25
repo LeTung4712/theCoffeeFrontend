@@ -57,7 +57,7 @@
                 variant="text"
                 density="compact"
                 class="mt-1"
-                @click="$emit('delete-item', order)"
+                @click="handleDeleteItem(order)"
               >
                 Xóa
               </v-btn>
@@ -115,6 +115,8 @@
 </template>
 
 <script>
+import { useNotificationStore } from '@/stores/notification'
+import { useCartStore } from '@/stores/cart'
 import EditOrderDialog from './EditOrderDialog.vue'
 
 export default {
@@ -134,7 +136,8 @@ export default {
         discount: 0
       },
       showEditDialog: false,
-      selectedOrder: null
+      selectedOrder: null,
+      isProcessingDelete: false
     }
   },
 
@@ -252,6 +255,38 @@ export default {
         this.calculateTotalPrice()
       }
       this.showEditDialog = false
+    },
+
+    async handleDeleteItem(item) {
+      if (this.isProcessingDelete) return
+      
+      const notificationStore = useNotificationStore()
+      const cartStore = useCartStore()
+      this.isProcessingDelete = true
+      
+      try {
+        if (!item || !item.id) {
+          console.error('Item hoặc item.id không hợp lệ:', item)
+          return
+        }
+
+        cartStore.removeItem(item.id)
+        await this.loadOrderData()
+
+        if (cartStore.itemCount === 0) {
+          notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000)
+          setTimeout(() => {
+            this.$router.push('/mainpage')
+          }, 3000)
+        } else {
+          notificationStore.success(`Đã xóa "${item.product_item.name}" khỏi giỏ hàng`, 3000)
+        }
+      } catch (error) {
+        console.error('Chi tiết lỗi:', error)
+        notificationStore.error('Lỗi khi xóa sản phẩm: ' + error.message)
+      } finally {
+        this.isProcessingDelete = false
+      }
     }
   }
 }
