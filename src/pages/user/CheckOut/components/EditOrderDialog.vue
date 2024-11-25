@@ -212,7 +212,7 @@ export default {
 
   computed: {
     hasToppings() {
-      return this.topping_items?.length > 0;
+      return this.topping_items?.length > 1;
     }
   },
 

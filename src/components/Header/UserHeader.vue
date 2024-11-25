@@ -34,23 +34,23 @@
         <!-- User Menu & Cart -->
         <v-col cols="auto" class="pr-4">
           <v-row no-gutters align="center">
+            
             <!-- User Menu -->
             <v-col cols="auto">
-              <v-menu v-model="displayClick" location="bottom" :close-on-content-click="false">
-                <template v-slot:activator="{ props }">
-                  <v-btn v-bind="props" icon variant="text" height="48">
-                    <v-avatar size="40">
-                      <v-img :src="userAvatar" />
-                    </v-avatar>
-                    <!-- Tên user chỉ hiện trên desktop -->
-                    <span v-if="logged" class="ml-2 text-body-1 d-none d-sm-flex">
-                      {{ user.last_name }}
-                    </span>
-                  </v-btn>
-                </template>
+              <template v-if="logged">
+                <v-menu v-model="displayClick" location="bottom" :close-on-content-click="false">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" icon variant="text" height="48">
+                      <v-avatar size="40">
+                        <v-img :src="userAvatar" />
+                      </v-avatar>
+                      <span class="ml-2 text-body-1 d-none d-sm-flex">
+                        {{ user.last_name }}
+                      </span>
+                    </v-btn>
+                  </template>
 
-                <v-list>
-                  <template v-if="logged">
+                  <v-list>
                     <v-list-item
                       v-for="(item, index) in userMenuItems"
                       :key="index"
@@ -64,14 +64,22 @@
                       title="Thoát"
                       @click="logout"
                     />
-                  </template>
-                  <template v-else>
-                    <v-list-item>
-                      <!-- <authentication-user /> -->
-                    </v-list-item>
-                  </template>
-                </v-list>
-              </v-menu>
+                  </v-list>
+                </v-menu>
+              </template>
+              <template v-else>
+                <!-- Khi chưa đăng nhập, click avatar sẽ mở dialog -->
+                <v-btn icon variant="text" height="48" @click="openLoginDialog">
+                  <v-avatar size="40">
+                    <v-img :src="userAvatar" />
+                  </v-avatar>
+                </v-btn>
+                <!-- Login Popup -->
+                <login-popup 
+                  ref="loginPopup"
+                  @login-success="handleLoginSuccess"
+                />
+              </template>
             </v-col>
 
             <!-- Cart Button -->
@@ -101,12 +109,14 @@
 <script>
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
+import LoginPopup from '@/pages/user/Auth/LoginPopup.vue'
 
 export default {
   name: "UserHeader",
   
   components: {
-    DeliveryAddressButton
+    DeliveryAddressButton,
+    LoginPopup
   },
 
   data() {
@@ -192,6 +202,17 @@ export default {
 
     handleAddressChange(newAddress) {
       this.oldAddress = newAddress
+    },
+
+    handleLoginSuccess(userData) {
+      this.user = userData;
+      this.logged = true;
+      this.displayClick = false;
+    },
+
+    openLoginDialog() {
+      // Gọi method openDialog của component LoginPopup
+      this.$refs.loginPopup.openDialog();
     }
   },
 
