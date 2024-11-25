@@ -43,7 +43,10 @@
         <!-- Categories -->
         <v-row justify="center" class="mb-6">
           <v-col cols="12" md="10" lg="8">
-            <div class="category-group">
+            <div v-if="loadingCategories" class="d-flex justify-center my-4">
+              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            </div>
+            <div v-else class="category-group">
               <div v-for="category in categories" :key="category.id" class="category-item"
                 :class="{ 'selected': category_type === category.id }" @click="category_type = category.id">
                 <div class="category-image-wrapper">
@@ -59,10 +62,21 @@
 
         <!-- Products Grid -->
         <v-row class="mt-6">
-          <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4" lg="2">
-            <ProductCard :product="product" :currentID="currentID" :dialog="dialog" :imageSize="imageSize"
-              class="product-card-responsive" />
-          </v-col>
+          <template v-if="loadingProducts">
+            <v-col v-for="n in 6" :key="n" cols="12" sm="6" md="4" lg="2">
+              <v-skeleton-loader
+                class="product-card-responsive"
+                type="card"
+                height="300"
+              ></v-skeleton-loader>
+            </v-col>
+          </template>
+          <template v-else>
+            <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4" lg="2">
+              <ProductCard :product="product" :currentID="currentID" :dialog="dialog" :imageSize="imageSize"
+                class="product-card-responsive" />
+            </v-col>
+          </template>
         </v-row>
       </v-col>
     </v-row>
@@ -121,6 +135,8 @@ export default {
         }
       ],
       imageSize: 155,
+      loadingCategories: false,
+      loadingProducts: false,
     }
   },
 
@@ -139,7 +155,11 @@ export default {
 
   methods: {
     async getCategories() {
+      this.loadingCategories = true
       try {
+        // Thêm delay 1.5s để test loading
+        //await new Promise(resolve => setTimeout(resolve, 1500))
+        
         const response = await categoryAPI.getByParentId({ params: { parent_id: 0 } })
         if (response?.data?.categories?.length) {
           this.categories = response.data.categories
@@ -147,11 +167,17 @@ export default {
         }
       } catch (error) {
         console.error('Lỗi khi lấy danh mục:', error)
+      } finally {
+        this.loadingCategories = false
       }
     },
 
     async getProductsByCategoryId() {
+      this.loadingProducts = true
       try {
+        // Thêm delay 2s để test loading
+        //await new Promise(resolve => setTimeout(resolve, 2000))
+        
         const response = await productAPI.getByCategory({ params: { category_id: this.category_type } })
 
         if (response?.data?.products?.length) {
@@ -160,11 +186,16 @@ export default {
         }
       } catch (error) {
         console.error('Lỗi khi lấy sản phẩm:', error)
+      } finally {
+        this.loadingProducts = false
       }
     },
 
     async getAllProducts() {
       try {
+        // Thêm delay 1s để test loading
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
         const response = await productAPI.getAll()
         if (response?.data?.products?.length) {
           this.product_searchs = response.data.products
