@@ -5,7 +5,7 @@
         <!-- Header -->
         <v-card flat class="text-center mb-8">
           <v-card-title class="text-h4 font-weight-bold">
-            <v-icon color="amber" size="x-large" class="mr-2">mdi-file</v-icon>
+            <v-icon color="primary" size="x-large" class="mr-2">mdi-file</v-icon>
             Xác nhận đơn hàng
           </v-card-title>
         </v-card>
@@ -21,18 +21,35 @@
               <payment-methods
                 @payment-method-changed="handlePaymentMethodChanged"
               />
-              <!-- Thêm nút xóa toàn bộ đơn hàng -->
+              
+              <!-- Thêm checkbox điều khoản -->
+              <v-card flat class="pa-4 bg-grey-lighten-4">
+                <v-checkbox
+                  v-model="agreedToTerms"
+                  color="primary"
+                >
+                  <template #label>
+                    <span>
+                      Đồng ý với các 
+                      <a href="#" class="text-primary text-decoration-underline">điều khoản và điều kiện</a>
+                      mua hàng của The Coffee House
+                    </span>
+                  </template>
+                </v-checkbox>
+              </v-card>
+
+              <!-- Nút xóa đơn hàng -->
               <v-card-actions class="pa-4 bg-grey-lighten-4">
-                  <v-btn
-                    block
-                    color="error"
-                    variant="outlined"
-                    prepend-icon="mdi-delete"
-                    @click="handleDeleteOrder"
-                  >
-                    Xóa toàn bộ đơn hàng
-                  </v-btn>
-                </v-card-actions>
+                <v-btn
+                  block
+                  color="error"
+                  variant="outlined"
+                  prepend-icon="mdi-delete"
+                  @click="handleDeleteOrder"
+                >
+                  Xóa toàn bộ đơn hàng
+                </v-btn>
+              </v-card-actions>
             </v-col>
 
             <!-- Right Column -->
@@ -46,7 +63,7 @@
                 />
                 
                 <!-- Desktop footer giữ nguyên -->
-                <v-card-actions class="bg-orange pa-4 desktop-footer">
+                <v-card-actions class="bg-primary pa-4 desktop-footer">
                   <v-row no-gutters align="center">
                     <v-col>
                       <div class="text-white">
@@ -134,7 +151,8 @@ export default {
       orderData: null,
       deliveryInfo: null,
       paymentMethod: 'cod',
-      totalAmount: 0
+      totalAmount: 0,
+      agreedToTerms: false
     }
   },
 
@@ -149,7 +167,10 @@ export default {
 
   methods: {
     handleOrderLoaded(data) {
-      this.orderData = data
+      this.orderData = {
+        items: data.items,
+        totalPrice: data.totalPrice
+      }
       this.totalAmount = data.totalPrice
     },
 
@@ -216,17 +237,13 @@ export default {
     },
 
     handleDeleteItem(item) {
-      // Lấy orders hiện tại từ localStorage
       const currentOrders = JSON.parse(localStorage.getItem('order') || '[]')
-      // Lọc bỏ item cần xóa
       const updatedOrders = currentOrders.filter(order => order.id !== item.id)
-      // Cập nhật lại localStorage
       localStorage.setItem('order', JSON.stringify(updatedOrders))
-      // Reload lại component OrderSummary
+      
       this.$nextTick(() => {
-        const orderSummary = this.$refs.orderSummary
-        if (orderSummary) {
-          orderSummary.loadOrderData()
+        if (this.$refs.orderSummary) {
+          this.$refs.orderSummary.loadOrderData()
         }
       })
     },
@@ -236,6 +253,11 @@ export default {
     },
 
     validateAndCheckout() {
+      if (!this.agreedToTerms) {
+        alert('Vui lòng đồng ý với điều khoản và điều kiện để tiếp tục đặt hàng')
+        return
+      }
+
       if (!this.deliveryInfo?.isLogged) {
         alert('Vui lòng đăng nhập để đặt hàng')
         return
@@ -255,12 +277,12 @@ export default {
 
 <style scoped>
 .desktop-footer {
-  background-color: #fa8c16;
+  background-color: rgb(var(--v-theme-primary)) !important;
 }
 
 .mobile-footer {
   display: none;
-  background-color: #fa8c16;
+  background-color: rgb(var(--v-theme-primary)) !important;
   padding: 16px;
 }
 
@@ -295,19 +317,31 @@ export default {
   text-transform: none;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
-  color: #fa8c16 !important;
+  color: rgb(var(--v-theme-primary)) !important;
   font-size: 1.1rem;
   cursor: pointer;
 }
 
 .order-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(250, 140, 22, 0.3);
-  background: linear-gradient(145deg, #ffffff, #fff5e6);
+  box-shadow: 0 6px 20px rgba(var(--v-theme-primary), 0.3);
+  background: linear-gradient(145deg, rgb(var(--v-theme-background)), rgb(var(--v-theme-secondary)));
 }
 
 .order-button:active {
   transform: translateY(1px);
-  background: linear-gradient(145deg, #fff5e6, #ffffff);
+  background: linear-gradient(145deg, rgb(var(--v-theme-secondary)), rgb(var(--v-theme-background)));
+}
+
+.text-primary {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.text-decoration-underline {
+  text-decoration: underline;
+}
+
+.text-decoration-underline:hover {
+  opacity: 0.8;
 }
 </style>

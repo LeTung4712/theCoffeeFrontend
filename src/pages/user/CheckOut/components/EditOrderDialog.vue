@@ -96,7 +96,7 @@
               v-for="option in sizeOptions"
               :key="option.value"
               :value="option.value"
-              color="warning"
+              color="primary"
               class="flex-grow-1 mx-4"
             >
               <template v-slot:label>
@@ -121,7 +121,7 @@
             :key="topping.id"
             v-model="checked_topping"
             :value="topping"
-            color="warning"
+            color="primary"
             density="comfortable"
             hide-details
             class="mb-2"
@@ -142,11 +142,11 @@
       <v-card-actions class="pa-4 bg-white border-top sticky-footer">
         <v-btn
           block
-          color="warning-darken-2"
+          color="primary"
+          variant="flat"
           :height="$vuetify.display.mobile ? '48' : '52'"
           rounded="pill"
-          class="text-capitalize font-weight-bold text-white"
-          :style="{ backgroundColor: '#d46b08' }"
+          class="text-capitalize font-weight-bold text-white update-btn"
           @click="saveChanges"
           :loading="isLoading"
           :disabled="isLoading"
@@ -313,8 +313,162 @@ export default {
 </script>
 
 <style scoped>
+.v-dialog > .v-card {
+  overflow: hidden !important;
+}
+
+.v-btn:hover {
+  opacity: 0.9;
+}
+
+.v-dialog-transition-enter-active,
+.v-dialog-transition-leave-active {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.v-dialog-transition-enter-from,
+.v-dialog-transition-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.v-dialog {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+}
+
+.v-card {
+  border: none !important;
+  background-color: white !important;
+}
+
+.v-btn-group {
+  border: 1px solid var(--tch-warning) !important;
+}
+
+.v-text-field :deep(.v-field__outline) {
+  border-radius: 12px !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--tch-border-color);
+}
+
+.border-top {
+  border-top: 1px solid var(--tch-border-color);
+}
+
+.border {
+  border: 1px solid var(--tch-border-color);
+}
+
+.update-btn {
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+}
+
+.update-btn:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(var(--tch-primary), 0.2);
+}
+
+.update-btn:active {
+  transform: translateY(0);
+}
+
 .dialog-card {
+  margin: 0;
+  height: 100%;
+}
+
+@media (max-width: 600px) {
+  .v-dialog {
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+    max-height: 90vh !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  .mobile-card-content {
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+    padding-bottom: 80px !important;
+  }
+
+  .quantity-group {
+    transform: scale(0.9);
+  }
+
+  .v-card-title {
+    font-size: 1.1rem !important;
+  }
+
+  .v-card-text {
+    padding: 12px !important;
+  }
+
+  .border {
+    padding: 8px !important;
+  }
+}
+
+.quantity-group {
+  border: 1px solid var(--tch-warning) !important;
+  height: 40px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.quantity-group .v-btn {
+  color: var(--tch-warning) !important;
+}
+
+.quantity-group .v-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  height: 60%;
+  width: 1px;
+  background-color: var(--tch-warning);
+  opacity: 0.2;
+  transform: translateY(-50%);
+}
+
+.quantity-text {
+  min-width: 40px;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: var(--tch-text-primary) !important;
+  font-size: 1rem;
+}
+
+.description-container {
   position: relative;
+}
+
+.truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-more-btn {
+  color: var(--tch-warning);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.read-more-btn:hover {
+  text-decoration: underline;
 }
 
 .sticky-header {
@@ -331,12 +485,34 @@ export default {
   background: white;
 }
 
-.mobile-card-content {
-  padding-bottom: 80px !important; /* Để tránh nội dung bị footer che khuất */
-}
-
 .v-btn--loading {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .size-radio-group {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    padding: 0 8px !important;
+    margin: 0 -8px !important;
+  }
+
+  .size-radio-group :deep(.v-radio) {
+    margin: 0 10px !important;
+    padding: 0 !important;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .size-radio-group :deep(.v-radio .v-label) {
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .size-radio-group :deep(.v-radio .v-selection-control) {
+    margin-inline-end: 4px !important;
+  }
 }
 </style> 

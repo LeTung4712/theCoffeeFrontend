@@ -165,9 +165,9 @@ export default {
 .delivery-btn {
     min-width: 220px;
     height: 56px !important;
-    background-color: rgb(232 130 21 / 70%) !important;
-    transition: var(--tch-transition);
-    border-radius: var(--tch-border-radius);
+    background-color: rgb(var(--v-theme-secondary)) !important;
+    transition: 0.3s ease-in-out;
+    border-radius: 8px;
 }
 
 /* Điều chỉnh kích thước cho mobile */
@@ -186,10 +186,10 @@ export default {
 .delivery-dialog .v-list-item {
     cursor: pointer;
     transition: background-color 0.2s;
-    border-radius: var(--tch-border-radius);
+    border-radius: 8px;
 }
 
 .delivery-dialog .v-list-item:hover {
-    background-color: var(--tch-hover-color);
+    background-color: rgb(var(--v-theme-surface-variant));
 }
 </style>

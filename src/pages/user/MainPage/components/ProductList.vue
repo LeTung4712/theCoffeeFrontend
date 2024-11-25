@@ -4,13 +4,13 @@
       <v-col>
         <!-- Header -->
         <v-row align="center" justify="center" class="mb-8">
-          <v-icon class="mr-3">mdi-beer-outline</v-icon>
+          <v-icon class="mr-3" color="primary">mdi-beer-outline</v-icon>
           <span class="text-h4 font-weight-bold">Sản phẩm từ Nhà</span>
 
           <!-- Search Dialog -->
           <v-dialog v-model="dialogSearch" max-width="700" class="mt-16">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" icon variant="text" class="ml-4" color="grey-lighten-1">
+              <v-btn v-bind="props" icon variant="text" class="ml-4" color="primary">
                 <v-icon size="32">mdi-magnify</v-icon>
               </v-btn>
             </template>
@@ -18,7 +18,7 @@
             <v-card>
               <v-card-title class="d-flex align-center">
                 <v-btn icon @click="dialogSearch = false">
-                  <v-icon size="32">mdi-close</v-icon>
+                  <v-icon size="32" color="text-secondary">mdi-close</v-icon>
                 </v-btn>
                 <span class="mx-auto">Tìm kiếm</span>
               </v-card-title>
@@ -293,8 +293,8 @@ export default {
   height: 80px;
   border-radius: 50%;
   padding: 6px;
-  background: white;
-  border: 2px solid #e5e5e5;
+  background: rgb(var(--v-theme-background));
+  border: 2px solid rgba(0, 0, 0, 0.12);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -305,12 +305,12 @@ export default {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50%;
-  background-color: #fff7e6;
+  background-color: rgb(var(--v-theme-secondary));
 }
 
 .category-name {
   font-size: 14px;
-  color: #b2b2b2;
+  color: rgb(var(--v-theme-text-secondary));
   text-align: center;
   font-weight: 400;
   white-space: normal;
@@ -319,23 +319,23 @@ export default {
 }
 
 .selected .category-image-wrapper {
-  border-color: #fa8c16;
+  border-color: rgb(var(--v-theme-primary));
   transform: scale(1.05);
 }
 
 .selected .category-name {
-  color: #000000;
+  color: rgb(var(--v-theme-text-primary));
   font-weight: 500;
 }
 
 /* Animation khi hover */
 .category-item:hover .category-image-wrapper {
-  border-color: #fa8c16;
+  border-color: rgb(var(--v-theme-primary));
   transform: scale(1.05);
 }
 
 .category-item:hover .category-name {
-  color: #000000;
+  color: rgb(var(--v-theme-text-primary));
 }
 
 /* Mobile styles */
@@ -371,7 +371,7 @@ export default {
   height: 300px;
   display: flex;
   flex-direction: column;
-  background: white;
+  background: rgb(var(--v-theme-background));
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
 }
@@ -383,14 +383,14 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgb(var(--v-theme-text-secondary));
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
 }
 
 .product-card:hover::after {
-  opacity: 1;
+  opacity: 0.05;
 }
 
 .product-card:hover {
@@ -441,7 +441,7 @@ export default {
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 40px;
-  color: rgba(0, 0, 0, 0.87) !important;
+  color: rgb(var(--v-theme-text-primary)) !important;
   font-size: 1rem;
   margin-bottom: 4px;
   line-height: 1.4;
@@ -616,6 +616,7 @@ export default {
     max-width: 50%;
     padding: 12px;
   }
+
 }
 
 /* Thêm styles mới cho responsive */
@@ -644,7 +645,7 @@ export default {
 .sticky-search {
   position: sticky;
   top: 0;
-  background: white;
+  background: rgb(var(--v-theme-background));
   z-index: 1;
   padding: 8px 0;
 }
@@ -655,16 +656,16 @@ export default {
 }
 
 .search-dialog-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgb(var(--v-theme-secondary));
   border-radius: 4px;
 }
 
 .search-dialog-content::-webkit-scrollbar-thumb {
-  background: #888;
+  background: rgb(var(--v-theme-text-secondary));
   border-radius: 4px;
 }
 
 .search-dialog-content::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgb(var(--v-theme-text-primary));
 }
 </style>

@@ -1,39 +1,36 @@
 <template>
   <div>
-    <v-card-title class="text-h6 font-weight-bold">
+    <v-card-title class="text-h6 font-weight-bold mb-4">
       Phương thức thanh toán
     </v-card-title>
 
-    <v-radio-group v-model="selectedPayment" class="pa-4">
-      <v-radio
+    <v-radio-group v-model="selectedPayment" class="payment-methods-group">
+      <div
         v-for="method in paymentMethods"
         :key="method.value"
-        :value="method.value"
-        :label="method.label"
+        :class="['payment-method', {'selected': selectedPayment === method.value}]"
+        @click="selectedPayment = method.value"
       >
-        <template #label>
-          <div class="d-flex align-center">
-            <v-img :src="method.image" width="24" height="24" class="mr-2"/>
-            <span>{{ method.label }}</span>
-          </div>
-        </template>
-      </v-radio>
+        <v-radio
+          :value="method.value"
+          hide-details
+          class="pa-0 payment-radio"
+        >
+          <template #label>
+            <div class="d-flex align-center py-3 px-4">
+              <v-img 
+                :src="method.image" 
+                width="32" 
+                height="32" 
+                class="mr-4 payment-icon"
+                :class="{'selected-icon': selectedPayment === method.value}"
+              />
+              <span class="font-weight-medium payment-label">{{ method.label }}</span>
+            </div>
+          </template>
+        </v-radio>
+      </div>
     </v-radio-group>
-
-    <v-checkbox
-      checked
-      disabled
-      label="Đồng ý với các điều khoản và điều kiện mua hàng của The Coffee House"
-      class="pa-4"
-    >
-      <template #label>
-        <span>
-          Đồng ý với các 
-          <a href="#" class="text-orange">điều khoản và điều kiện</a>
-          mua hàng của The Coffee House
-        </span>
-      </template>
-    </v-checkbox>
   </div>
 </template>
 
@@ -79,4 +76,63 @@ export default {
     }
   }
 }
-</script> 
+</script>
+
+<style scoped>
+.payment-methods-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.payment-method {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.payment-method:hover {
+  transform: translateY(-2px);
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+
+.payment-method.selected {
+  background-color: rgb(var(--v-theme-secondary));
+}
+
+.payment-radio {
+  opacity: 1 !important;
+}
+
+.payment-icon {
+  opacity: 1;
+  object-fit: contain;
+  display: block;
+}
+
+.payment-method:not(.selected) .payment-icon {
+  opacity: 0.85;
+}
+
+.selected-icon {
+  opacity: 1;
+}
+
+.payment-label {
+  color: rgb(var(--v-theme-text-primary));
+  font-weight: 500;
+}
+
+.payment-method.selected .payment-label {
+  color: rgb(var(--v-theme-primary));
+}
+
+:deep(.v-radio) {
+  opacity: 1 !important;
+}
+
+:deep(.v-radio__label) {
+  opacity: 1 !important;
+}
+</style> 

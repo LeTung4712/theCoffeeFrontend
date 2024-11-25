@@ -228,13 +228,12 @@ export default {
         return sum + this.getProductPrice(order)
       }, 0)
       
-      this.totalPrice = this.subtotal + 15000
+      this.totalPrice = this.subtotal + 15000 - (this.voucher?.discount || 0)
       
-      if (this.voucher && this.voucher.discount) {
-        this.totalPrice -= this.voucher.discount
-      }
-
-      this.$emit('update-total-price', this.totalPrice)
+      this.$emit('order-loaded', {
+        items: this.orders,
+        totalPrice: this.totalPrice
+      })
     },
 
     openEditDialog(order) {

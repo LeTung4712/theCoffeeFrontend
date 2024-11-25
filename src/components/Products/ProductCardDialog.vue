@@ -6,7 +6,7 @@
         <v-btn
           v-bind="props"
           icon="mdi-plus-circle"
-          color="#fa8c16"
+          color="primary"
           variant="text"
           size="x-large"
           title="thêm vào giỏ hàng"
@@ -15,9 +15,9 @@
       </template>
 
       <!-- Dialog Content -->
-      <v-card class="rounded-lg dialog-card">
+      <v-card class="rounded-lg dialog-card d-flex flex-column">
         <!-- Header -->
-        <v-card-title class="d-flex align-center py-3 px-4 bg-white border-bottom">
+        <v-card-title class="d-flex align-center py-3 px-4 bg-white border-bottom dialog-header">
           <v-btn
             icon="mdi-close"
             variant="text"
@@ -25,11 +25,11 @@
             @click="closeDialog"
             class="mr-2"
           />
-          <span class="mx-auto text-subtitle-1 font-weight-bold text-warning-darken-2">Thêm món mới</span>
+          <span class="mx-auto text-subtitle-1 font-weight-bold text-primary">Thêm món mới</span>
         </v-card-title>
 
         <!-- Body -->
-        <v-card-text class="pa-4 bg-white mobile-card-content">
+        <v-card-text class="pa-4 bg-white dialog-content flex-grow-1">
           <!-- Product Info -->
           <v-row no-gutters class="rounded-lg pa-3 border">
             <v-col cols="5" sm="5">
@@ -54,7 +54,7 @@
                 
                 <div class="d-flex justify-space-between align-center mt-2">
                   <span class="text-subtitle-1 font-weight-bold">{{ formatPrice(price) }}đ</span>
-                  <v-btn-group variant="outlined" color="warning" rounded="lg" class="quantity-group">
+                  <v-btn-group variant="outlined" color="primary" rounded="lg" class="quantity-group">
                     <v-btn
                       icon="mdi-minus"
                       variant="text"
@@ -105,7 +105,7 @@
                 v-for="option in sizeOptions"
                 :key="option.value"
                 :value="option.value"
-                color="warning"
+                color="primary"
                 class="flex-grow-1 mx-4"
               >
                 <template v-slot:label>
@@ -130,7 +130,7 @@
               :key="topping.id"
               v-model="checked_topping"
               :value="topping"
-              color="warning"
+              color="primary"
               density="comfortable"
               hide-details
               class="mb-2"
@@ -148,14 +148,14 @@
         </v-card-text>
 
         <!-- Footer -->
-        <v-card-actions class="pa-4 bg-white border-top">
+        <v-card-actions class="pa-4 bg-white border-top dialog-footer">
           <v-btn
             block
-            color="warning-darken-2"
+            color="primary"
+            variant="flat"
             :height="$vuetify.display.mobile ? '48' : '52'"
             rounded="pill"
             class="text-capitalize font-weight-bold text-white"
-            :style="{ backgroundColor: '#d46b08' }"
             @click="addToCart"
             :loading="isLoading"
             :disabled="isLoading"
@@ -207,7 +207,18 @@ export default {
       },
       size: 'S',
       checked_topping: [],
-      topping_items: [],
+      topping_items: [
+        {
+          id: 1,
+          name: "Topping 1",
+          price: 10000
+        },
+        {
+          id: 2,
+          name: "Topping 2",
+          price: 15000
+        }
+      ],
       sizeOptions: [
         { label: 'Lớn', value: 'L', price: 10000 },
         { label: 'Vừa', value: 'M', price: 6000 },
@@ -367,27 +378,6 @@ export default {
   opacity: 0.9;
 }
 
-/* Custom scrollbar cho dialog content */
-.v-card-text {
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #fa8c16 #f5f5f5;
-}
-
-.v-card-text::-webkit-scrollbar {
-  width: 6px;
-}
-
-.v-card-text::-webkit-scrollbar-track {
-  background: #f5f5f5;
-}
-
-.v-card-text::-webkit-scrollbar-thumb {
-  background-color: #fa8c16;
-  border-radius: 3px;
-}
-
 /* Animation cho dialog */
 .v-dialog-transition-enter-active,
 .v-dialog-transition-leave-active {
@@ -411,7 +401,7 @@ export default {
 }
 
 .v-btn-group {
-  border: 1px solid #fa8c16 !important;
+  border: 1px solid var(--tch-primary) !important;
 }
 
 .v-text-field :deep(.v-field__outline) {
@@ -419,15 +409,15 @@ export default {
 }
 
 .border-bottom {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--tch-border-color);
 }
 
 .border-top {
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 1px solid var(--tch-border-color);
 }
 
 .border {
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--tch-border-color);
 }
 
 /* Style cho nút thêm vào giỏ hàng */
@@ -440,7 +430,7 @@ export default {
   opacity: 0.95;
   transform: translateY(-1px);
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(212, 107, 8, 0.2);
+  box-shadow: 0 4px 12px rgba(var(--tch-primary), 0.2);
 }
 
 .v-btn.v-btn--size-large:active {
@@ -504,8 +494,26 @@ export default {
 }
 
 .quantity-group {
-  border: 1px solid #fa8c16 !important;
+  border: 1px solid var(--tch-primary) !important;
   height: 40px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.quantity-group .v-btn {
+  color: var(--tch-primary) !important;
+}
+
+.quantity-group .v-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  height: 60%;
+  width: 1px;
+  background-color: var(--tch-primary);
+  opacity: 0.2;
+  transform: translateY(-50%);
 }
 
 .quantity-text {
@@ -515,7 +523,7 @@ export default {
   align-items: center;
   justify-content: center;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.87) !important;
+  color: var(--tch-text-primary) !important;
   font-size: 1rem;
 }
 
@@ -546,7 +554,7 @@ export default {
 }
 
 .read-more-btn {
-  color: #fa8c16;
+  color: var(--tch-primary);
   cursor: pointer;
   font-weight: 500;
   font-size: 0.875rem;
@@ -588,5 +596,67 @@ export default {
 .v-btn--loading {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Cập nhật style cho border chung */
+.border {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.border-bottom {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.border-top {
+  border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Thêm hiệu ứng hover cho quantity group */
+.quantity-group:hover {
+  border-color: var(--tch-primary) !important;
+  opacity: 0.85;
+}
+
+.quantity-group .v-btn:hover {
+  background-color: rgba(76, 175, 80, 0.05) !important; /* --tch-primary với opacity */
+}
+
+/* Thêm styles mới cho dialog layout */
+.dialog-card {
+  height: 100%;
+  max-height: 100vh;
+}
+
+.dialog-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+}
+
+.dialog-content {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dialog-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: white;
+}
+
+/* Cập nhật mobile styles */
+@media (max-width: 600px) {
+  .dialog-card {
+    max-height: 90vh;
+    height: 90vh;
+  }
+
+  .dialog-content {
+    padding: 12px !important;
+    max-height: none !important; /* Xóa max-height cũ */
+  }
 }
 </style>
