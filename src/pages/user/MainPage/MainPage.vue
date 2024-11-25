@@ -50,6 +50,7 @@ export default {
         "https://file.hstatic.net/1000075078/file/banner_web_moi_-_desktop_4c05cc897a634650b7dc685dd5e0d7f7.jpg",
         "https://file.hstatic.net/1000075078/file/desktop_b924413014a1448eb0a38024cd8bc270.jpg",
         "https://file.hstatic.net/1000075078/file/web_desktop_aeb6f5acca5d46adad94c262dcd9ac72.jpg",
+        "https://file.hstatic.net/1000075078/file/web_moi_-_desktop_1722134bf9ec49c1a6dd0bf7ccba81e5.jpg"
       ],
     };
   },

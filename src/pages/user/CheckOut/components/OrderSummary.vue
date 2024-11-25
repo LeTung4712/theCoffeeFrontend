@@ -187,7 +187,7 @@ export default {
       if (!order?.product_item) return 0
       
       const basePrice = Number(order.product_item.price) * (order.count || 1)
-      const toppingPrice = this.calculateToppingPrice(order.topping_items)
+      const toppingPrice = this.calculateToppingPrice(order.topping_items) * (order.count || 1)
       const sizePrice = this.calculateSizePrice(order.size, order.count || 1)
       
       return basePrice + toppingPrice + sizePrice

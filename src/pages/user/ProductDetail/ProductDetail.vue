@@ -326,8 +326,9 @@ export default {
             const notificationStore = useNotificationStore()
 
             try {
+                let orders = JSON.parse(localStorage.getItem('order') || '[]')
                 const entry = {
-                    id: this.product.id,
+                    id: orders.length > 0 ? Math.max(...orders.map(item => item.id)) + 1 : 1,
                     product_item: {
                         ...this.product,
                         id: this.product.id
@@ -340,7 +341,6 @@ export default {
                     }))
                 }
 
-                const orders = JSON.parse(localStorage.getItem('order') || '[]')
                 orders.push(entry)
 
                 localStorage.setItem('order', JSON.stringify(orders))

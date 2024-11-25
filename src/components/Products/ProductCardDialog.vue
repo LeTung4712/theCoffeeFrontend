@@ -186,7 +186,7 @@ export default {
     image_url: String,
     name: String,
     description: String, 
-    price: String,
+    price: Number,
     dialog: {
       type: Boolean,
       default: false
@@ -307,8 +307,17 @@ export default {
       const notificationStore = useNotificationStore()
 
       try {
+        // Lấy order hiện tại từ localStorage
+        let order = JSON.parse(localStorage.getItem("order") || "[]");
+        
+        // Tìm ID lớn nhất hiện tại
+        const maxId = order.length > 0 
+          ? Math.max(...order.map(item => item.id))
+          : 0;
+        
+        // Tạo entry mới với ID tăng dần
         const entry = {
-          id: this.id,
+          id: maxId + 1, // ID mới sẽ là maxId + 1
           product_item: {
             id: this.id,
             image_url: this.image_url,
@@ -326,7 +335,6 @@ export default {
         };
 
         // Update localStorage
-        const order = JSON.parse(localStorage.getItem("order") || "[]");
         order.push(entry);
         localStorage.setItem("order", JSON.stringify(order));
         localStorage.setItem("entry", JSON.stringify(entry));

@@ -3,7 +3,7 @@
     v-model="isVisible"
     :color="notification.type"
     :timeout="notification.duration"
-    location="top"
+    location="top right"
     class="notification-bar"
   >
     <div class="d-flex align-center">

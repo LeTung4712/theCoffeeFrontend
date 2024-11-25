@@ -187,7 +187,8 @@ export default {
       totalAmount: 0,
       agreedToTerms: false,
       showConfirmDialog: false,
-      isDeleting: false
+      isDeleting: false,
+      isProcessingDelete: false,
     }
   },
 
@@ -314,31 +315,44 @@ export default {
       }
     },
 
-    handleDeleteItem(item) {
+    async handleDeleteItem(item) {
+      if (this.isProcessingDelete) return // Prevent multiple simultaneous deletions
+      
       const notificationStore = useNotificationStore()
+      this.isProcessingDelete = true
       
       try {
+        if (!item || !item.id) {
+          console.error('Item hoặc item.id không hợp lệ:', item)
+          return
+        }
+
         const currentOrders = JSON.parse(localStorage.getItem('order') || '[]')
         const updatedOrders = currentOrders.filter(order => order.id !== item.id)
-        localStorage.setItem('order', JSON.stringify(updatedOrders))
         
-        this.$nextTick(() => {
-          if (this.$refs.orderSummary) {
-            this.$refs.orderSummary.loadOrderData()
-          }
+        await new Promise(resolve => {
+          localStorage.setItem('order', JSON.stringify(updatedOrders))
+          resolve()
         })
 
-        // Kiểm tra nếu không còn item nào trong đơn hàng
+        await this.$nextTick()
+        if (this.$refs.orderSummary) {
+          await this.$refs.orderSummary.loadOrderData()
+        }
+
         if (updatedOrders.length === 0) {
-          notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000);
+          notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000)
           setTimeout(() => {
-            this.$router.push('/mainpage'); // Chuyển về trang chính sau 3 giây
-          }, 3000);
+            this.$router.push('/mainpage')
+          }, 3000)
         } else {
           notificationStore.success(`Đã xóa "${item.product_item.name}" khỏi giỏ hàng`, 3000)
         }
       } catch (error) {
+        console.error('Chi tiết lỗi:', error)
         notificationStore.error('Lỗi khi xóa sản phẩm: ' + error.message)
+      } finally {
+        this.isProcessingDelete = false
       }
     },
 
