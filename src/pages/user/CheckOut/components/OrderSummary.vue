@@ -99,8 +99,15 @@
       <v-list-item class="px-0">
         <template v-slot:default>
           <div class="d-flex justify-space-between w-100">
-            <span>{{ voucher.description }}</span>
-            <span>-{{ formatPrice(voucher.discount) }}đ</span>
+            <EditVoucherDialog
+              v-model="selectedVoucher"
+              :total-price="subtotal"
+              @voucher-selected="handleVoucherSelected"
+            />
+            <span v-if="selectedVoucher" class="text-orange">
+              -{{ formatPrice(selectedVoucher.price) }}đ
+            </span>
+            <span v-else>0đ</span>
           </div>
         </template>
       </v-list-item>
@@ -118,12 +125,15 @@
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 import EditOrderDialog from './EditOrderDialog.vue'
+import EditVoucherDialog from './EditVoucherDialog.vue'
+import { useVoucherStore } from '@/stores/voucher'
 
 export default {
   name: 'OrderSummary',
   
   components: {
-    EditOrderDialog
+    EditOrderDialog,
+    EditVoucherDialog
   },
 
   data() {
@@ -131,10 +141,7 @@ export default {
       orders: [],
       totalPrice: 0,
       subtotal: 0,
-      voucher: {
-        description: "Xem thêm khuyến mãi",
-        discount: 0
-      },
+      selectedVoucher: null,
       showEditDialog: false,
       selectedOrder: null,
       isProcessingDelete: false
@@ -143,12 +150,26 @@ export default {
 
   created() {
     this.loadOrderData()
+    this.voucherStore.loadVoucherFromStorage()
+    window.addEventListener('voucher-localstorage-changed', this.handleVoucherChange)
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('voucher-localstorage-changed', this.handleVoucherChange)
   },
 
   computed: {
     safeOrders() {
       return this.orders || []
+    },
+    selectedVoucher() {
+      return this.voucherStore.selectedVoucher
     }
+  },
+
+  setup() {
+    const voucherStore = useVoucherStore()
+    return { voucherStore }
   },
 
   methods: {
@@ -189,9 +210,10 @@ export default {
     getProductPrice(order) {
       if (!order?.product_item) return 0
       
-      const basePrice = Number(order.product_item.price) * (order.count || 1)
-      const toppingPrice = this.calculateToppingPrice(order.topping_items) * (order.count || 1)
-      const sizePrice = this.calculateSizePrice(order.size, order.count || 1)
+      const count = order.count || 1
+      const basePrice = Number(order.product_item.price) * count
+      const toppingPrice = this.calculateToppingPrice(order.topping_items, count)
+      const sizePrice = this.calculateSizePrice(order.size, count)
       
       return basePrice + toppingPrice + sizePrice
     },
@@ -206,11 +228,11 @@ export default {
       )
     },
 
-    calculateToppingPrice(toppings = []) {
+    calculateToppingPrice(toppings = [], count = 1) {
       if (!Array.isArray(toppings)) return 0
       return toppings.reduce((sum, topping) => {
-        if (!topping?.price || topping.count !== 1) return sum
-        return sum + Number(topping.price)
+        if (!topping?.price) return sum
+        return sum + (Number(topping.price) * count)
       }, 0)
     },
 
@@ -227,15 +249,19 @@ export default {
     },
 
     calculateTotalPrice() {
-      this.subtotal = this.orders.reduce((sum, order) => {
+      this.subtotal = Math.max(0, this.orders.reduce((sum, order) => {
         return sum + this.getProductPrice(order)
-      }, 0)
+      }, 0))
       
-      this.totalPrice = this.subtotal + 15000 - (this.voucher?.discount || 0)
+      const shippingFee = 15000
+      const discount = this.voucherStore.selectedVoucher?.price || 0
+      
+      this.totalPrice = Math.max(0, this.subtotal + shippingFee - discount)
       
       this.$emit('order-loaded', {
         items: this.orders,
-        totalPrice: this.totalPrice
+        totalPrice: this.totalPrice,
+        voucher: this.voucherStore.selectedVoucher
       })
     },
 
@@ -287,6 +313,18 @@ export default {
       } finally {
         this.isProcessingDelete = false
       }
+    },
+
+    handleVoucherChange(event) {
+      if (event.detail?.storage) {
+        this.voucherStore.selectedVoucher = JSON.parse(event.detail.storage)
+        this.calculateTotalPrice()
+      }
+    },
+
+    handleVoucherSelected(voucher) {
+      this.voucherStore.setSelectedVoucher(voucher)
+      this.calculateTotalPrice()
     }
   }
 }

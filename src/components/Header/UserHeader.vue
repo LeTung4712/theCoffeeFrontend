@@ -110,6 +110,7 @@
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
 import LoginPopup from '@/pages/user/Auth/LoginPopup.vue'
+import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
 
 export default {
@@ -122,14 +123,13 @@ export default {
 
   setup() {
     const cartStore = useCartStore()
-    return { cartStore }
+    const authStore = useAuthStore()
+    return { cartStore, authStore }
   },
 
   data() {
     return {
       oldAddress: "...",
-      logged: false,
-      user: {},
       drawer: false,
       group: null,
       displayClick: false,
@@ -150,6 +150,12 @@ export default {
   },
 
   computed: {
+    logged() {
+      return this.authStore.isLoggedIn
+    },
+    user() {
+      return this.authStore.userInfo
+    },
     userAvatar() {
       return this.logged
         ? 'https://th.bing.com/th/id/OIP.4bP4PqQqYnMYbub5PNgXeQHaEK?w=311&h=180&c=7&r=0&o=5&pid=1.7'
@@ -185,7 +191,10 @@ export default {
     },
 
     logout() {
-      // Xử lý khi click vào menu item "Thoát"
+      this.authStore.logout()
+      this.displayClick = false
+      // Có thể thêm chuyển hướng về trang chủ nếu cần
+      this.$router.push('/')
     },
 
     handelClickCart() {

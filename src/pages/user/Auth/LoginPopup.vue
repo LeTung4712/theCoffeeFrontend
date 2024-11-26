@@ -128,6 +128,7 @@
 <script>
 import { userAPI } from "@/api/user";
 import { useNotificationStore } from '@/stores/notification';
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   name: "LoginPopup",
@@ -253,6 +254,8 @@ export default {
     // Xác thực OTP
     async sendOTP() {
       const notificationStore = useNotificationStore();
+      const authStore = useAuthStore();
+      
       if (this.data.otp.length !== 6) {
         notificationStore.error('Vui lòng nhập đủ 6 số OTP',3000);
         return;
@@ -268,12 +271,11 @@ export default {
           throw new Error('Xác thực không thành công');
         }
 
-        // Lưu thông tin user
-        this.user = response.data.userInfo;
-        localStorage.setItem('user', JSON.stringify(this.user));
+        // Lưu thông tin user vào store
+        authStore.login(response.data.userInfo);
         
         // Emit event login success
-        this.$emit('login-success', this.user);
+        this.$emit('login-success', response.data.userInfo);
         
         // Đóng dialog
         this.dialog = false;
