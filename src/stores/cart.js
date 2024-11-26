@@ -18,6 +18,14 @@ export const useCartStore = defineStore('cart', {
       this.saveToStorage()
     },
 
+    updateItem(updatedItem) {
+      const index = this.items.findIndex(item => item.id === updatedItem.id)
+      if (index !== -1) {
+        this.items[index] = updatedItem
+        this.saveToStorage()
+      }
+    },
+
     removeItem(id) {
       this.items = this.items.filter(item => item.id !== id)
       this.saveToStorage()
@@ -30,6 +38,6 @@ export const useCartStore = defineStore('cart', {
           detail: { storage: JSON.stringify(this.items) }
         })
       )
-    }
+    },
   }
 }) 

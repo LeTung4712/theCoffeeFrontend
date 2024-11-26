@@ -10,9 +10,16 @@
     </template>
 
     <v-card>
-      <v-card-title class="d-flex align-center pa-4 border-b">
-        <v-btn icon="mdi-close" variant="text" @click="dialog = false" class="ml-n2" />
-        <span class="mx-auto text-h6 font-weight-bold">Chọn khuyến mãi</span>
+      <v-card-title class="d-flex align-center pa-2 border-b header-fixed">
+        <v-btn 
+          icon="mdi-close" 
+          variant="text" 
+          @click="dialog = false" 
+          class="ml-n1" 
+          density="comfortable"
+          size="small"
+        />
+        <span class="mx-auto text-subtitle-1 font-weight-bold">Chọn khuyến mãi</span>
       </v-card-title>
 
       <v-card-text class="pa-4">
@@ -51,38 +58,45 @@
               :key="item.id" 
               class="mb-3 rounded-lg border"
             >
-              <div class="d-flex align-stretch" style="height: 120px">
-                <!-- Phần hình ảnh bên trái -->
-                <v-img 
-                  :src="item.image_url" 
-                  width="120" 
-                  height="120" 
-                  cover 
-                  class="rounded-l-lg flex-shrink-0"
-                />
+              <div class="d-flex align-stretch voucher-container">
+                <!-- Phần bên trái với hình ảnh và đường cắt nét đứt -->
+                <div class="voucher-left">
+                  <v-img 
+                    :src="item.image_url" 
+                    width="140"
+                    height="140"
+                    cover 
+                    class="rounded-l-lg"
+                  />
+                  <div class="dotted-border"></div>
+                </div>
                 
                 <!-- Phần thông tin bên phải -->
-                <div class="d-flex flex-column justify-space-between pa-3 flex-grow-1">
+                <div class="voucher-content pa-3 flex-grow-1">
                   <div>
-                    <div class="text-h7 font-weight-bold mb-1 text-truncate">
+                    <div class="text-subtitle-1 font-weight-bold mb-1">
                       {{ item.description }}
                     </div>
-                    <div class="d-flex align-center text-grey-darken-1 text-body-2">
-                      <v-icon size="16" class="mr-1">mdi-clock-outline</v-icon>
+                    <div class="d-flex align-center text-grey-darken-1 text-caption">
+                      <v-icon size="14" class="mr-1">mdi-clock-outline</v-icon>
                       HSD: {{ formatDate(item.expire_at) }}
                     </div>
                   </div>
                   
-                  <v-btn 
-                    color="primary" 
-                    @click="handleChooseVoucher(item)"
-                    variant="flat"
-                    class="mt-2 px-4"
-                    size="small"
-                    width="fit-content"
-                  >
-                    Sử dụng ngay
-                  </v-btn>
+                  <div class="d-flex justify-space-between align-center mt-2">
+                    <div class="text-primary text-caption font-weight-medium">
+                      Mã: {{ item.code }}
+                    </div>
+                    <v-btn 
+                      color="primary" 
+                      @click="handleChooseVoucher(item)"
+                      variant="tonal"
+                      density="comfortable"
+                      class="text-caption px-3"
+                    >
+                      Áp dụng
+                    </v-btn>
+                  </div>
                 </div>
               </div>
             </v-list-item>
@@ -163,11 +177,9 @@ export default {
       if (!this.voucher_code.trim()) {
         return this.notificationStore.error('Vui lòng nhập mã khuyến mãi', 3000)
       }
-
       const voucher = this.availableVouchers.find(
         v => v.code.toLowerCase() === this.voucher_code.trim().toLowerCase()
       )
-
       if (!voucher) {
         return this.notificationStore.error('Không tìm thấy mã khuyến mãi', 3000)
       }
@@ -230,7 +242,7 @@ export default {
 
 .voucher-list :deep(.v-list-item:hover) {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .center-input :deep(input) {
@@ -243,5 +255,40 @@ export default {
   padding-bottom: 0;
   display: flex;
   align-items: center;
+}
+
+.voucher-container {
+  height: 140px;
+  background: white;
+}
+
+.voucher-left {
+  position: relative;
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.dotted-border {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  border-right: 2px dashed #e0e0e0;
+}
+
+.voucher-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px !important;
+}
+
+.header-fixed {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: white;
+  min-height: 48px;
 }
 </style>

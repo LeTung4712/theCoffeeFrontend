@@ -89,7 +89,7 @@
         <template v-slot:default>
           <div class="d-flex justify-space-between w-100">
             <span>Phí giao hàng</span>
-            <span>{{ formatPrice(15000) }}đ</span>
+            <span>{{ formatPrice(shippingFee) }}đ</span>
           </div>
         </template>
       </v-list-item>
@@ -136,12 +136,15 @@ export default {
     EditVoucherDialog
   },
 
+  setup() {
+    const cartStore = useCartStore()
+    const voucherStore = useVoucherStore()
+    return { cartStore, voucherStore }
+  },
+
   data() {
     return {
-      orders: [],
-      totalPrice: 0,
       subtotal: 0,
-      selectedVoucher: null,
       showEditDialog: false,
       selectedOrder: null,
       isProcessingDelete: false
@@ -149,56 +152,43 @@ export default {
   },
 
   created() {
-    this.loadOrderData()
+    this.calculateTotalPrice()
     this.voucherStore.loadVoucherFromStorage()
-    window.addEventListener('voucher-localstorage-changed', this.handleVoucherChange)
   },
 
-  beforeUnmount() {
-    window.removeEventListener('voucher-localstorage-changed', this.handleVoucherChange)
+  watch: {
+    safeOrders: {
+      handler() {
+        this.calculateTotalPrice()
+      },
+      deep: true
+    },
+    selectedVoucher: {
+      handler() {
+        this.calculateTotalPrice()
+      },
+      deep: true
+    }
   },
 
   computed: {
     safeOrders() {
-      return this.orders || []
+      const cartStore = useCartStore()
+      return cartStore.items || []
     },
     selectedVoucher() {
       return this.voucherStore.selectedVoucher
-    }
-  },
-
-  setup() {
-    const voucherStore = useVoucherStore()
-    return { voucherStore }
+    },
+    shippingFee() {
+      return 15000
+    },
+    finalTotal() {
+      const discount = this.selectedVoucher?.price || 0
+      return Math.max(0, this.subtotal + this.shippingFee - discount)
+    },
   },
 
   methods: {
-    loadOrderData() {
-      try {
-        const orderData = JSON.parse(localStorage.getItem("order"))
-        if (!orderData) return
-        
-        //console.log('orderData trước khi map:', orderData)
-        
-        this.orders = orderData.map(order => ({
-          ...order,
-          count: order.count || 1,
-          product_item: order.product_item,
-          topping_items: Array.isArray(order.topping_items) ? order.topping_items : []
-        }))
-
-        //console.log('orders sau khi map:', this.orders)
-        this.calculateTotalPrice()
-        this.$emit('order-loaded', {
-          orders: this.orders,
-          totalPrice: this.totalPrice
-        })
-      } catch (error) {
-        console.error('Lỗi khi load đơn hàng:', error)
-        console.error('Chi tiết lỗi:', error.message)
-      }
-    },
-
     getProductName(order) {
       if (!order?.product_item?.name) {
         console.warn('Không tìm thấy tên sản phẩm:', order)
@@ -211,11 +201,16 @@ export default {
       if (!order?.product_item) return 0
       
       const count = order.count || 1
-      const basePrice = Number(order.product_item.price) * count
-      const toppingPrice = this.calculateToppingPrice(order.topping_items, count)
-      const sizePrice = this.calculateSizePrice(order.size, count)
-      
-      return basePrice + toppingPrice + sizePrice
+      try {
+        const basePrice = Number(order.product_item.price) * count
+        const toppingPrice = this.calculateToppingPrice(order.topping_items, count)
+        const sizePrice = this.calculateSizePrice(order.size, count)
+        
+        return basePrice + toppingPrice + sizePrice
+      } catch (error) {
+        console.error('Lỗi tính giá sản phẩm:', error)
+        return 0
+      }
     },
 
     filterToppings(order) {
@@ -224,15 +219,15 @@ export default {
         topping && 
         typeof topping === 'object' && 
         topping.name &&
-        topping.count === 1
+        topping.count > 0
       )
     },
 
-    calculateToppingPrice(toppings = [], count = 1) {
+    calculateToppingPrice(toppings = [], orderCount = 1) {
       if (!Array.isArray(toppings)) return 0
       return toppings.reduce((sum, topping) => {
-        if (!topping?.price) return sum
-        return sum + (Number(topping.price) * count)
+        if (!topping?.price || !topping.count || topping.count <= 0) return sum
+        return sum + (Number(topping.price) * topping.count * orderCount)
       }, 0)
     },
 
@@ -249,19 +244,14 @@ export default {
     },
 
     calculateTotalPrice() {
-      this.subtotal = Math.max(0, this.orders.reduce((sum, order) => {
+      this.subtotal = Math.max(0, this.safeOrders.reduce((sum, order) => {
         return sum + this.getProductPrice(order)
       }, 0))
       
-      const shippingFee = 15000
-      const discount = this.voucherStore.selectedVoucher?.price || 0
-      
-      this.totalPrice = Math.max(0, this.subtotal + shippingFee - discount)
-      
       this.$emit('order-loaded', {
-        items: this.orders,
-        totalPrice: this.totalPrice,
-        voucher: this.voucherStore.selectedVoucher
+        items: this.safeOrders,
+        totalPrice: this.finalTotal,
+        voucher: this.selectedVoucher
       })
     },
 
@@ -271,13 +261,10 @@ export default {
     },
 
     handleEditComplete(updatedOrder) {
-      // Cập nhật order trong danh sách
-      const index = this.orders.findIndex(o => o.id === updatedOrder.id)
+      const cartStore = useCartStore()
+      const index = cartStore.items.findIndex(o => o.id === updatedOrder.id)
       if (index !== -1) {
-        this.orders.splice(index, 1, updatedOrder)
-        // Lưu lại vào localStorage
-        localStorage.setItem('order', JSON.stringify(this.orders))
-        // Tính toán lại tổng tiền
+        cartStore.updateItem(updatedOrder)
         this.calculateTotalPrice()
       }
       this.showEditDialog = false
@@ -291,21 +278,24 @@ export default {
       this.isProcessingDelete = true
       
       try {
-        if (!item || !item.id) {
-          console.error('Item hoặc item.id không hợp lệ:', item)
-          return
+        if (!item?.id) {
+          throw new Error('Item không hợp lệ')
         }
 
-        cartStore.removeItem(item.id)
-        await this.loadOrderData()
+        await cartStore.removeItem(item.id)
+        this.calculateTotalPrice()
 
         if (cartStore.itemCount === 0) {
-          notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000)
-          setTimeout(() => {
-            this.$router.push('/mainpage')
-          }, 3000)
+          await notificationStore.warning(
+            'Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.',
+            5000
+          )
+          await this.$router.push('/mainpage')
         } else {
-          notificationStore.success(`Đã xóa "${item.product_item.name}" khỏi giỏ hàng`, 3000)
+          await notificationStore.success(
+            `Đã xóa "${item.product_item.name}" khỏi giỏ hàng`,
+            3000
+          )
         }
       } catch (error) {
         console.error('Chi tiết lỗi:', error)
@@ -315,17 +305,12 @@ export default {
       }
     },
 
-    handleVoucherChange(event) {
-      if (event.detail?.storage) {
-        this.voucherStore.selectedVoucher = JSON.parse(event.detail.storage)
-        this.calculateTotalPrice()
-      }
-    },
-
     handleVoucherSelected(voucher) {
       this.voucherStore.setSelectedVoucher(voucher)
       this.calculateTotalPrice()
     }
-  }
+  },
+
+  
 }
 </script> 

@@ -188,7 +188,8 @@ export default {
     handleOrderLoaded(data) {
       this.orderData = {
         items: data.items,
-        totalPrice: data.totalPrice
+        totalPrice: data.totalPrice,
+        voucher: data.voucher
       }
       this.totalAmount = data.totalPrice
     },
