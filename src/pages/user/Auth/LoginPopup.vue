@@ -24,7 +24,7 @@
           width="65%"
         />
         
-        <v-form @submit.prevent="sendPhoneNumber">
+        <v-form @submit.prevent="handleLogin">
           <v-sheet class="d-flex align-center mb-4 bg-grey-lighten-4 rounded">
             <div class="px-3 py-2 border-r d-flex align-center">
               <v-img
@@ -50,7 +50,6 @@
             color="primary"
             rounded="pill"
             :loading="loading"
-            @click="handleLogin"
           >
             Đăng nhập
           </v-btn>
@@ -150,7 +149,52 @@ export default {
     errorMessage: ''
   }),
 
+  watch: {
+    // Reset form khi đóng dialog
+    dialog(newVal) {
+      if (!newVal) {
+        this.resetForm();
+      }
+    }
+  },
   methods: {
+    // Thêm phương thức validate số điện thoại
+    validatePhoneNumber(phone) {
+      if (!phone) return false;
+      const numberOnly = phone.replace(/\D/g, '');
+      
+      // Kiểm tra xem chuỗi có chứa ký tự không phải số không
+      if (phone !== numberOnly) {
+        return false;
+      }
+      
+      // Kiểm tra độ dài số điện thoại (10 hoặc 11 số, tính cả số 0)
+      if (numberOnly.startsWith('0')) {
+        return numberOnly.length === 10;
+      } else {
+        return numberOnly.length === 9;
+      }
+    },
+
+    // Xử lý chuyển sang màn hình OTP sau khi gửi số điện thoại
+    handleLogin() {
+      const notificationStore = useNotificationStore();
+      
+      // Kiểm tra số điện thoại trống
+      if (!this.data.mobile_no) {
+        notificationStore.error('Vui lòng nhập số điện thoại', 3000);
+        return;
+      }
+      
+      // Kiểm tra định dạng số điện thoại
+      if (!this.validatePhoneNumber(this.data.mobile_no)) {
+        notificationStore.error('Số điện thoại không hợp lệ. Vui lòng nhập đúng số điện thoại Việt Nam (10 số)', 3000);
+        return;
+      }
+      
+      this.sendPhoneNumber();
+    },
+
     // Xử lý input số điện thoại
     formatPhoneNumber(phone) {
       if (!phone) return '';
@@ -160,12 +204,71 @@ export default {
       return numberOnly.startsWith('0') ? numberOnly.slice(1) : numberOnly;
     },
 
-    // Thêm phương thức validate số điện thoại
-    validatePhoneNumber(phone) {
-      if (!phone) return false;
-      const numberOnly = phone.replace(/\D/g, '');
-      // Kiểm tra độ dài số điện thoại (tính cả số 0 ở đầu)
-      return /^0\d{9}$|^\d{10}$/.test(numberOnly);
+    // Gửi số điện thoại để nhận OTP
+    async sendPhoneNumber() {
+      try {
+        this.loading = true;
+        this.errorMessage = '';
+        
+        // Format số điện thoại
+        const formattedPhone = this.formatPhoneNumber(this.data.mobile_no);
+        const phoneWithCode = `+84${formattedPhone}`;
+        //console.log('phoneWithCode', phoneWithCode);
+        const response = await userAPI.login({ mobile_no: phoneWithCode });
+        
+        if (response.status === 200) {
+          this.otpActive = true;
+          this.loginHidden = true;
+          this.data.mobile_no = phoneWithCode; // Lưu số điện thoại đã format
+        }
+      } catch (error) {
+        this.errorMessage = error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+        const formattedPhone = this.formatPhoneNumber(this.data.mobile_no);
+        const phoneWithCode = `+84${formattedPhone}`;
+        this.otpActive = true;
+        this.loginHidden = true;
+        this.data.mobile_no = phoneWithCode;
+        console.error('Login error:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // Xác thực OTP
+    async sendOTP() {
+      const notificationStore = useNotificationStore();
+      const authStore = useAuthStore();
+      
+      if (this.data.otp.length !== 6) {
+        notificationStore.error('Vui lòng nhập đủ 6 số OTP',3000);
+        return;
+      }
+
+      try {
+        this.loading = true;
+        this.errorMessage = '';
+        const response = await userAPI.verifyOtp(this.data);
+        if (!response.data?.userInfo) {
+          throw new Error('Xác thực không thành công');
+        }
+
+        // Lưu thông tin user vào store
+        authStore.login(response.data.userInfo);
+        
+        // Emit event login success
+        this.$emit('login-success', response.data.userInfo);
+        
+        // Đóng dialog
+        this.dialog = false;
+        
+        // Thông báo thành công
+        notificationStore.success('Đăng nhập thành công',3000); 
+      } catch (error) {
+        notificationStore.error(error.response?.data?.message || 'Mã OTP không chính xác',3000);
+        console.error('OTP verification error:', error);
+      } finally {
+        this.loading = false;
+      }
     },
 
     // Xử lý OTP keydown
@@ -194,20 +297,6 @@ export default {
       }
     },
 
-    // Xử lý chuyển sang màn hình OTP sau khi gửi số điện thoại
-    handleLogin() {
-      const notificationStore = useNotificationStore();
-      if (!this.data.mobile_no) {
-        notificationStore.error('Vui lòng nhập số điện thoại', 3000);
-        return;
-      }
-      if (!this.validatePhoneNumber(this.data.mobile_no)) {
-        notificationStore.error('Vui lòng nhập đúng số điện thoại ', 3000);
-        return;
-      }
-      this.sendPhoneNumber();
-    },
-
     // Gửi lại OTP
     async resendOTP() {
       const notificationStore = useNotificationStore();
@@ -226,70 +315,6 @@ export default {
       }
     },
 
-    // Gửi số điện thoại để nhận OTP
-    async sendPhoneNumber() {
-      try {
-        this.loading = true;
-        this.errorMessage = '';
-        
-        // Format số điện thoại
-        const formattedPhone = this.formatPhoneNumber(this.data.mobile_no);
-        const phoneWithCode = `+84${formattedPhone}`;
-
-        const response = await userAPI.login({ mobile_no: phoneWithCode });
-        
-        if (response.status === 200) {
-          this.otpActive = true;
-          this.loginHidden = true;
-          this.data.mobile_no = phoneWithCode; // Lưu số điện thoại đã format
-        }
-      } catch (error) {
-        this.errorMessage = error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
-        console.error('Login error:', error);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    // Xác thực OTP
-    async sendOTP() {
-      const notificationStore = useNotificationStore();
-      const authStore = useAuthStore();
-      
-      if (this.data.otp.length !== 6) {
-        notificationStore.error('Vui lòng nhập đủ 6 số OTP',3000);
-        return;
-      }
-
-      try {
-        this.loading = true;
-        this.errorMessage = '';
-
-        const response = await userAPI.verifyOtp(this.data);
-
-        if (!response.data?.userInfo) {
-          throw new Error('Xác thực không thành công');
-        }
-
-        // Lưu thông tin user vào store
-        authStore.login(response.data.userInfo);
-        
-        // Emit event login success
-        this.$emit('login-success', response.data.userInfo);
-        
-        // Đóng dialog
-        this.dialog = false;
-        
-        // Thông báo thành công
-        notificationStore.success('Đăng nhập thành công',3000); 
-      } catch (error) {
-        notificationStore.error(error.response?.data?.message || 'Mã OTP không chính xác',3000);
-        console.error('OTP verification error:', error);
-      } finally {
-        this.loading = false;
-      }
-    },
-
     // Reset form khi đóng dialog
     resetForm() {
       this.data.mobile_no = '';
@@ -303,16 +328,6 @@ export default {
     // Method để mở dialog từ component cha
     openDialog() {
       this.dialog = true;
-    },
-
-    
-  },
-
-  watch: {
-    dialog(newVal) {
-      if (!newVal) {
-        this.resetForm();
-      }
     }
   }
 }

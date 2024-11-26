@@ -112,6 +112,7 @@ import DeliveryAddressButton from './DeliveryAddressButton.vue'
 import LoginPopup from '@/pages/user/Auth/LoginPopup.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useNotificationStore } from '@/stores/notification'
 
 export default {
   name: "UserHeader",
@@ -124,7 +125,8 @@ export default {
   setup() {
     const cartStore = useCartStore()
     const authStore = useAuthStore()
-    return { cartStore, authStore }
+    const notificationStore = useNotificationStore()
+    return { cartStore, authStore, notificationStore }
   },
 
   data() {
@@ -193,8 +195,8 @@ export default {
     logout() {
       this.authStore.logout()
       this.displayClick = false
-      // Có thể thêm chuyển hướng về trang chủ nếu cần
-      this.$router.push('/')
+      this.notificationStore.success('Đăng xuất thành công', 3000)
+      this.$router.push('/mainpage')
     },
 
     handelClickCart() {

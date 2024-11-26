@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" max-width="400">
     <template v-slot:activator="{ props }">
       <v-sheet v-bind="props" class="d-flex align-center cursor-pointer">
-        <v-icon icon="mdi-ticket-percent" color="orange" class="mr-2"/>
+        <v-icon icon="mdi-ticket-percent" color="primary" class="mr-2"/>
         <span class="text-orange">
           {{ selectedVoucher ? selectedVoucher.description : "Chọn khuyến mãi" }}
         </span>
