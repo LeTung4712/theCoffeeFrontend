@@ -30,7 +30,12 @@ export const useCartStore = defineStore('cart', {
       this.items = this.items.filter(item => item.id !== id)
       this.saveToStorage()
     },
-
+     
+    clearCart() {
+      this.items = []
+      this.saveToStorage()
+    },
+    
     saveToStorage() {
       localStorage.setItem('order', JSON.stringify(this.items))
       window.dispatchEvent(

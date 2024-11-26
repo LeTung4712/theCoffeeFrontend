@@ -21,7 +21,7 @@
               <v-btn 
                 variant="text"
                 :to="item.to"
-                class="text-none font-weight-medium px-4"
+                class="text-none font-weight-medium px-2"
                 color="text-primary"
                 height="48"
               >

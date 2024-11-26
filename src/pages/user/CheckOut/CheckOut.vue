@@ -130,6 +130,7 @@ import OrderSummary from './components/OrderSummary.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
+import { useVoucherStore } from '@/stores/voucher'
 
 export default {
   name: 'CheckOut',
@@ -144,8 +145,8 @@ export default {
     const cartStore = useCartStore()
     const authStore = useAuthStore()
     const notificationStore = useNotificationStore()
-    
-    return { cartStore, authStore, notificationStore }
+    const voucherStore = useVoucherStore()
+    return { cartStore, authStore, notificationStore, voucherStore }
   },
 
   data() {
@@ -211,18 +212,27 @@ export default {
       this.isLoading = true
       try {
         const orderData = {
-          items: this.orderData.items,
-          delivery: {
-            ...this.deliveryInfo,
-            user_id: this.authStore.userInfo.id
-          },
-          payment: {
-            method: this.paymentMethod,
-            amount: this.totalAmount
-          },
-          status: this.paymentMethod === 'cod' ? 'pending' : 'awaiting_payment'
+          user_id: this.authStore.userInfo.id,
+          user_name: this.authStore.userInfo.first_name,
+          mobile_no: this.deliveryInfo.phone,
+          order_date: new Date().toISOString().split('T')[0],
+          address: this.deliveryInfo.address,
+          note: this.deliveryInfo.note || '',
+          shipcost: 15000, // Có thể cần điều chỉnh theo logic của bạn
+          total_price: this.totalAmount,
+          discount_money: this.orderData.voucher?.discount || 0,
+          payment_method: this.paymentMethod,
+          products: this.orderData.items.map(item => ({
+            product_id: item.id,
+            product_count: item.count,
+            size: item.size,
+            price: item.product_item.price,
+            topping_id: item.topping_items?.map(t => t.id) || [],
+            topping_count: item.topping_items?.map(t => t.count) || []
+          }))
         }
-
+        console.log('voucher',this.orderData)
+        console.log('orderData', orderData)
         const { data: { order_id } } = await orderAPI.create(orderData)
 
         if (this.paymentMethod === 'cod') {
@@ -231,7 +241,7 @@ export default {
           await this.handleOnlinePayment(order_id)
         }
       } catch (error) {
-        this.notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message)
+        this.notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message, 3000)
       } finally {
         this.isLoading = false
       }
@@ -239,7 +249,10 @@ export default {
 
     async handleCodPayment() {
       try {
-        localStorage.removeItem('order')
+        // Xóa giỏ hàng và voucher
+        this.cartStore.clearCart()
+        this.voucherStore.clearVoucher()
+        
         this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
         this.$router.push('/mainpage')
       } catch (error) {
@@ -251,16 +264,17 @@ export default {
       try {
         const paymentData = {
           order_id: orderId,
-          amount: this.totalAmount,
+          total_price: this.totalAmount,
           return_url: `${window.location.origin}/payment/callback`
         }
-        const { data: paymentUrl } = await paymentAPI.createPayment(paymentData)
+        const { data: paymentUrl } = await paymentAPI.createMomoPayment(paymentData)
         
         if (!paymentUrl) {
           throw new Error('Không nhận được URL thanh toán')
         }
-        
-        localStorage.setItem('pending_order_id', orderId)
+        // Xóa giỏ hàng và voucher
+        this.cartStore.clearCart()
+        this.voucherStore.clearVoucher()
         window.location.href = paymentUrl
       } catch (error) {
         this.notificationStore.error('Lỗi khi tạo thanh toán online: ' + error.message)

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="400">
+  <v-dialog v-model="dialog" :max-width="$vuetify.display.mobile ? '100%' : '400'" :max-height="$vuetify.display.mobile ? '66vh' : 'auto'" :class="{ 'mobile-dialog': $vuetify.display.mobile }">
     <template v-slot:activator="{ props }">
       <v-sheet v-bind="props" class="d-flex align-center cursor-pointer">
         <v-icon icon="mdi-ticket-percent" color="primary" class="mr-2"/>
@@ -290,5 +290,51 @@ export default {
   z-index: 100;
   background: white;
   min-height: 48px;
+}
+
+@media (max-width: 600px) {
+  .voucher-container {
+    height: 100px;
+  }
+
+  .voucher-left {
+    width: 100px;
+  }
+
+  .voucher-left :deep(img) {
+    width: 100px;
+    height: 100px;
+  }
+
+  .voucher-content {
+    padding: 8px !important;
+  }
+
+  :deep(.text-subtitle-1) {
+    font-size: 13px !important;
+    line-height: 1.2;
+  }
+
+  :deep(.text-caption) {
+    font-size: 10px !important;
+  }
+
+  :deep(.mobile-dialog) {
+    position: fixed;
+    bottom: 0;
+    margin: 0;
+    height: 66vh !important;
+  }
+
+  :deep(.mobile-dialog .v-card) {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  :deep(.mobile-dialog .v-card-text) {
+    flex: 1;
+    overflow-y: auto;
+  }
 }
 </style>
