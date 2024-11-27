@@ -234,6 +234,7 @@ export default {
             product_id: item.id,
             product_count: item.count,
             size: item.size,
+            note: item.note,
             price: item.product_item.price,
             topping_id: item.topping_items?.map(t => t.id) || [],
             topping_count: item.topping_items?.map(t => t.count) || []

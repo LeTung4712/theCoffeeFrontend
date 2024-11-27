@@ -27,12 +27,14 @@
 
               <v-card-text class="search-dialog-content">
                 <v-text-field v-model="searchProduct" prepend-icon="mdi-magnify"
-                  placeholder="Tìm kiếm theo sản phẩm bạn quan tâm" variant="outlined" density="comfortable"
-                  @keydown.delete="updateSearch" hide-details class="sticky-search"></v-text-field>
+                  placeholder="Nhập tên sản phẩm" variant="outlined" density="comfortable"
+                  @keydown.delete="updateSearch" hide-details class="sticky-search">
+                </v-text-field>
 
                 <v-row class="mt-4">
-                  <v-col v-for="product in filteredList" :key="product.id" cols="12" sm="6">
-                    <ProductCard :currentID="product.id" :dialog="dialog" :product="product" :isInProductListing="1" />
+                  <v-col v-for="product in filteredList" :key="product.id" cols="12" sm="6" md="3">
+                    <ProductCard :currentID="product.id" :dialog="dialog" :product="product" :isInProductListing="1"
+                      class="product-card-responsive" />
                   </v-col>
                 </v-row>
               </v-card-text>
@@ -64,11 +66,7 @@
         <v-row class="mt-6">
           <template v-if="loadingProducts">
             <v-col v-for="n in 6" :key="n" cols="12" sm="6" md="4" lg="2">
-              <v-skeleton-loader
-                class="product-card-responsive"
-                type="card"
-                height="300"
-              ></v-skeleton-loader>
+              <v-skeleton-loader class="product-card-responsive" type="card" height="300"></v-skeleton-loader>
             </v-col>
           </template>
           <template v-else>
@@ -159,7 +157,7 @@ export default {
       try {
         // Thêm delay 1.5s để test loading
         //await new Promise(resolve => setTimeout(resolve, 1500))
-        
+
         const response = await categoryAPI.getByParentId({ params: { parent_id: 0 } })
         if (response?.data?.categories?.length) {
           this.categories = response.data.categories
@@ -177,7 +175,7 @@ export default {
       try {
         // Thêm delay 2s để test loading
         //await new Promise(resolve => setTimeout(resolve, 2000))
-        
+
         const response = await productAPI.getByCategory({ params: { category_id: this.category_type } })
 
         if (response?.data?.products?.length) {
@@ -195,7 +193,7 @@ export default {
       try {
         // Thêm delay 1s để test loading
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         const response = await productAPI.getAll()
         if (response?.data?.products?.length) {
           this.product_searchs = response.data.products
@@ -636,8 +634,10 @@ export default {
 }
 
 .search-dialog-content {
-  max-height: 70vh; /* Chiều cao tối đa là 70% viewport height */
-  overflow-y: auto; /* Cho phép cuộn dọc */
+  max-height: 70vh;
+  /* Chiều cao tối đa là 70% viewport height */
+  overflow-y: auto;
+  /* Cho phép cuộn dọc */
   padding: 16px;
   position: relative;
 }

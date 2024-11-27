@@ -92,11 +92,11 @@
             <v-btn
               variant="text"
               color="primary"
-              class="ms-2"
-              :disabled="loading"
+              class="ms-2 resend-btn"
+              :disabled="loading || countdown > 0"
               @click="resendOTP"
             >
-              Gửi lại
+              {{ countdown > 0 ? `Gửi lại (${countdown}s)` : 'Gửi lại' }}
             </v-btn>
           </v-row>
 
@@ -146,7 +146,9 @@ export default {
     },
     otpDigits: Array(6).fill(''),
     user: null,
-    errorMessage: ''
+    errorMessage: '',
+    countdown: 0,
+    timer: null,
   }),
 
   watch: {
@@ -220,6 +222,7 @@ export default {
           this.otpActive = true;
           this.loginHidden = true;
           this.data.mobile_no = phoneWithCode; // Lưu số điện thoại đã format
+          this.startCountdown();
         }
       } catch (error) {
         this.errorMessage = error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
@@ -229,6 +232,7 @@ export default {
         this.loginHidden = true;
         this.data.mobile_no = phoneWithCode;
         console.error('Login error:', error);
+        this.startCountdown();
       } finally {
         this.loading = false;
       }
@@ -303,10 +307,9 @@ export default {
       try {
         this.loading = true;
         await this.sendPhoneNumber();
-        // Reset OTP fields
         this.otpDigits = Array(6).fill('');
         this.data.otp = '';
-        // Thông báo thành công
+        this.startCountdown();
         notificationStore.success('Đã gửi lại mã OTP',3000);
       } catch (error) {
         notificationStore.error('Không thể gửi lại mã OTP. Vui lòng thử lại sau.',3000);
@@ -323,12 +326,26 @@ export default {
       this.otpActive = false;
       this.loginHidden = false;
       this.errorMessage = '';
+      clearInterval(this.timer);
+      this.countdown = 0;
     },
 
     // Method để mở dialog từ component cha
     openDialog() {
       this.dialog = true;
-    }
+    },
+
+    startCountdown() {
+      this.countdown = 120;
+      clearInterval(this.timer);
+      this.timer = setInterval(() => {
+        if (this.countdown > 0) {
+          this.countdown--;
+        } else {
+          clearInterval(this.timer);
+        }
+      }, 1000);
+    },
   }
 }
 </script>
@@ -355,5 +372,9 @@ export default {
 .phone-input :deep(.v-field__input::placeholder) {
   color: rgba(0, 0, 0, 0.6);
   font-size: 14px;
+}
+
+.resend-btn:disabled {
+  opacity: 1 !important;
 }
 </style>

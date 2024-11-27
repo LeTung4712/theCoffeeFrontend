@@ -14,7 +14,6 @@
              width="40" class="mr-4"/>
       <div class="flex-grow-1">
         <div class="text-subtitle-1">{{ address }}</div>
-        <div class="text-body-2">{{ address }}</div>
       </div>
       <v-icon>mdi-chevron-right</v-icon>
     </v-card>
