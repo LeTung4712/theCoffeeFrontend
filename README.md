@@ -1,79 +1,89 @@
-# Vuetify (Default)
+# The Coffee Shop
 
-This is the official scaffolding tool for Vuetify, designed to give you a head start in building your new Vuetify application. It sets up a base template with all the necessary configurations and standard directory structure, enabling you to begin development without the hassle of setting up the project from scratch.
+## Mô Tả Dự Án
 
-## ❗️ Important Links
+Mục Tiêu: Xây dựng một trang web cho phép người dùng dễ dàng đặt hàng online các loại đồ uống và đồ ăn.
 
-- 📄 [Docs](https://vuetifyjs.com/)
-- 🚨 [Issues](https://issues.vuetifyjs.com/)
-- 🏬 [Store](https://store.vuetifyjs.com/)
-- 🎮 [Playground](https://play.vuetifyjs.com/)
-- 💬 [Discord](https://community.vuetifyjs.com)
+## Công nghệ sử dụng
 
-## 💿 Install
+- [![Vue][Vue]][Vue-url]
+- [![Vuetify][Vuetify]][Vuetify-url]
+- [![Pinia][Pinia]][Pinia-url]
+- [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+- [![Vite][Vite]][Vite-url]
 
-Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
+## Deploy
 
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
+Link: https://the-coffee-shop-2024.web.app
 
-After completing the installation, your environment is ready for Vuetify development.
+## Các Tính Năng Chính
 
-## ✨ Features
+1. Trang Chính:
 
-- 🖼️ **Optimized Front-End Stack**: Leverage the latest Vue 3 and Vuetify 3 for a modern, reactive UI development experience. [Vue 3](https://v3.vuejs.org/) | [Vuetify 3](https://vuetifyjs.com/en/)
-- 🗃️ **State Management**: Integrated with [Pinia](https://pinia.vuejs.org/), the intuitive, modular state management solution for Vue.
-- 🚦 **Routing and Layouts**: Utilizes Vue Router for SPA navigation and vite-plugin-vue-layouts for organizing Vue file layouts. [Vue Router](https://router.vuejs.org/) | [vite-plugin-vue-layouts](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
-- ⚡ **Next-Gen Tooling**: Powered by Vite, experience fast cold starts and instant HMR (Hot Module Replacement). [Vite](https://vitejs.dev/)
-- 🧩 **Automated Component Importing**: Streamline your workflow with unplugin-vue-components, automatically importing components as you use them. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
+- ✅ Gợi ý các sản phẩm được được đề xuất dựa trên sở thích của người dùng.
+- ✅ Hiển thị danh sách đồ uống và đồ ăn theo các danh mục.
+- ✅ Hiển thị các sự kiện đặc biệt hoặc khuyến mãi.
 
-These features are curated to provide a seamless development experience from setup to deployment, ensuring that your Vuetify application is both powerful and maintainable.
+2. Chi Tiết Sản Phẩm:
 
-## 💡 Usage
+- ✅ Hiển thị thông tin chi tiết về sản phẩm (tiêu đề, mô tả, giá, đánh giá).
+- ✅ Các sản phẩm liên quan.
 
-This section covers how to start the development server and build your project for production.
+3. Đặt Hàng:
 
-### Starting the Development Server
+- ✅ Chọn sản phẩm và số lượng.
+- ✅ Chức năng chọn địa chỉ giao hàng.
+- ✅ Thanh toán trực tuyến (thẻ tín dụng, ví điện tử).
 
-To start the development server with hot-reload, run the following command. The server will be accessible at [http://localhost:3000](http://localhost:3000):
+4. Quản Lý Tài Khoản:
 
-```bash
-yarn dev
-```
+- ✅ Đăng ký và đăng nhập người dùng.
+- ✅ Quản lý thông tin cá nhân và lịch sử đặt hàng.
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+## Cài Đặt
 
-> Add NODE_OPTIONS='--no-warnings' to suppress the JSON import warnings that happen as part of the Vuetify import mapping. If you are on Node [v21.3.0](https://nodejs.org/en/blog/release/v21.3.0) or higher, you can change this to NODE_OPTIONS='--disable-warning=5401'. If you don't mind the warning, you can remove this from your package.json dev script.
+1. Clone dự án về máy:
 
-### Building for Production
+   ```sh
+   git clone https://github.com/LeTung4712/theCoffeeFrontend.git
+   cd theCoffeeFrontend
+   ```
 
-To build your project for production, use:
+2. Cài đặt các phụ thuộc:
+   ```sh
+   npm install
+   ```
+   hoặc
+   ```sh
+   yarn
+   ```
+3. Chạy ứng dụng
 
-```bash
-yarn build
-```
+   ```sh
+   npm run dev
+   ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+   hoặc
 
-Once the build process is completed, your application will be ready for deployment in a production environment.
+   ```sh
+   yarn dev
+   ```
 
-## 💪 Support Vuetify Development
+4. thêm api url vào .env
+   ```js
+   VITE_API_URL =
+   ```
 
-This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
 
-- [Requesting Enterprise Support](https://support.vuetifyjs.com/)
-- [Sponsoring John on Github](https://github.com/users/johnleider/sponsorship)
-- [Sponsoring Kael on Github](https://github.com/users/kaelwd/sponsorship)
-- [Supporting the team on Open Collective](https://opencollective.com/vuetify)
-- [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
-- [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
-- [Making a one-time donation with Paypal](https://paypal.me/vuetify)
+<!-- MARKDOWN LINKS & IMAGES -->
 
-## 📑 License
-[MIT](http://opensource.org/licenses/MIT)
-
-Copyright (c) 2016-present Vuetify, LLC
+[Vue]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vue.js&logoColor=4FC08D
+[Vue-url]: https://vuejs.org/
+[Vuetify]: https://img.shields.io/badge/Vuetify-007BFF?style=for-the-badge&logo=vuetify&logoColor=white
+[Vuetify-url]: https://vuetifyjs.com/
+[Pinia]: https://img.shields.io/badge/Pinia-646CFF?style=for-the-badge&logo=pinia&logoColor=white
+[Pinia-url]: https://pinia.vuejs.org/
+[Vite]: https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white
+[Vite-url]: https://vitejs.dev/
+[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
+[Bootstrap-url]: https://getbootstrap.com/
