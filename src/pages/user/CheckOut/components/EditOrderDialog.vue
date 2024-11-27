@@ -165,6 +165,7 @@
 
 <script>
 import { productAPI } from "@/api/product";
+import { useCartStore } from '@/stores/cart'
 import { useNotificationStore } from '@/stores/notification'
 export default {
   name: 'EditOrderDialog',
@@ -212,7 +213,7 @@ export default {
 
   computed: {
     hasToppings() {
-      return this.topping_items?.length > 0;
+      return this.topping_items?.length > 1;
     }
   },
 
@@ -264,12 +265,15 @@ export default {
     },
 
     calculateTotalPrice() {
-      const basePrice = parseInt((this.product && this.product.price) || (this.order && this.order.product_item && this.order.product_item.price) || 0);
-      const toppingPrice = this.checked_topping.reduce((sum, topping) => 
-        sum + parseInt(topping.price), 0);
-      const sizePrice = this.sizeOptions.find(opt => opt.value === this.size)?.price || 0;
+      const basePrice = parseInt((this.product && this.product.price) || 
+        (this.order && this.order.product_item && this.order.product_item.price) || 0)
       
-      return (basePrice + toppingPrice + sizePrice) * this.quantity;
+      const toppingPrice = this.checked_topping.reduce((sum, topping) => 
+        sum + parseInt(topping.price), 0)
+      
+      const sizePrice = this.sizeOptions.find(opt => opt.value === this.size)?.price || 0
+      
+      return (basePrice + toppingPrice + sizePrice) * this.quantity
     },
 
     formatPrice(price) {
@@ -277,8 +281,10 @@ export default {
     },
 
     async saveChanges() {
-      this.isLoading = true;
+      this.isLoading = true
+      const cartStore = useCartStore()
       const notificationStore = useNotificationStore()
+
       try {
         const updatedOrder = {
           ...this.order,
@@ -290,15 +296,16 @@ export default {
             ...topping,
             count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
           }))
-        };
+        }
 
-        this.$emit('save', updatedOrder);
+        cartStore.updateItem(updatedOrder)
         notificationStore.success('Cập nhật thành công!', 3000)
-        this.closeDialog();
+        this.closeDialog()
       } catch (error) {
-        console.error("Lỗi khi cập nhật:", error);
+        console.error("Lỗi khi cập nhật:", error)
+        notificationStore.error('Có lỗi xảy ra khi cập nhật!', 3000)
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     },
 

@@ -57,7 +57,7 @@
                 variant="text"
                 density="compact"
                 class="mt-1"
-                @click="$emit('delete-item', order)"
+                @click="handleDeleteItem(order)"
               >
                 Xóa
               </v-btn>
@@ -89,7 +89,7 @@
         <template v-slot:default>
           <div class="d-flex justify-space-between w-100">
             <span>Phí giao hàng</span>
-            <span>{{ formatPrice(15000) }}đ</span>
+            <span>{{ formatPrice(shippingFee) }}đ</span>
           </div>
         </template>
       </v-list-item>
@@ -99,8 +99,15 @@
       <v-list-item class="px-0">
         <template v-slot:default>
           <div class="d-flex justify-space-between w-100">
-            <span>{{ voucher.description }}</span>
-            <span>-{{ formatPrice(voucher.discount) }}đ</span>
+            <EditVoucherDialog
+              v-model="selectedVoucher"
+              :total-price="subtotal"
+              @voucher-selected="handleVoucherSelected"
+            />
+            <span v-if="selectedVoucher" class="text-orange">
+              -{{ formatPrice(selectedVoucher.price) }}đ
+            </span>
+            <span v-else>0đ</span>
           </div>
         </template>
       </v-list-item>
@@ -115,66 +122,73 @@
 </template>
 
 <script>
+import { useNotificationStore } from '@/stores/notification'
+import { useCartStore } from '@/stores/cart'
 import EditOrderDialog from './EditOrderDialog.vue'
+import EditVoucherDialog from './EditVoucherDialog.vue'
+import { useVoucherStore } from '@/stores/voucher'
 
 export default {
   name: 'OrderSummary',
   
   components: {
-    EditOrderDialog
+    EditOrderDialog,
+    EditVoucherDialog
+  },
+
+  setup() {
+    const cartStore = useCartStore()
+    const voucherStore = useVoucherStore()
+    return { cartStore, voucherStore }
   },
 
   data() {
     return {
-      orders: [],
-      totalPrice: 0,
       subtotal: 0,
-      voucher: {
-        description: "Xem thêm khuyến mãi",
-        discount: 0
-      },
       showEditDialog: false,
-      selectedOrder: null
+      selectedOrder: null,
+      isProcessingDelete: false
     }
   },
 
   created() {
-    this.loadOrderData()
+    this.calculateTotalPrice()
+    this.voucherStore.loadVoucherFromStorage()
+  },
+
+  watch: {
+    safeOrders: {
+      handler() {
+        this.calculateTotalPrice()
+      },
+      deep: true
+    },
+    selectedVoucher: {
+      handler() {
+        this.calculateTotalPrice()
+      },
+      deep: true
+    }
   },
 
   computed: {
     safeOrders() {
-      return this.orders || []
-    }
+      const cartStore = useCartStore()
+      return cartStore.items || []
+    },
+    selectedVoucher() {
+      return this.voucherStore.selectedVoucher
+    },
+    shippingFee() {
+      return 15000
+    },
+    finalTotal() {
+      const discount = this.selectedVoucher?.price || 0
+      return Math.max(0, this.subtotal + this.shippingFee - discount)
+    },
   },
 
   methods: {
-    loadOrderData() {
-      try {
-        const orderData = JSON.parse(localStorage.getItem("order"))
-        if (!orderData) return
-        
-        //console.log('orderData trước khi map:', orderData)
-        
-        this.orders = orderData.map(order => ({
-          ...order,
-          count: order.count || 1,
-          product_item: order.product_item,
-          topping_items: Array.isArray(order.topping_items) ? order.topping_items : []
-        }))
-
-        //console.log('orders sau khi map:', this.orders)
-        this.calculateTotalPrice()
-        this.$emit('order-loaded', {
-          orders: this.orders,
-          totalPrice: this.totalPrice
-        })
-      } catch (error) {
-        console.error('Lỗi khi load đơn hàng:', error)
-        console.error('Chi tiết lỗi:', error.message)
-      }
-    },
-
     getProductName(order) {
       if (!order?.product_item?.name) {
         console.warn('Không tìm thấy tên sản phẩm:', order)
@@ -186,11 +200,17 @@ export default {
     getProductPrice(order) {
       if (!order?.product_item) return 0
       
-      const basePrice = Number(order.product_item.price) * (order.count || 1)
-      const toppingPrice = this.calculateToppingPrice(order.topping_items)
-      const sizePrice = this.calculateSizePrice(order.size, order.count || 1)
-      
-      return basePrice + toppingPrice + sizePrice
+      const count = order.count || 1
+      try {
+        const basePrice = Number(order.product_item.price) * count
+        const toppingPrice = this.calculateToppingPrice(order.topping_items, count)
+        const sizePrice = this.calculateSizePrice(order.size, count)
+        
+        return basePrice + toppingPrice + sizePrice
+      } catch (error) {
+        console.error('Lỗi tính giá sản phẩm:', error)
+        return 0
+      }
     },
 
     filterToppings(order) {
@@ -199,15 +219,15 @@ export default {
         topping && 
         typeof topping === 'object' && 
         topping.name &&
-        topping.count === 1
+        topping.count > 0
       )
     },
 
-    calculateToppingPrice(toppings = []) {
+    calculateToppingPrice(toppings = [], orderCount = 1) {
       if (!Array.isArray(toppings)) return 0
       return toppings.reduce((sum, topping) => {
-        if (!topping?.price || topping.count !== 1) return sum
-        return sum + Number(topping.price)
+        if (!topping?.price || !topping.count || topping.count <= 0) return sum
+        return sum + (Number(topping.price) * topping.count * orderCount)
       }, 0)
     },
 
@@ -224,15 +244,14 @@ export default {
     },
 
     calculateTotalPrice() {
-      this.subtotal = this.orders.reduce((sum, order) => {
+      this.subtotal = Math.max(0, this.safeOrders.reduce((sum, order) => {
         return sum + this.getProductPrice(order)
-      }, 0)
-      
-      this.totalPrice = this.subtotal + 15000 - (this.voucher?.discount || 0)
+      }, 0))
       
       this.$emit('order-loaded', {
-        items: this.orders,
-        totalPrice: this.totalPrice
+        items: this.safeOrders,
+        totalPrice: this.finalTotal,
+        voucher: this.selectedVoucher
       })
     },
 
@@ -242,17 +261,56 @@ export default {
     },
 
     handleEditComplete(updatedOrder) {
-      // Cập nhật order trong danh sách
-      const index = this.orders.findIndex(o => o.id === updatedOrder.id)
+      const cartStore = useCartStore()
+      const index = cartStore.items.findIndex(o => o.id === updatedOrder.id)
       if (index !== -1) {
-        this.orders.splice(index, 1, updatedOrder)
-        // Lưu lại vào localStorage
-        localStorage.setItem('order', JSON.stringify(this.orders))
-        // Tính toán lại tổng tiền
+        cartStore.updateItem(updatedOrder)
         this.calculateTotalPrice()
       }
       this.showEditDialog = false
+    },
+
+    async handleDeleteItem(item) {
+      if (this.isProcessingDelete) return
+      
+      const notificationStore = useNotificationStore()
+      const cartStore = useCartStore()
+      this.isProcessingDelete = true
+      
+      try {
+        if (!item?.id) {
+          throw new Error('Item không hợp lệ')
+        }
+
+        await cartStore.removeItem(item.id)
+        this.calculateTotalPrice()
+
+        if (cartStore.itemCount === 0) {
+          await notificationStore.warning(
+            'Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.',
+            5000
+          )
+          await this.$router.push('/mainpage')
+        } else {
+          await notificationStore.success(
+            `Đã xóa "${item.product_item.name}" khỏi giỏ hàng`,
+            3000
+          )
+        }
+      } catch (error) {
+        console.error('Chi tiết lỗi:', error)
+        notificationStore.error('Lỗi khi xóa sản phẩm: ' + error.message)
+      } finally {
+        this.isProcessingDelete = false
+      }
+    },
+
+    handleVoucherSelected(voucher) {
+      this.voucherStore.setSelectedVoucher(voucher)
+      this.calculateTotalPrice()
     }
-  }
+  },
+
+  
 }
 </script> 

@@ -21,7 +21,7 @@
               <v-btn 
                 variant="text"
                 :to="item.to"
-                class="text-none font-weight-medium px-4"
+                class="text-none font-weight-medium px-2"
                 color="text-primary"
                 height="48"
               >
@@ -34,23 +34,23 @@
         <!-- User Menu & Cart -->
         <v-col cols="auto" class="pr-4">
           <v-row no-gutters align="center">
+            
             <!-- User Menu -->
             <v-col cols="auto">
-              <v-menu v-model="displayClick" location="bottom" :close-on-content-click="false">
-                <template v-slot:activator="{ props }">
-                  <v-btn v-bind="props" icon variant="text" height="48">
-                    <v-avatar size="40">
-                      <v-img :src="userAvatar" />
-                    </v-avatar>
-                    <!-- Tên user chỉ hiện trên desktop -->
-                    <span v-if="logged" class="ml-2 text-body-1 d-none d-sm-flex">
-                      {{ user.last_name }}
-                    </span>
-                  </v-btn>
-                </template>
+              <template v-if="logged">
+                <v-menu v-model="displayClick" location="bottom" :close-on-content-click="false">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" icon variant="text" height="48">
+                      <v-avatar size="40">
+                        <v-img :src="userAvatar" />
+                      </v-avatar>
+                      <span class="ml-2 text-body-1 d-none d-sm-flex">
+                        {{ user.last_name }}
+                      </span>
+                    </v-btn>
+                  </template>
 
-                <v-list>
-                  <template v-if="logged">
+                  <v-list>
                     <v-list-item
                       v-for="(item, index) in userMenuItems"
                       :key="index"
@@ -64,27 +64,35 @@
                       title="Thoát"
                       @click="logout"
                     />
-                  </template>
-                  <template v-else>
-                    <v-list-item>
-                      <!-- <authentication-user /> -->
-                    </v-list-item>
-                  </template>
-                </v-list>
-              </v-menu>
+                  </v-list>
+                </v-menu>
+              </template>
+              <template v-else>
+                <!-- Khi chưa đăng nhập, click avatar sẽ mở dialog -->
+                <v-btn icon variant="text" height="48" @click="openLoginDialog">
+                  <v-avatar size="40">
+                    <v-img :src="userAvatar" />
+                  </v-avatar>
+                </v-btn>
+                <!-- Login Popup -->
+                <login-popup 
+                  ref="loginPopup"
+                  @login-success="handleLoginSuccess"
+                />
+              </template>
             </v-col>
 
             <!-- Cart Button -->
             <v-col cols="auto" class="ml-2 ml-sm-6">
               <v-btn icon variant="text" @click="handelClickCart" height="48">
                 <v-badge
-                  :content="itemCount"
+                  :content="cartStore.itemCount"
                   color="error"
                   location="bottom start"
                   :dot="false"
                   offset-x="0"
                   offset-y="0"
-                  v-if="itemCount > 0"
+                  v-if="cartStore.itemCount > 0"
                 >
                   <v-icon size="32" color="background">mdi-cart</v-icon>
                 </v-badge>
@@ -101,20 +109,31 @@
 <script>
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
+import LoginPopup from '@/pages/user/Auth/LoginPopup.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useCartStore } from '@/stores/cart'
+import { useNotificationStore } from '@/stores/notification'
 
 export default {
   name: "UserHeader",
   
   components: {
-    DeliveryAddressButton
+    DeliveryAddressButton,
+    LoginPopup
+  },
+
+  setup() {
+    const cartStore = useCartStore()
+    const authStore = useAuthStore()
+    const notificationStore = useNotificationStore()
+    return { cartStore, authStore, notificationStore }
   },
 
   data() {
     return {
       oldAddress: "...",
-      logged: false,
-      user: {},
-      itemCount: 0,
+      drawer: false,
+      group: null,
       displayClick: false,
       menuItems: [
         { title: 'Menu', to: '/collections/menu' },
@@ -133,6 +152,12 @@ export default {
   },
 
   computed: {
+    logged() {
+      return this.authStore.isLoggedIn
+    },
+    user() {
+      return this.authStore.userInfo
+    },
     userAvatar() {
       return this.logged
         ? 'https://th.bing.com/th/id/OIP.4bP4PqQqYnMYbub5PNgXeQHaEK?w=311&h=180&c=7&r=0&o=5&pid=1.7'
@@ -140,26 +165,11 @@ export default {
     }
   },
 
-  created() {
-    this.initializeData()
-  },
-
   mounted() {
     this.setupEventListeners()
   },
 
   methods: {
-    initializeData() {
-      const order = localStorage.getItem("order")
-      this.itemCount = order ? JSON.parse(order).length : 0
-
-      const user = localStorage.getItem("user") 
-      if (user) {
-        this.user = JSON.parse(user)
-        this.logged = true
-      }
-    },
-
     setupEventListeners() {
       window.addEventListener("order-localstorage-changed", this.handleOrderChange)
       window.addEventListener("scroll", this.handleScroll)
@@ -183,7 +193,10 @@ export default {
     },
 
     logout() {
-      // Xử lý khi click vào menu item "Thoát"
+      this.authStore.logout()
+      this.displayClick = false
+      this.notificationStore.success('Đăng xuất thành công', 3000)
+      this.$router.push('/mainpage')
     },
 
     handelClickCart() {
@@ -192,6 +205,17 @@ export default {
 
     handleAddressChange(newAddress) {
       this.oldAddress = newAddress
+    },
+
+    handleLoginSuccess(userData) {
+      this.user = userData;
+      this.logged = true;
+      this.displayClick = false;
+    },
+
+    openLoginDialog() {
+      // Gọi method openDialog của component LoginPopup
+      this.$refs.loginPopup.openDialog();
     }
   },
 

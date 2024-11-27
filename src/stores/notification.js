@@ -8,7 +8,7 @@ export const useNotificationStore = defineStore('notification', {
 
   actions: {
     add(notification) {
-      console.log('Adding notification:', notification)
+      //console.log('Adding notification:', notification)
       const id = this.nextId++
       this.notifications.push({
         id,
@@ -17,7 +17,7 @@ export const useNotificationStore = defineStore('notification', {
         duration: notification.duration || 3000,
         timestamp: new Date()
       })
-      console.log('Current notifications:', this.notifications)
+      //console.log('Current notifications:', this.notifications)
 
       // Tự động xóa sau duration
       if (notification.duration !== 0) {

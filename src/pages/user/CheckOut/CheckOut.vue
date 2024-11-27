@@ -15,22 +15,15 @@
           <v-row>
             <!-- Left Column -->
             <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 1 : 2">
-              <delivery-section
-                @delivery-info-loaded="handleDeliveryInfoLoaded"
-              />
-              <payment-methods
-                @payment-method-changed="handlePaymentMethodChanged"
-              />
-              
+              <DeliverySection @delivery-info-loaded="handleDeliveryInfoLoaded" />
+              <PaymentMethods @payment-method-changed="handlePaymentMethodChanged" />
+
               <!-- Thêm checkbox điều khoản -->
               <v-card flat class="pa-4 bg-grey-lighten-4">
-                <v-checkbox
-                  v-model="agreedToTerms"
-                  color="primary"
-                >
+                <v-checkbox v-model="agreedToTerms" color="primary">
                   <template #label>
                     <span>
-                      Đồng ý với các 
+                      Đồng ý với các
                       <a href="#" class="text-primary text-decoration-underline">điều khoản và điều kiện</a>
                       mua hàng của The Coffee House
                     </span>
@@ -40,13 +33,7 @@
 
               <!-- Nút xóa đơn hàng -->
               <v-card-actions class="pa-4 bg-grey-lighten-4">
-                <v-btn
-                  block
-                  color="error"
-                  variant="outlined"
-                  prepend-icon="mdi-delete"
-                  @click="handleDeleteOrder"
-                >
+                <v-btn block color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteOrder">
                   Xóa toàn bộ đơn hàng
                 </v-btn>
               </v-card-actions>
@@ -55,13 +42,12 @@
             <!-- Right Column -->
             <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 2 : 1">
               <v-card elevation="4" rounded="lg" class="pa-0">
-                <order-summary
-                  ref="orderSummary"
+                <OrderSummary 
+                  ref="orderSummary" 
                   @order-loaded="handleOrderLoaded"
-                  @add-more="$router.push('/mainpage')"
-                  @delete-item="handleDeleteItem"
+                  @add-more="$router.push('/mainpage')" 
                 />
-                
+
                 <!-- Desktop footer giữ nguyên -->
                 <v-card-actions class="bg-primary pa-4 desktop-footer">
                   <v-row no-gutters align="center">
@@ -73,19 +59,10 @@
                         </div>
                       </div>
                     </v-col>
-                    
+
                     <v-col class="text-right">
-                      <v-btn
-                        color="white"
-                        size="x-large"
-                        rounded
-                        variant="elevated"
-                        :loading="isLoading"
-                        :elevation="3"
-                        prepend-icon="mdi-cart-check"
-                        class="order-button"
-                        @click="validateAndCheckout"
-                      >
+                      <v-btn color="white" size="x-large" rounded variant="elevated" :loading="isLoading" :elevation="3"
+                        prepend-icon="mdi-cart-check" class="order-button" @click="validateAndCheckout">
                         Đặt hàng
                       </v-btn>
                     </v-col>
@@ -107,19 +84,10 @@
                 </div>
               </div>
             </v-col>
-            
+
             <v-col class="text-right">
-              <v-btn
-                color="white"
-                size="x-large"
-                rounded
-                variant="elevated"
-                :loading="isLoading"
-                :elevation="3"
-                prepend-icon="mdi-cart-check"
-                class="order-button"
-                @click="validateAndCheckout"
-              >
+              <v-btn color="white" size="x-large" rounded variant="elevated" :loading="isLoading" :elevation="3"
+                prepend-icon="mdi-cart-check" class="order-button" @click="validateAndCheckout">
                 Đặt hàng
               </v-btn>
             </v-col>
@@ -132,26 +100,17 @@
             <v-card-title class="text-h6 pa-4">
               Xác nhận xóa
             </v-card-title>
-            
+
             <v-card-text class="pa-4">
               Bạn có chắc muốn xóa toàn bộ đơn hàng?
             </v-card-text>
-            
+
             <v-card-actions class="pa-4">
               <v-spacer></v-spacer>
-              <v-btn
-                color="grey-darken-1"
-                variant="text"
-                @click="showConfirmDialog = false"
-              >
+              <v-btn color="grey-darken-1" variant="text" @click="showConfirmDialog = false">
                 Hủy
               </v-btn>
-              <v-btn
-                color="error"
-                variant="elevated"
-                @click="confirmDeleteOrder"
-                :loading="isDeleting"
-              >
+              <v-btn color="error" variant="elevated" @click="confirmDeleteOrder" :loading="isDeleting">
                 Xóa đơn hàng
               </v-btn>
             </v-card-actions>
@@ -169,34 +128,60 @@ import DeliverySection from './components/DeliverySection.vue'
 import PaymentMethods from './components/PaymentMethods.vue'
 import OrderSummary from './components/OrderSummary.vue'
 import { useNotificationStore } from '@/stores/notification'
+import { useCartStore } from '@/stores/cart'
+import { useAuthStore } from '@/stores/auth'
+import { useVoucherStore } from '@/stores/voucher'
 
 export default {
   name: 'CheckOut',
-  
+
   components: {
     DeliverySection,
     PaymentMethods,
     OrderSummary
   },
 
+  setup() {
+    const cartStore = useCartStore()
+    const authStore = useAuthStore()
+    const notificationStore = useNotificationStore()
+    const voucherStore = useVoucherStore()
+    return { cartStore, authStore, notificationStore, voucherStore }
+  },
+
   data() {
     return {
+      isLoading: false,
       orderData: null,
       deliveryInfo: null,
       paymentMethod: 'cod',
       totalAmount: 0,
       agreedToTerms: false,
       showConfirmDialog: false,
-      isDeleting: false
+      isDeleting: false,
+      redirectTimeout: null
+    }
+  },
+
+  mounted() {
+    window.scrollTo(0, 0)
+    const currentOrders = JSON.parse(localStorage.getItem('order') || '[]')
+    if (!currentOrders.length) {
+      this.notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000)
+      this.redirectTimeout = setTimeout(() => {
+        this.$router.push('/mainpage')
+      }, 3000)
     }
   },
 
   computed: {
     isValidCheckout() {
-      return this.orderData?.items?.length > 0 && 
-             this.deliveryInfo?.isLogged &&
-             this.deliveryInfo?.address &&
-             this.deliveryInfo.address !== "Chưa có địa chỉ giao hàng"
+      return (
+        this.orderData?.items?.length > 0 &&
+        this.authStore.isLoggedIn &&
+        this.deliveryInfo?.address &&
+        this.deliveryInfo.address !== "Chưa có địa chỉ giao hàng"
+      )
     }
   },
 
@@ -204,7 +189,8 @@ export default {
     handleOrderLoaded(data) {
       this.orderData = {
         items: data.items,
-        totalPrice: data.totalPrice
+        totalPrice: data.totalPrice,
+        voucher: data.voucher
       }
       this.totalAmount = data.totalPrice
     },
@@ -218,10 +204,35 @@ export default {
     },
 
     async handleCheckout() {
-      const notificationStore = useNotificationStore()
-      
+      if (!this.orderData?.items?.length) {
+        this.notificationStore.error('Không có sản phẩm trong đơn hàng')
+        return
+      }
+
+      this.isLoading = true
       try {
-        const orderData = this.prepareOrderData()
+        const orderData = {
+          user_id: this.authStore.userInfo.id,
+          user_name: this.authStore.userInfo.first_name,
+          mobile_no: this.deliveryInfo.phone,
+          order_date: new Date().toISOString().split('T')[0],
+          address: this.deliveryInfo.address,
+          note: this.deliveryInfo.note || '',
+          shipcost: 15000, // Có thể cần điều chỉnh theo logic của bạn
+          total_price: this.totalAmount,
+          discount_money: this.orderData.voucher?.discount || 0,
+          payment_method: this.paymentMethod,
+          products: this.orderData.items.map(item => ({
+            product_id: item.id,
+            product_count: item.count,
+            size: item.size,
+            price: item.product_item.price,
+            topping_id: item.topping_items?.map(t => t.id) || [],
+            topping_count: item.topping_items?.map(t => t.count) || []
+          }))
+        }
+        console.log('voucher',this.orderData)
+        console.log('orderData', orderData)
         const { data: { order_id } } = await orderAPI.create(orderData)
 
         if (this.paymentMethod === 'cod') {
@@ -230,51 +241,43 @@ export default {
           await this.handleOnlinePayment(order_id)
         }
       } catch (error) {
-        console.error('Lỗi thanh toán:', error)
-        notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message, 3000)
-      }
-    },
-
-    prepareOrderData() {
-      return {
-        items: this.orderData.items,
-        delivery: {
-          name: this.deliveryInfo.name,
-          phone: this.deliveryInfo.phone,
-          address: this.deliveryInfo.address,
-          note: this.deliveryInfo.note
-        },
-        payment: {
-          method: this.paymentMethod,
-          amount: this.totalAmount
-        }
+        this.notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message, 3000)
+      } finally {
+        this.isLoading = false
       }
     },
 
     async handleCodPayment() {
-      const notificationStore = useNotificationStore()
-      
       try {
-        localStorage.removeItem('order')
-        notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
+        // Xóa giỏ hàng và voucher
+        this.cartStore.clearCart()
+        this.voucherStore.clearVoucher()
+        
+        this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
         this.$router.push('/mainpage')
       } catch (error) {
-        notificationStore.error('Lỗi khi xử lý thanh toán COD: ' + error.message)
+        this.notificationStore.error('Lỗi khi xử lý thanh toán COD: ' + error.message)
       }
     },
 
     async handleOnlinePayment(orderId) {
-      const notificationStore = useNotificationStore()
-      
       try {
         const paymentData = {
           order_id: orderId,
-          amount: this.totalAmount
+          total_price: this.totalAmount,
+          return_url: `${window.location.origin}/payment/callback`
         }
-        const { data: paymentUrl } = await paymentAPI.createPayment(paymentData)
+        const { data: paymentUrl } = await paymentAPI.createMomoPayment(paymentData)
+        
+        if (!paymentUrl) {
+          throw new Error('Không nhận được URL thanh toán')
+        }
+        // Xóa giỏ hàng và voucher
+        this.cartStore.clearCart()
+        this.voucherStore.clearVoucher()
         window.location.href = paymentUrl
       } catch (error) {
-        notificationStore.error('Lỗi khi tạo thanh toán online: ' + error.message)
+        this.notificationStore.error('Lỗi khi tạo thanh toán online: ' + error.message)
       }
     },
 
@@ -283,38 +286,19 @@ export default {
     },
 
     async confirmDeleteOrder() {
-      const notificationStore = useNotificationStore()
       this.isDeleting = true
-      
       try {
+        await this.cartStore.clearCart()
         localStorage.removeItem('order')
         this.showConfirmDialog = false
-        notificationStore.success('Đã xóa toàn bộ đơn hàng')
-        await this.$router.push('/mainpage')
+        this.notificationStore.success('Đã xóa toàn bộ đơn hàng', 3000)
+        this.redirectTimeout = setTimeout(() => {
+          this.$router.push('/mainpage')
+        }, 2000)
       } catch (error) {
-        notificationStore.error('Lỗi khi xóa đơn hàng: ' + error.message)
+        this.notificationStore.error('Lỗi khi xóa đơn hàng: ' + error.message)
       } finally {
         this.isDeleting = false
-      }
-    },
-
-    handleDeleteItem(item) {
-      const notificationStore = useNotificationStore()
-      
-      try {
-        const currentOrders = JSON.parse(localStorage.getItem('order') || '[]')
-        const updatedOrders = currentOrders.filter(order => order.id !== item.id)
-        localStorage.setItem('order', JSON.stringify(updatedOrders))
-        
-        this.$nextTick(() => {
-          if (this.$refs.orderSummary) {
-            this.$refs.orderSummary.loadOrderData()
-          }
-        })
-
-        notificationStore.success(`Đã xóa "${item.product_item.name}" khỏi giỏ hàng`, 3000)
-      } catch (error) {
-        notificationStore.error('Lỗi khi xóa sản phẩm: ' + error.message)
       }
     },
 
@@ -323,31 +307,35 @@ export default {
     },
 
     validateAndCheckout() {
-      const notificationStore = useNotificationStore()
-
       if (!this.agreedToTerms) {
-        console.log('vui long dong y')
-        notificationStore.warning('Vui lòng đồng ý với điều khoản và điều kiện để tiếp tục đặt hàng', 3000)
+        this.notificationStore.warning('Vui lòng đồng ý với điều khoản và điều kiện để tiếp tục đặt hàng', 3000)
         return
       }
 
-      if (!this.deliveryInfo?.isLogged) {
-        notificationStore.warning('Vui lòng đăng nhập để đặt hàng', 3000)
+      if (!this.authStore.isLoggedIn) {
+        this.notificationStore.warning('Vui lòng đăng nhập để đặt hàng', 3000)
         return
       }
 
       if (!this.deliveryInfo?.address || 
           this.deliveryInfo.address === "Chưa có địa chỉ giao hàng") {
-        notificationStore.warning('Vui lòng nhập địa chỉ giao hàng', 3000)
+        this.notificationStore.warning('Vui lòng nhập địa chỉ giao hàng', 3000)
         return
       }
 
       if (!this.isValidCheckout) {
-        notificationStore.warning('Vui lòng kiểm tra lại thông tin đặt hàng', 3000)
+        this.notificationStore.warning('Vui lòng kiểm tra lại thông tin đặt hàng', 3000)
         return
       }
 
       this.handleCheckout()
+    }
+  },
+
+  beforeUnmount() {
+    // Cleanup timeout để tránh memory leak
+    if (this.redirectTimeout) {
+      clearTimeout(this.redirectTimeout)
     }
   }
 }

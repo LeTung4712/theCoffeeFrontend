@@ -98,65 +98,63 @@
 
 <script>
 import { useAddressStore } from '@/stores/address'
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   name: 'DeliverySection',
   
+  emits: ['delivery-info-loaded'],
+
   setup() {
     const addressStore = useAddressStore()
-    return { addressStore }
+    const authStore = useAuthStore()
+    return { addressStore, authStore }
   },
 
   data() {
     return {
-      userData: {
-        name: '',
-        phone: '',
-        isLogged: false
-      },
       noteDelivery: '',
       dialog: false
-    }
-  },
-
-  created() {
-    this.loadUserData()
-  },
-
-  methods: {
-    loadUserData() {
-      try {
-        // Lấy thông tin user nếu có
-        const userData = JSON.parse(localStorage.getItem("user"))
-        if (userData) {
-          this.userData = {
-            name: `${userData.last_name} ${userData.first_name}`,
-            phone: userData.mobile_no,
-            isLogged: true
-          }
-        } else {
-          this.initGuestUser()
-        }
-        
-        this.$emit('delivery-info-loaded', this.userData)
-      } catch (error) {
-        console.error('Lỗi khi load thông tin:', error)
-        this.initGuestUser()
-      }
-    },
-
-    initGuestUser() {
-      this.userData = {
-        name: "Tên người nhận",
-        phone: "Số điện thoại",
-        isLogged: false
-      }
     }
   },
 
   computed: {
     address() {
       return this.addressStore.address
+    },
+    userData() {
+      if (this.authStore.isLoggedIn) {
+        const user = this.authStore.userInfo
+        return {
+          name: `${user.last_name} ${user.first_name}`,
+          phone: user.mobile_no,
+          isLogged: true
+        }
+      }
+      return {
+        name: "Tên người nhận",
+        phone: "Số điện thoại",
+        isLogged: false
+      }
+    },
+    deliveryInfo() {
+      return {
+        name: this.userData.name,
+        phone: this.userData.phone,
+        address: this.address,
+        note: this.noteDelivery,
+        isLogged: this.userData.isLogged
+      }
+    }
+  },
+
+  watch: {
+    deliveryInfo: {
+      handler(newInfo) {
+        this.$emit('delivery-info-loaded', newInfo)
+      },
+      deep: true,
+      immediate: true
     }
   }
 }

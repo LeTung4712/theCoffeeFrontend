@@ -3,13 +3,14 @@
         <div class="headers-wrapper">
             <HeaderIntro class="header-intro" :class="{ 'hide-intro': isScrolled }" />
             <UserHeader class="user-header" :class="{ 'header-scrolled': isScrolled }" />
-            <notification-list />
         </div>
+
+        <notification-list class="notification-container" />
 
         <v-main class="bg-white main-content">
             <router-view />
         </v-main>
-        <Footer class="d-none d-sm-block" />
+        <Footer />
         <MobileNavBar />
     </v-app>
 </template>
@@ -98,5 +99,13 @@ export default {
   .v-main {
     padding-bottom: 56px !important;
   }
+}
+
+/* Thêm style mới cho notification-list */
+:deep(.notification-list) {
+    position: fixed;
+    top: calc(42px + 80px); /* 42px từ header-intro + 80px từ user-header */
+    right: 20px;
+    z-index: 99;
 }
 </style>
