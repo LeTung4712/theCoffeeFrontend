@@ -3,9 +3,14 @@
     <v-row justify="center" align="center">
       <v-col cols="12" md="10">
         <!-- Header -->
-        <v-card flat class="text-center mb-8">
-          <v-card-title class="text-h4 font-weight-bold">
-            <v-icon color="primary" size="x-large" class="mr-2">mdi-file</v-icon>
+        <v-card flat class="text-center mb-4 mb-sm-8">
+          <v-card-title :class="{
+            'text-h4 font-weight-bold': $vuetify.display.smAndUp,
+            'text-h5 font-weight-bold': $vuetify.display.xs
+          }">
+            <v-icon color="primary" :size="$vuetify.display.smAndUp ? 'x-large' : 'large'" class="mr-2">
+              mdi-file
+            </v-icon>
             Xác nhận đơn hàng
           </v-card-title>
         </v-card>
@@ -33,7 +38,13 @@
 
               <!-- Nút xóa đơn hàng -->
               <v-card-actions class="pa-4 bg-grey-lighten-4">
-                <v-btn block color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteOrder">
+                <v-btn 
+                  color="error" 
+                  variant="outlined" 
+                  prepend-icon="mdi-delete" 
+                  @click="handleDeleteOrder"
+                  class="delete-order-btn"
+                >
                   Xóa toàn bộ đơn hàng
                 </v-btn>
               </v-card-actions>
@@ -42,11 +53,8 @@
             <!-- Right Column -->
             <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 2 : 1">
               <v-card elevation="4" rounded="lg" class="pa-0">
-                <OrderSummary 
-                  ref="orderSummary" 
-                  @order-loaded="handleOrderLoaded"
-                  @add-more="$router.push('/mainpage')" 
-                />
+                <OrderSummary ref="orderSummary" @order-loaded="handleOrderLoaded"
+                  @add-more="$router.push('/mainpage')" />
 
                 <!-- Desktop footer giữ nguyên -->
                 <v-card-actions class="bg-primary pa-4 desktop-footer">
@@ -231,7 +239,7 @@ export default {
             topping_count: item.topping_items?.map(t => t.count) || []
           }))
         }
-        console.log('voucher',this.orderData)
+        console.log('voucher', this.orderData)
         console.log('orderData', orderData)
         const { data: { order_id } } = await orderAPI.create(orderData)
 
@@ -252,7 +260,7 @@ export default {
         // Xóa giỏ hàng và voucher
         this.cartStore.clearCart()
         this.voucherStore.clearVoucher()
-        
+
         this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
         this.$router.push('/mainpage')
       } catch (error) {
@@ -268,7 +276,7 @@ export default {
           return_url: `${window.location.origin}/payment/callback`
         }
         const { data: paymentUrl } = await paymentAPI.createMomoPayment(paymentData)
-        
+
         if (!paymentUrl) {
           throw new Error('Không nhận được URL thanh toán')
         }
@@ -317,8 +325,8 @@ export default {
         return
       }
 
-      if (!this.deliveryInfo?.address || 
-          this.deliveryInfo.address === "Chưa có địa chỉ giao hàng") {
+      if (!this.deliveryInfo?.address ||
+        this.deliveryInfo.address === "Chưa có địa chỉ giao hàng") {
         this.notificationStore.warning('Vui lòng nhập địa chỉ giao hàng', 3000)
         return
       }
@@ -350,6 +358,12 @@ export default {
   display: none;
   background-color: rgb(var(--v-theme-primary)) !important;
   padding: 16px;
+  width: 100vw;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 @media (max-width: 600px) {
@@ -361,19 +375,24 @@ export default {
     display: block;
     position: fixed;
     bottom: 56px;
-    left: 0;
-    right: 0;
     z-index: 99;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  }
-
-  .checkout-content {
-    margin-bottom: calc(136px + env(safe-area-inset-bottom));
   }
 
   .v-container {
     padding-bottom: 0 !important;
     min-height: calc(100vh - 56px - env(safe-area-inset-bottom));
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .v-row {
+    margin: 0;
+    width: 100%;
+  }
+
+  .v-col {
+    padding: 0;
   }
 }
 
@@ -427,5 +446,19 @@ export default {
 .v-btn {
   text-transform: none;
   font-weight: 500;
+}
+
+.delete-order-btn {
+  width: fit-content;
+  margin: 0 auto;
+  min-width: unset;
+  padding: 0 20px;
+}
+
+@media (max-width: 600px) {
+  .delete-order-btn {
+    font-size: 0.875rem;
+    padding: 0 16px;
+  }
 }
 </style>

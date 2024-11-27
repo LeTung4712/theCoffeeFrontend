@@ -2,17 +2,17 @@
     <v-dialog v-model="showDialog" max-width="750">
         <template v-slot:activator="{ props }">
             <v-btn v-bind="props" variant="text" class="delivery-btn rounded-pill px-2 px-sm-4" color="secondary">
-                <v-row no-gutters align="center" style="height: 100%">
+                <v-row no-gutters align="center" style="height: 100%; width: 100%">
                     <v-col cols="auto">
                         <v-img src="https://minio.thecoffeehouse.com/images/tch-web-order/Delivery2.png" 
                             width="36" 
                             height="36" 
                             class="mr-2 rounded-circle" />
                     </v-col>
-                    <v-col>
+                    <v-col class="address-container">
                         <div class="ml-2">
                             <div class="text-subtitle-1 font-weight-bold text-black">Giao hàng</div>
-                            <div class="text-caption text-truncate text-black" style="max-width: 200px">
+                            <div class="text-caption text-truncate text-black">
                                 {{ address }}
                             </div>
                         </div>
@@ -164,10 +164,16 @@ export default {
 <style scoped>
 .delivery-btn {
     min-width: 220px;
+    max-width: 220px;
     height: 56px !important;
     background-color: rgb(var(--v-theme-secondary)) !important;
     transition: 0.3s ease-in-out;
     border-radius: 8px;
+}
+
+.address-container {
+    width: 120px; /* Đặt chiều rộng cố định cho phần địa chỉ */
+    overflow: hidden;
 }
 
 /* Điều chỉnh kích thước cho mobile */
@@ -175,6 +181,11 @@ export default {
     .delivery-btn {
         height: 48px !important;
         min-width: 180px;
+        max-width: 180px;
+    }
+    
+    .address-container {
+        width: 90px;
     }
 }
 
