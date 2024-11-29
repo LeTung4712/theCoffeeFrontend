@@ -290,6 +290,7 @@ export default {
           ...this.order,
           product_item: this.product || this.order.product_item,
           count: this.quantity,
+          total_amount: this.calculateTotalPrice(),
           size: this.size,
           note: this.note,
           topping_items: this.topping_items.map(topping => ({

@@ -105,7 +105,7 @@
               @voucher-selected="handleVoucherSelected"
             />
             <span v-if="selectedVoucher" class="text-orange">
-              -{{ formatPrice(selectedVoucher.price) }}đ
+              -{{ formatPrice(voucherDiscount) }}đ
             </span>
             <span v-else>0đ</span>
           </div>
@@ -157,6 +157,11 @@ export default {
   },
 
   watch: {
+    voucherDiscount: {
+      handler(newValue) {
+        this.emitOrderData();
+      }
+    },
     safeOrders: {
       handler() {
         this.calculateTotalPrice()
@@ -182,10 +187,18 @@ export default {
     shippingFee() {
       return 15000
     },
-    finalTotal() {
-      const discount = this.selectedVoucher?.price || 0
-      return Math.max(0, this.subtotal + this.shippingFee - discount)
+    voucherDiscount() {
+      if (!this.selectedVoucher || !this.subtotal) return 0
+      
+      if (this.selectedVoucher.discount_type === 'percent') {
+        const discountAmount = (this.subtotal * this.selectedVoucher.discount_percent) / 100
+        return Math.min(discountAmount, this.selectedVoucher.max_discount_amount)
+      }
+      return this.selectedVoucher.max_discount_amount
     },
+    finalTotal() {
+      return Math.max(0, this.subtotal + this.shippingFee - (this.voucherDiscount || 0))
+    }
   },
 
   methods: {
@@ -244,14 +257,13 @@ export default {
     },
 
     calculateTotalPrice() {
-      this.subtotal = Math.max(0, this.safeOrders.reduce((sum, order) => {
-        return sum + this.getProductPrice(order)
-      }, 0))
+      this.subtotal = this.safeOrders.reduce((sum, order) => {
+        const price = this.getProductPrice(order)
+        return sum + (isNaN(price) ? 0 : price)
+      }, 0)
       
-      this.$emit('order-loaded', {
-        items: this.safeOrders,
-        totalPrice: this.finalTotal,
-        voucher: this.selectedVoucher
+      this.$nextTick(() => {
+        this.emitOrderData()
       })
     },
 
@@ -265,7 +277,9 @@ export default {
       const index = cartStore.items.findIndex(o => o.id === updatedOrder.id)
       if (index !== -1) {
         cartStore.updateItem(updatedOrder)
-        this.calculateTotalPrice()
+        this.$nextTick(() => {
+          this.calculateTotalPrice()
+        })
       }
       this.showEditDialog = false
     },
@@ -307,7 +321,17 @@ export default {
 
     handleVoucherSelected(voucher) {
       this.voucherStore.setSelectedVoucher(voucher)
-      this.calculateTotalPrice()
+      this.$nextTick(() => {
+        this.calculateTotalPrice()
+      })
+    },
+
+    emitOrderData() {
+      this.$emit('order-loaded', {
+        items: this.safeOrders,
+        voucherDiscount: this.voucherDiscount,
+        totalPrice: this.finalTotal
+      })
     }
   },
 

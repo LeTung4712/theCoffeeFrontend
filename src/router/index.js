@@ -22,11 +22,11 @@ const routes = [
       //   path: ROUTES.USER_ACCOUNT,
       //   component: () => import("@/components/userComponents/accountUser"),
       // },
-      // {
-      //   name: "user",
-      //   path: ROUTES.USER_PAGE,
-      //   component: () => import("@/views/pages_user/UserPage"),
-      // },
+      {
+        name: "UserInfo",
+        path: ROUTES.USER_PAGE,
+        component: () => import("@/pages/user/UserPage/UserInfo"),
+      },
       // {
       //   name: "menuMenu",
       //   path: ROUTES.MENU,

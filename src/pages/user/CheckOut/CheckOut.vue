@@ -198,8 +198,9 @@ export default {
       this.orderData = {
         items: data.items,
         totalPrice: data.totalPrice,
-        voucher: data.voucher
+        voucherDiscount: data.voucherDiscount
       }
+      //console.log('orderData', this.orderData)
       this.totalAmount = data.totalPrice
     },
 
@@ -228,19 +229,19 @@ export default {
           note: this.deliveryInfo.note || '',
           shipcost: 15000, // Có thể cần điều chỉnh theo logic của bạn
           total_price: this.totalAmount,
-          discount_money: this.orderData.voucher?.discount || 0,
+          discount_money: this.orderData.voucherDiscount || 0,
           payment_method: this.paymentMethod,
           products: this.orderData.items.map(item => ({
             product_id: item.id,
             product_count: item.count,
             size: item.size,
-            price: item.product_item.price,
+            note: item.note,
+            price: item.total_amount,
             topping_id: item.topping_items?.map(t => t.id) || [],
             topping_count: item.topping_items?.map(t => t.count) || []
           }))
         }
-        console.log('voucher', this.orderData)
-        console.log('orderData', orderData)
+        
         const { data: { order_id } } = await orderAPI.create(orderData)
 
         if (this.paymentMethod === 'cod') {

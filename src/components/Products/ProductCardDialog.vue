@@ -320,6 +320,7 @@ export default {
           },
           size: this.size,
           count: this.quantity,
+          total_amount: this.calculateTotalPrice(),
           topping_items: this.topping_items.map(topping => ({
             ...topping,
             count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0

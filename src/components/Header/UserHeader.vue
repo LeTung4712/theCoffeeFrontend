@@ -56,7 +56,7 @@
                       :key="index"
                       :prepend-icon="item.icon"
                       :title="item.title"
-                      @click="handelClickInfo(item.route)"
+                      @click="handleClickInfo(item.route)"
                     />
                     <v-divider />
                     <v-list-item
@@ -188,8 +188,13 @@ export default {
       }
     },
 
-    handelClickInfo(route) {
-      // Xử lý khi click vào menu item
+    handleClickInfo(route) {
+      // Chuyển hướng đến trang UserInfo với param name
+      this.$router.push({
+        name: 'UserInfo',
+        params: { name: route }
+      });
+      this.displayClick = false;
     },
 
     logout() {
