@@ -50,7 +50,7 @@
         <v-radio label="Nam" value="male"></v-radio>
         <v-radio label="Nữ" value="female"></v-radio>
       </v-radio-group>
-      <v-btn type="submit" color="warning" class="mt-4" block>Cập nhật</v-btn>
+      <v-btn type="submit" color="primary" class="mt-4" block>Cập nhật</v-btn>
     </v-form>
   </div>
 </template>

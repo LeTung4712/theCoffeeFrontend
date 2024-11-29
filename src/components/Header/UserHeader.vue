@@ -189,22 +189,12 @@ export default {
     },
 
     handleClickInfo(route) {
-      // Xử lý điều hướng dựa trên route được chọn
-      console.log(route)
-      switch (route) {
-        case 'user-info':
-          this.$router.push(`/user/${route}`);
-          break;
-        case 'so-dia-chi':
-          // TODO: Thêm route cho sổ địa chỉ khi có
-          this.notificationStore.info('Tính năng đang được phát triển', 3000);
-          break;
-        case 'lich-su':
-          // TODO: Thêm route cho lịch sử mua hàng khi có
-          this.notificationStore.info('Tính năng đang được phát triển', 3000);
-          break;
-      }
-      this.displayClick = false; // Đóng menu sau khi click
+      // Chuyển hướng đến trang UserInfo với param name
+      this.$router.push({
+        name: 'UserInfo',
+        params: { name: route }
+      });
+      this.displayClick = false;
     },
 
     logout() {

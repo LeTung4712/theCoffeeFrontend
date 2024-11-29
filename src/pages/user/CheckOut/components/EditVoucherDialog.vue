@@ -3,7 +3,7 @@
     <template v-slot:activator="{ props }">
       <v-sheet v-bind="props" class="d-flex align-center cursor-pointer">
         <v-icon icon="mdi-ticket-percent" color="primary" class="mr-2"/>
-        <span class="text-orange">
+        <span class="text-secondary">
           {{ selectedVoucher ? selectedVoucher.description : "Chọn khuyến mãi" }}
         </span>
       </v-sheet>
@@ -203,7 +203,6 @@ export default {
       const voucherData = {
         id: voucher.id,
         description: voucher.description,
-        price: this.calculateDiscountAmount(voucher),
         discount_percent: voucher.discount_percent,
         discount_type: voucher.discount_type,
         code: voucher.code,
@@ -215,14 +214,6 @@ export default {
       this.$emit('voucher-selected', voucherData)
       this.dialog = false
       this.notificationStore.success('Áp dụng voucher thành công', 3000)
-    },
-
-    calculateDiscountAmount(voucher) {
-      if (voucher.discount_type === 'PERCENT') {
-        const discountAmount = (this.totalPrice * voucher.discount_percent) / 100
-        return Math.min(discountAmount, voucher.max_discount_amount)
-      }
-      return voucher.max_discount_amount
     }
   }
 }

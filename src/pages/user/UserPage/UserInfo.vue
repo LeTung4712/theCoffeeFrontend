@@ -70,19 +70,6 @@
             <!-- Right Panel -->
             <v-col cols="12" lg="7">
                 <v-card class="user-info-right">
-                    <!-- Header -->
-                    <v-row justify="center" align="center" class="user-info-header ">
-                        <v-col cols="12" class="text-center">
-                            <div class="d-inline-flex align-center">
-                                <v-avatar size="48" class="me-3">
-                                    <v-img src="https://order.thecoffeehouse.com/_nuxt/img/user-icon-gold.5f2886d.svg"
-                                        alt="User Icon" />
-                                </v-avatar>
-                                <h2 class="text-h5 font-weight-bold mb-0">Tài khoản của bạn</h2>
-                            </div>
-                        </v-col>
-                    </v-row>
-
                     <v-window v-model="select">
                         <!-- User Info Tab -->
                         <v-window-item :value="1">
@@ -101,7 +88,7 @@
 
                         <!-- Order History Tab -->
                         <v-window-item :value="4">
-                            <OrderHistoryTab :orders="listOrders" :search="search" @update:search="search = $event" />
+                            <OrderHistoryTab :orders="listOrders" />
                         </v-window-item>
                     </v-window>
                 </v-card>
@@ -114,12 +101,14 @@
 <script>
 import { userAPI } from "@/api/user";
 import { useAuthStore } from "@/stores/auth";
+import { useAddressStore } from "@/stores/address";
 import { useNotificationStore } from "@/stores/notification";
 import UserInfoTab from './tabs/UserInfoTab.vue'
 import AddressTab from './tabs/AddressTab.vue'
 import BenefitsTab from './tabs/BenefitsTab.vue'
 import OrderHistoryTab from './tabs/OrderHistoryTab.vue'
 import JsBarcode from 'jsbarcode'
+
 
 // Import icons
 import userIcon from '@/assets/icons/user-icon.svg'
@@ -140,9 +129,11 @@ export default {
     setup() {
         const notificationStore = useNotificationStore()
         const authStore = useAuthStore()
+        const addressStore = useAddressStore()
         return {
             notificationStore,
-            authStore
+            authStore,
+            addressStore
         }
     },
 
@@ -174,15 +165,7 @@ export default {
                     route: 'lich-su'
                 }
             ],
-            userInfomation: {
-                id: "",
-                last_name: "",
-                first_name: "",
-                mobile_no: "",
-                birth: "",
-                email: "",
-                gender: "male"
-            },
+            userInfomation: {},
             listOrders: [],
             listAddresses: [],
             loading: false,
@@ -196,18 +179,7 @@ export default {
     },
 
     computed: {
-        membershipCardStyle() {
-            return {
-                background: 'linear-gradient(rgb(255, 149, 34) 0%, rgb(218, 84, 9) 50%)'
-            }
-        },
-
-        filteredOrders() {
-            return this.listOrders.filter(order =>
-                order.order_id.toLowerCase().includes(this.search.toLowerCase())
-            )
-        },
-
+        // Tạo mã QR từ dữ liệu của người dùng
         qrValue() {
             return JSON.stringify({
                 id: this.userInfomation.id,
@@ -228,63 +200,60 @@ export default {
         async initializeUserData() {
             const userData = this.authStore.userInfo
             this.userInfomation = userData
-            console.log('user', this.userInfomation)
             if (!userData) {
                 this.$router.push('/')
                 return
             }
             await Promise.all([
-                this.getAddresses(),
-                this.getOrders()
+                this.getAddresses(userData.id),
+                this.getOrders(userData.id)
             ])
         },
 
-        async getAddresses() {
-            const response = await userAPI.getAddressNote()
-            this.listAddresses = response.data
+        // Lấy danh sách địa chỉ của người dùng
+        async getAddresses(userId) {
+            if (this.addressStore.addressNote.length === 0) {
+                const response = await userAPI.getAddressNote({ user_id: userId })
+                this.addressStore.setAddressNote(response.data.address_note)
+            }
+            this.listAddresses = this.addressStore.addressNote
         },
 
-        async getOrders() {
-            const response = await userAPI.getOrdersUser()
-            this.listOrders = response.data
+        // Lấy danh sách đơn hàng của người dùng
+        async getOrders(userId) {
+            const response = await userAPI.getOrdersUser({ user_id: userId })
+            this.listOrders = response.data.orders
         },
 
+        // Chuyển đến trang tương ứng với item trong menu
         handleMenuClick(index) {
             this.select = index
             const route = this.menuItems[index - 1].route
             this.$router.push({
-                name: 'user',
+                name: 'UserInfo',
                 params: { name: route }
             })
         },
 
+        // Cập nhật thông tin của người dùng
         async handleUpdate(updatedInfo) {
             this.loading = true
             try {
-                await userAPI.updateUserInfo(updatedInfo)
+                const response = await userAPI.updateInfo(updatedInfo)
                 this.userInfomation = { ...this.userInfomation, ...updatedInfo }
-                this.notificationStore.showSuccessNotification('Cập nhật thông tin thành công', 3000)
+                if (response.data?.userInfo) {
+                    this.authStore.updateUser(response.data.userInfo)
+                }
+                this.notificationStore.success('Cập nhật thông tin thành công', 3000)
             } catch (error) {
                 console.error('Lỗi khi cập nhật thông tin:', error)
-                this.notificationStore.showErrorNotification('Có lỗi xảy ra khi cp nhật thông tin', 3000)
+                this.notificationStore.error('Có lỗi xảy ra khi cập nhật thông tin', 3000)
             } finally {
                 this.loading = false
             }
         },
 
-        async refreshData() {
-            this.loading = true
-            try {
-                await this.initializeUserData()
-                this.notificationStore.showSuccessNotification('Dữ liệu đã được cập nhật', 3000)
-            } catch (error) {
-                console.error('Lỗi khi làm mới dữ liệu:', error)
-                this.notificationStore.showErrorNotification('Có lỗi xảy ra khi lm mới dữ liệu', 3000)
-            } finally {
-                this.loading = false
-            }
-        },
-
+        // Tạo mã barcode từ dữ liệu của người dùng
         generateBarcode() {
             const canvas = document.createElement('canvas')
             JsBarcode(canvas, this.memberCode, {
@@ -298,9 +267,26 @@ export default {
     },
 
     watch: {
-        async select(newValue) {
-            if (newValue === 2 || newValue === 4) {
-                await this.refreshData()
+        // Theo dõi sự thay đổi của route params
+        '$route.params.name': {
+            immediate: true,
+            handler(newName) {
+                switch (newName) {
+                    case 'user-info':
+                        this.select = 1
+                        break
+                    case 'so-dia-chi':
+                        this.select = 2
+                        break
+                    case 'quyen-loi':
+                        this.select = 3
+                        break
+                    case 'lich-su':
+                        this.select = 4
+                        break
+                    default:
+                        this.select = 1
+                }
             }
         }
     }

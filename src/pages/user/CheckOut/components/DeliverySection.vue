@@ -10,8 +10,13 @@
 
     <!-- Address -->
     <v-card flat class="pa-4 d-flex align-center" @click="dialog = true">
-      <v-img src="https://minio.thecoffeehouse.com/images/tch-web-order/Delivery2.png" 
-             width="40" class="mr-4"/>
+      <v-img 
+        src="@/assets/Delivery2.png" 
+        width="24" 
+        height="24"
+        contain
+        class="mr-4"
+      />
       <div class="flex-grow-1">
         <div class="text-subtitle-1">{{ address }}</div>
       </div>
