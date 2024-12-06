@@ -183,12 +183,12 @@ export default {
   name: "ProductCardDialog",
   
   props: {
-    currentID: String,
+    currentID: Number,
     id: Number,
     image_url: String,
     name: String,
     description: String, 
-    price: Number,
+    price: String,
     dialog: {
       type: Boolean,
       default: false

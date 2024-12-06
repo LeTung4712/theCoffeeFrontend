@@ -170,7 +170,7 @@ export default {
             ProductStore
         }
     },
-    
+
     data() {
         return {
             quantity: 1,
@@ -182,7 +182,7 @@ export default {
                 name: "The Coffee House Sữa Đá",
                 category_id: 1,
                 description: "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
-                price: 39000,
+                price: "39000.00",
                 image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
             },
             product_relations: [
@@ -191,7 +191,7 @@ export default {
                     name: "The Coffee Sữa Đá",
                     category_id: 1,
                     description: "Thức uống giúp tỉnh táo tức thì ",
-                    price: 39000,
+                    price: "39000.00",
                     image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
                 },
                 {
@@ -199,7 +199,7 @@ export default {
                     name: "The Đá",
                     category_id: 1,
                     description: "Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
-                    price: 39000,
+                    price: "39000.00",
                     image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
                 },
             ],
@@ -207,17 +207,17 @@ export default {
                 {
                     id: 1,
                     name: "Sữa tươi",
-                    price: 10000,
+                    price: "10000.00",
                 },
                 {
                     id: 2,
                     name: "Sữa bánh flan",
-                    price: 10000,
+                    price: "10000.00",
                 },
                 {
                     id: 3,
                     name: "Sữa tươi bánh flan",
-                    price: 10000,
+                    price: "10000.00",
                 }
             ],
             isLoading: false,
@@ -226,7 +226,7 @@ export default {
 
     computed: {
         hasToppings() {
-            return this.topping_items.length > 1
+            return this.topping_items.length > 0
         },
 
         formattedTotalPrice() {
@@ -235,25 +235,29 @@ export default {
     },
 
     created() {
-        this.product_id = this.ProductStore.getCurrentProductId
-        this.loadProductData()
+        if (this.ProductStore.getCurrentProductId) {
+            this.product_id = this.ProductStore.getCurrentProductId
+            this.loadProductData()
+        } else {
+            this.$router.push('/mainpage')
+        }
     },
 
     watch: {
-        'product_id': {
-        handler() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-            this.isLoading = true;
-            this.loadProductData().finally(() => {
-                this.isLoading = false;
-            });
-        },
-        immediate: true,
-        deep: true
-    }
+        // 'product_id': {
+        //     handler() {
+        //         window.scrollTo({
+        //             top: 0,
+        //             behavior: 'smooth'
+        //         });
+        //         this.isLoading = true;
+        //         this.loadProductData().finally(() => {
+        //             this.isLoading = false;
+        //         });
+        //     },
+        //     immediate: true,
+        //     deep: true
+        // }
     },
 
     methods: {

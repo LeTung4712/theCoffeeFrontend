@@ -16,11 +16,11 @@
 
           <v-card-text class="pt-2">
             <v-row dense>
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="12">
                 <v-icon small class="mr-2">mdi-clock-outline</v-icon>
                 {{ formatDateTime(order.order_time) }}
               </v-col>
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="12">
                 <v-icon small class="mr-2">mdi-map-marker</v-icon>
                 {{ order.address }}
               </v-col>

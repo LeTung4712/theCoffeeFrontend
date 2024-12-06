@@ -93,7 +93,7 @@ export default {
     ProductCard
   },
   props: {
-    currentID: String,
+    currentID: Number,
     dialog: Boolean,
   },
   data() {
@@ -142,12 +142,10 @@ export default {
     try {
       await Promise.all([
         this.getCategories(),
-        this.getProductsByCategoryId(),
         this.getAllProducts()
       ])
     } catch (error) {
       console.error('Lỗi khi tải dữ liệu:', error)
-      // Giữ lại dữ liệu mẫu nếu API fails
     }
   },
 

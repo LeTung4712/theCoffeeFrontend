@@ -21,6 +21,18 @@ export const userAPI = {
     return httpClient.post(`${PREFIX}/info/getAddressNote`, data);
   },
 
+  createAddressNote(data) {
+    return httpClient.post(`${PREFIX}/info/createAddressNote`, data);
+  },
+
+  updateAddressNote(data) {
+    return httpClient.put(`${PREFIX}/info/updateAddressNote`, data);
+  },
+
+  deleteAddressNote(data) {
+    return httpClient.delete(`${PREFIX}/info/deleteAddressNote`, data);
+  },
+
   getOrdersUser(data) {
     return httpClient.post(`${PREFIX}/info/getOrderHistory`, data);
   },

@@ -32,7 +32,7 @@
 
             <v-card-text class="mobile-content">
                 <div class="text-subtitle-1 font-weight-bold mb-2 mobile-product-name text-black">
-                    {{ product.name }} x {{ product.id }}
+                    {{ product.name }}
                 </div>
 
                 <div class="d-flex justify-space-between align-center">
@@ -64,7 +64,7 @@ export default {
             type: Object,
             required: true
         },
-        currentID: String,
+        currentID: Number,
         dialog: Boolean,
         imageSize: {
             type: Number,
@@ -83,7 +83,6 @@ export default {
                 .replaceAll(' ', '-')
                 .toLowerCase();
                 
-            console.log('product_id',this.product.id)
             const productStore = useProductStore()
             productStore.setProductId(this.product.id)
             this.$router.push({
