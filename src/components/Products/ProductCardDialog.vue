@@ -53,7 +53,7 @@
                 </div>
                 
                 <div class="d-flex justify-space-between align-center mt-2">
-                  <span class="text-subtitle-1 font-weight-bold">{{ formatPrice(price) }}đ</span>
+                  <span class="text-subtitle-1 font-weight-bold">{{ formattedPrice(price) }}đ</span>
                   <v-btn-group variant="outlined" color="primary" rounded="lg" class="quantity-group">
                     <v-btn
                       icon="mdi-minus"
@@ -79,7 +79,7 @@
 
           <!-- Note -->
           <v-text-field
-            v-model="note"
+            v-model="item_note"
             placeholder="Ghi chú thêm cho món này"
             variant="outlined"
             density="comfortable"
@@ -112,7 +112,7 @@
                   <div class="d-flex flex-column">
                     <span class="font-weight-medium">{{ option.label }}</span>
                     <span class="text-caption text-grey-darken-1">
-                      + {{ formatPrice(option.price) }}đ
+                      + {{ formattedPrice(option.price) }}đ
                     </span>
                   </div>
                 </template>
@@ -139,7 +139,7 @@
                 <div class="d-flex flex-column">
                   <span class="font-weight-medium">{{ topping.name }}</span>
                   <span class="text-caption text-grey-darken-1">
-                    + {{ formatPrice(topping.price) }}đ
+                    + {{ formattedPrice(topping.price) }}đ
                   </span>
                 </div>
               </template>
@@ -161,7 +161,7 @@
             :disabled="isLoading"
           >
             <template v-if="!isLoading">
-              {{ formatPrice(calculateTotalPrice()) }}đ - Thêm vào giỏ hàng
+              {{ formattedPrice(calculateTotalPrice()) }}đ - Thêm vào giỏ hàng
             </template>
             <template v-else>
               Đang tải...
@@ -174,6 +174,7 @@
 </template>
 
 <script>
+import { formatPrice } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
@@ -199,7 +200,7 @@ export default {
     return {
       dialogVisible: false,
       quantity: 1,
-      note: "",
+      item_note: "",
       product: {
         id: 0,
         name: "",
@@ -249,6 +250,10 @@ export default {
   },
 
   methods: {
+    formattedPrice(price) {
+      return formatPrice(price)
+    },
+
     async fetchProductInfo() {
       if (!this.id) return;
       
@@ -263,9 +268,8 @@ export default {
           ...data.product,
           price: this.price
         };
-        this.topping_items = data.toppings.map(topping => ({
+        this.topping_items = data.product.toppings.map(topping => ({
           ...topping,
-          count: 0
         }));
       } catch (error) {
         console.error("Failed to fetch product info:", error);
@@ -294,14 +298,10 @@ export default {
     calculateTotalPrice() {
       const basePrice = parseInt(this.price || 0);
       const toppingPrice = this.checked_topping.reduce((sum, topping) => 
-        sum + parseInt(topping.price), 0);
+        sum + Number(topping.price), 0);
       const sizePrice = this.sizeOptions.find(opt => opt.value === this.size)?.price || 0;
       
       return (basePrice + toppingPrice + sizePrice) * this.quantity;
-    },
-
-    formatPrice(price) {
-      return price?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
 
     addToCart() {
@@ -319,13 +319,10 @@ export default {
             price: this.price
           },
           size: this.size,
-          count: this.quantity,
+          quantity: this.quantity,
           total_amount: this.calculateTotalPrice(),
-          topping_items: this.topping_items.map(topping => ({
-            ...topping,
-            count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
-          })),
-          note: this.note
+          topping_items: this.checked_topping,
+          item_note: this.item_note
         };
 
         // Sử dụng cartStore thay vì localStorage
@@ -346,8 +343,6 @@ export default {
       this.size = 'S';
       this.note = '';
       this.checked_topping = [];
-      localStorage.setItem('info_size', 'S');
-      localStorage.setItem('topping_counts', JSON.stringify([0, 0, 0, 0, 0]));
     },
 
     closeDialog() {

@@ -31,7 +31,7 @@
         disabled
       />
       <v-text-field
-        v-model="form.birth"
+        v-model="form.date_of_birth"
         label="Sinh nhật"
         variant="outlined"
         density="comfortable"

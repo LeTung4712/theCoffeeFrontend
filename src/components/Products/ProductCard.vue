@@ -3,7 +3,8 @@
         <!-- Desktop Layout -->
         <div class="d-none d-sm-flex flex-column h-100">
             <div class="image-container">
-                <v-img :src="product.image_url" :width="imageSize" :height="imageSize" cover class="rounded-lg bg-grey-lighten-3" />
+                <v-img :src="product.image_url" :width="imageSize" :height="imageSize" cover
+                    class="rounded-lg bg-grey-lighten-3" />
             </div>
 
             <v-card-text class="d-flex flex-column h-100">
@@ -16,7 +17,8 @@
                         {{ formattedPrice }}đ
                     </span>
                     <div class="add-button-wrapper">
-                        <ProductCardDialog :currentID="currentID" :dialog="dialog" v-bind="product" :isInProductListing="1" />
+                        <ProductCardDialog :currentID="currentID" :dialog="dialog" v-bind="product"
+                            :isInProductListing="1" />
                     </div>
                 </div>
             </v-card-text>
@@ -30,7 +32,7 @@
 
             <v-card-text class="mobile-content">
                 <div class="text-subtitle-1 font-weight-bold mb-2 mobile-product-name text-black">
-                    {{ product.name }}
+                    {{ product.name }} x {{ product.id }}
                 </div>
 
                 <div class="d-flex justify-space-between align-center">
@@ -38,7 +40,8 @@
                         {{ formattedPrice }}đ
                     </span>
                     <div class="add-button-wrapper">
-                        <ProductCardDialog :currentID="currentID" :dialog="dialog" v-bind="product" :isInProductListing="1" />
+                        <ProductCardDialog :currentID="currentID" :dialog="dialog" v-bind="product"
+                            :isInProductListing="1" />
                     </div>
                 </div>
             </v-card-text>
@@ -47,8 +50,9 @@
 </template>
 
 <script>
-import { removeVietnameseTones } from "@/utils/format";
+import { removeVietnameseTones, formatPrice } from "@/utils/format";
 import ProductCardDialog from "./ProductCardDialog.vue";
+import { useProductStore } from '@/stores/product'
 
 export default {
     name: "ProductCard",
@@ -67,9 +71,10 @@ export default {
             default: 155
         }
     },
+
     computed: {
         formattedPrice() {
-            return this.product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return formatPrice(this.product.price);
         }
     },
     methods: {
@@ -77,9 +82,12 @@ export default {
             const productNameInUrl = removeVietnameseTones(this.product.name)
                 .replaceAll(' ', '-')
                 .toLowerCase();
-
+                
+            console.log('product_id',this.product.id)
+            const productStore = useProductStore()
+            productStore.setProductId(this.product.id)
             this.$router.push({
-                path: `/products/${productNameInUrl}`
+                path: `/products/${productNameInUrl}`,
             });
         }
     }

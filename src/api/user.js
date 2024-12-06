@@ -22,6 +22,6 @@ export const userAPI = {
   },
 
   getOrdersUser(data) {
-    return httpClient.post(`${PREFIX}/info/getOrders`, data);
+    return httpClient.post(`${PREFIX}/info/getOrderHistory`, data);
   },
 };

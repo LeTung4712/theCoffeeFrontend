@@ -34,7 +34,7 @@
             <div>
               <!-- Tên sản phẩm -->
               <div class="text-body-1 font-weight-medium" v-if="getProductName(order)">
-                {{ order.count || 1 }} x {{ getProductName(order) }}
+                {{ order.quantity || 1 }} x {{ getProductName(order) }}
               </div>
               
               <!-- Size -->
@@ -44,11 +44,11 @@
               
               <!-- Toppings -->
               <div 
-                v-for="(topping, tIndex) in filterToppings(order)"
+                v-for="(topping, tIndex) in order.topping_items"
                 :key="`${order.id}-${tIndex}`"
                 class="text-subtitle-2"
               >
-                + {{ topping.name }} (x{{ topping.count || 1 }})
+                + {{ topping.name }} x 1
               </div>
 
               <v-btn
@@ -65,7 +65,7 @@
           </div>
 
           <div class="text-right">
-            <span class="text-body-1">{{ formatPrice(getProductPrice(order)) }}đ</span>
+            <span class="text-body-1">{{ formattedPrice(order.total_amount) }}đ</span>
           </div>
         </div>
         <v-divider class="my-2" ></v-divider>
@@ -80,7 +80,7 @@
         <template v-slot:default>
           <div class="d-flex justify-space-between w-100">
             <span>Thành tiền</span>
-            <span>{{ formatPrice(subtotal) }}đ</span>
+            <span>{{ formattedPrice(totalPrice) }}đ</span>
           </div>
         </template>
       </v-list-item>
@@ -89,7 +89,7 @@
         <template v-slot:default>
           <div class="d-flex justify-space-between w-100">
             <span>Phí giao hàng</span>
-            <span>{{ formatPrice(shippingFee) }}đ</span>
+            <span>{{ formattedPrice(shippingFee) }}đ</span>
           </div>
         </template>
       </v-list-item>
@@ -101,11 +101,11 @@
           <div class="d-flex justify-space-between w-100">
             <EditVoucherDialog
               v-model="selectedVoucher"
-              :total-price="subtotal"
+              :total-price="totalPrice"
               @voucher-selected="handleVoucherSelected"
             />
             <span v-if="selectedVoucher" class="text-orange">
-              -{{ formatPrice(voucherDiscount) }}đ
+              -{{ formattedPrice(voucherDiscount) }}đ
             </span>
             <span v-else>0đ</span>
           </div>
@@ -122,11 +122,13 @@
 </template>
 
 <script>
+import { formatPrice } from '@/utils/format'
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
+import { useVoucherStore } from '@/stores/voucher'
 import EditOrderDialog from './EditOrderDialog.vue'
 import EditVoucherDialog from './EditVoucherDialog.vue'
-import { useVoucherStore } from '@/stores/voucher'
+
 
 export default {
   name: 'OrderSummary',
@@ -144,7 +146,7 @@ export default {
 
   data() {
     return {
-      subtotal: 0,
+      totalPrice: 0,
       showEditDialog: false,
       selectedOrder: null,
       isProcessingDelete: false
@@ -158,7 +160,7 @@ export default {
 
   watch: {
     voucherDiscount: {
-      handler(newValue) {
+      handler( newValue ) {
         this.emitOrderData();
       }
     },
@@ -188,20 +190,24 @@ export default {
       return 15000
     },
     voucherDiscount() {
-      if (!this.selectedVoucher || !this.subtotal) return 0
+      if (!this.selectedVoucher || !this.totalPrice) return 0
       
       if (this.selectedVoucher.discount_type === 'percent') {
-        const discountAmount = (this.subtotal * this.selectedVoucher.discount_percent) / 100
+        const discountAmount = (this.totalPrice * this.selectedVoucher.discount_percent) / 100
         return Math.min(discountAmount, this.selectedVoucher.max_discount_amount)
       }
-      return this.selectedVoucher.max_discount_amount
+      return Math.min(this.totalPrice,this.selectedVoucher.max_discount_amount)
     },
     finalTotal() {
-      return Math.max(0, this.subtotal + this.shippingFee - (this.voucherDiscount || 0))
+      return Math.max(0, this.totalPrice + this.shippingFee - (this.voucherDiscount || 0))
     }
   },
 
   methods: {
+    formattedPrice(price) {
+      return formatPrice(price)
+    },
+    
     getProductName(order) {
       if (!order?.product_item?.name) {
         console.warn('Không tìm thấy tên sản phẩm:', order)
@@ -210,58 +216,8 @@ export default {
       return order.product_item.name
     },
 
-    getProductPrice(order) {
-      if (!order?.product_item) return 0
-      
-      const count = order.count || 1
-      try {
-        const basePrice = Number(order.product_item.price) * count
-        const toppingPrice = this.calculateToppingPrice(order.topping_items, count)
-        const sizePrice = this.calculateSizePrice(order.size, count)
-        
-        return basePrice + toppingPrice + sizePrice
-      } catch (error) {
-        console.error('Lỗi tính giá sản phẩm:', error)
-        return 0
-      }
-    },
-
-    filterToppings(order) {
-      if (!Array.isArray(order?.topping_items)) return []
-      return order.topping_items.filter(topping => 
-        topping && 
-        typeof topping === 'object' && 
-        topping.name &&
-        topping.count > 0
-      )
-    },
-
-    calculateToppingPrice(toppings = [], orderCount = 1) {
-      if (!Array.isArray(toppings)) return 0
-      return toppings.reduce((sum, topping) => {
-        if (!topping?.price || !topping.count || topping.count <= 0) return sum
-        return sum + (Number(topping.price) * topping.count * orderCount)
-      }, 0)
-    },
-
-    calculateSizePrice(size, count = 1) {
-      const prices = { M: 6000, L: 10000 }
-      return (prices[size] || 0) * count
-    },
-
-    formatPrice(price) {
-      if (typeof price === 'string') {
-        price = parseFloat(price)
-      }
-      return new Intl.NumberFormat('vi-VN').format(price || 0)
-    },
-
     calculateTotalPrice() {
-      this.subtotal = this.safeOrders.reduce((sum, order) => {
-        const price = this.getProductPrice(order)
-        return sum + (isNaN(price) ? 0 : price)
-      }, 0)
-      
+      this.totalPrice = this.safeOrders.reduce((sum, order) => sum + order.total_amount, 0)
       this.$nextTick(() => {
         this.emitOrderData()
       })
@@ -330,7 +286,8 @@ export default {
       this.$emit('order-loaded', {
         items: this.safeOrders,
         voucherDiscount: this.voucherDiscount,
-        totalPrice: this.finalTotal
+        totalPrice: this.totalPrice,
+        finalPrice: this.finalTotal
       })
     }
   },

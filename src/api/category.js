@@ -7,8 +7,8 @@ export const categoryAPI = {
     return httpClient.get(`${PREFIX}/index`);
   },
 
-  getByParentId(params) {
-    return httpClient.get(`${PREFIX}/indexByParentId`, { params });
+  getByParentId(parentId) {
+    return httpClient.get(`${PREFIX}/indexByParentId`, { params: { parent_id: parentId } });
   },
 
   create(data) {

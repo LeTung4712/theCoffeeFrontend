@@ -63,7 +63,7 @@
                       <div class="text-white">
                         <div class="text-body-2">Thành tiền</div>
                         <div class="text-h6 font-weight-bold">
-                          {{ formatPrice(totalAmount) }}đ
+                          {{ formattedPrice(finalPrice) }}đ
                         </div>
                       </div>
                     </v-col>
@@ -88,7 +88,7 @@
               <div class="text-white">
                 <div class="text-body-2">Thành tiền</div>
                 <div class="text-h6 font-weight-bold">
-                  {{ formatPrice(totalAmount) }}đ
+                  {{ formattedPrice(finalPrice) }}đ
                 </div>
               </div>
             </v-col>
@@ -139,6 +139,7 @@ import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
 import { useVoucherStore } from '@/stores/voucher'
+import { formatPrice } from '@/utils/format'
 
 export default {
   name: 'CheckOut',
@@ -163,7 +164,7 @@ export default {
       orderData: null,
       deliveryInfo: null,
       paymentMethod: 'cod',
-      totalAmount: 0,
+      finalPrice: 0,
       agreedToTerms: false,
       showConfirmDialog: false,
       isDeleting: false,
@@ -194,14 +195,18 @@ export default {
   },
 
   methods: {
+    formattedPrice(price) {
+      return formatPrice(price)
+    },
+
     handleOrderLoaded(data) {
       this.orderData = {
         items: data.items,
         totalPrice: data.totalPrice,
+        finalPrice: data.finalPrice,
         voucherDiscount: data.voucherDiscount
       }
-      //console.log('orderData', this.orderData)
-      this.totalAmount = data.totalPrice
+      this.finalPrice = data.finalPrice
     },
 
     handleDeliveryInfoLoaded(data) {
@@ -224,24 +229,25 @@ export default {
           user_id: this.authStore.userInfo.id,
           user_name: this.authStore.userInfo.first_name,
           mobile_no: this.deliveryInfo.phone,
-          order_date: new Date().toISOString().split('T')[0],
           address: this.deliveryInfo.address,
           note: this.deliveryInfo.note || '',
-          shipcost: 15000, // Có thể cần điều chỉnh theo logic của bạn
-          total_price: this.totalAmount,
-          discount_money: this.orderData.voucherDiscount || 0,
+          shipping_fee: 15000.00,
+          total_price: this.orderData.totalPrice,
+          discount_amount: this.orderData.voucherDiscount || 0,
+          final_price: this.orderData.finalPrice,
           payment_method: this.paymentMethod,
           products: this.orderData.items.map(item => ({
             product_id: item.id,
-            product_count: item.count,
+            product_name: item.product_item.name,
+            product_price: item.product_item.price,
+            product_quantity : item.quantity,
             size: item.size,
-            note: item.note,
-            price: item.total_amount,
-            topping_id: item.topping_items?.map(t => t.id) || [],
-            topping_count: item.topping_items?.map(t => t.count) || []
+            item_note: item.item_note,
+            topping_items: item.topping_items
           }))
         }
         
+        console.log(orderData)
         const { data: { order_id } } = await orderAPI.create(orderData)
 
         if (this.paymentMethod === 'cod') {

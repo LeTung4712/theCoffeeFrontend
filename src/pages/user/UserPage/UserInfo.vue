@@ -212,11 +212,13 @@ export default {
 
         // Lấy danh sách địa chỉ của người dùng
         async getAddresses(userId) {
-            if (this.addressStore.addressNote.length === 0) {
+            //if (this.addressStore.addressNote.length === 0) {
                 const response = await userAPI.getAddressNote({ user_id: userId })
                 this.addressStore.setAddressNote(response.data.address_note)
-            }
+            //}
             this.listAddresses = this.addressStore.addressNote
+            //set address note la tim trong list address cais co is_default = true
+            this.addressStore.updateAddress(this.listAddresses.find(address => address.is_default).address)
         },
 
         // Lấy danh sách đơn hàng của người dùng

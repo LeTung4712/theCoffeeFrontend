@@ -20,6 +20,9 @@
           <v-list-item-subtitle class="text-grey">
             {{ address.mobile_no || 'Chưa có số điện thoại' }}
           </v-list-item-subtitle>
+          <v-list-item-subtitle class="text-grey-darker">
+            {{ address.address_type }} - {{ address.is_default ? 'Mặc định' : '' }}
+          </v-list-item-subtitle>
         </v-list-item-content>
 
       </v-list-item>

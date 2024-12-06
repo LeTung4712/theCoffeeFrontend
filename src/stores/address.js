@@ -15,6 +15,7 @@ export const useAddressStore = defineStore('address', {
       this.address = newAddress
       localStorage.setItem('oldAddress', JSON.stringify(newAddress))
     },
+    
     setAddressNote(addresses) {
       this.addressNote = addresses
       localStorage.setItem('addressNote', JSON.stringify(addresses))

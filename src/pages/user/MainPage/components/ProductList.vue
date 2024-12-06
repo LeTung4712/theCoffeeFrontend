@@ -155,10 +155,7 @@ export default {
     async getCategories() {
       this.loadingCategories = true
       try {
-        // Thêm delay 1.5s để test loading
-        //await new Promise(resolve => setTimeout(resolve, 1500))
-
-        const response = await categoryAPI.getByParentId({ params: { parent_id: 0 } })
+        const response = await categoryAPI.getByParentId({ params: { parent_id: null } })
         if (response?.data?.categories?.length) {
           this.categories = response.data.categories
           //console.log('hello this', this.categories);
@@ -173,9 +170,6 @@ export default {
     async getProductsByCategoryId() {
       this.loadingProducts = true
       try {
-        // Thêm delay 2s để test loading
-        //await new Promise(resolve => setTimeout(resolve, 2000))
-
         const response = await productAPI.getByCategory({ params: { category_id: this.category_type } })
 
         if (response?.data?.products?.length) {

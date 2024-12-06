@@ -60,8 +60,8 @@
               <template v-slot:prepend>
                 <v-icon color="primary" class="mr-2">
                   {{
-                  address.type === 'home' ? 'mdi-home' :
-                  address.type === 'office' ? 'mdi-office-building' : 'mdi-map-marker'
+                  address.address_type === 'home' ? 'mdi-home' :
+                  address.address_type === 'office' ? 'mdi-office-building' : 'mdi-map-marker'
                   }}
                 </v-icon>
               </template>
@@ -151,8 +151,8 @@ export default {
       }
     },
     savedAddresses() {
-        // Lấy danh sách địa chỉ đã lưu từ store nhưng chỉ lấy 3 địa chỉ đầu tiên mới nhất
-        return this.addressStore.addressNote.slice(0, 3);
+        // Lấy danh sách địa chỉ đã lưu từ store nhưng chỉ lấy 4 địa chỉ đầu tiên mới nhất
+        return this.addressStore.addressNote.slice(0, 4);
     }
   },
 
