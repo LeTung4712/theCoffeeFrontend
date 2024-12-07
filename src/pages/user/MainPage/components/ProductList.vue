@@ -26,9 +26,9 @@
               <v-divider></v-divider>
 
               <v-card-text class="search-dialog-content">
-                <v-text-field v-model="searchProduct" prepend-icon="mdi-magnify"
-                  placeholder="Nhập tên sản phẩm" variant="outlined" density="comfortable"
-                  @keydown.delete="updateSearch" hide-details class="sticky-search">
+                <v-text-field v-model="searchProduct" prepend-icon="mdi-magnify" placeholder="Nhập tên sản phẩm"
+                  variant="outlined" density="comfortable" @keydown.delete="updateSearch" hide-details
+                  class="sticky-search">
                 </v-text-field>
 
                 <v-row class="mt-4">
@@ -153,7 +153,7 @@ export default {
     async getCategories() {
       this.loadingCategories = true
       try {
-        const response = await categoryAPI.getByParentId({ params: { parent_id: null } })
+        const response = await categoryAPI.getByParentId({ parent_id: null })
         if (response?.data?.categories?.length) {
           this.categories = response.data.categories
           //console.log('hello this', this.categories);
@@ -168,7 +168,7 @@ export default {
     async getProductsByCategoryId() {
       this.loadingProducts = true
       try {
-        const response = await productAPI.getByCategory({ params: { category_id: this.category_type } })
+        const response = await productAPI.getByCategory({ category_id: this.category_type })
 
         if (response?.data?.products?.length) {
           this.products = response.data.products

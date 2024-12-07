@@ -19,6 +19,11 @@ export const useAddressStore = defineStore('address', {
     setAddressNote(addresses) {
       this.addressNote = addresses
       localStorage.setItem('addressNote', JSON.stringify(addresses))
+    },
+
+    removeAddressNoteById(id) {
+      this.addressNote = this.addressNote.filter(address => address.id !== id)
+      localStorage.setItem('addressNote', JSON.stringify(this.addressNote))
     }
   }
 }) 

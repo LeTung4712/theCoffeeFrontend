@@ -4,20 +4,20 @@ const PREFIX = '/order';
 
 export const orderAPI = {
   // Lấy thông tin đơn hàng
-  getOrders(params) {
-    return httpClient.get(`${PREFIX}/getOrders`, { params });
+  getOrders(data) {
+    return httpClient.get(`${PREFIX}/getOrders`, { params: data });
   },
 
-  getOrderInfo(params) {
-    return httpClient.get(`${PREFIX}/getOrderInfo`, { params });
+  getOrderInfo(data) {
+    return httpClient.get(`${PREFIX}/getOrderInfo`, { params: data });
   },
 
-  getSuccessOrders(params) {
-    return httpClient.get(`${PREFIX}/getSuccessOrders`, { params });
+  getSuccessOrders(data) {
+    return httpClient.get(`${PREFIX}/getSuccessOrders`, { params: data });
   },
 
-  getUnsuccessOrders(params) {
-    return httpClient.get(`${PREFIX}/getUnsuccessOrders`, { params });
+  getUnsuccessOrders(data) {
+    return httpClient.get(`${PREFIX}/getUnsuccessOrders`, { params: data });
   },
 
   // Thao tác với đơn hàng
@@ -29,8 +29,8 @@ export const orderAPI = {
     return httpClient.put(`${PREFIX}/acceptOrder`, data);
   },
 
-  markAsPaid(data) {
-    return httpClient.put(`${PREFIX}/paidOrder`, data);
+  success(data) {
+    return httpClient.put(`${PREFIX}/successOrder`, data);
   },
 
   cancel(data) {

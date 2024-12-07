@@ -8,12 +8,12 @@ export const productAPI = {
     return httpClient.get(`${PREFIX}/index`);
   },
   
-  getByCategory(categoryId) {
-    return httpClient.get(`${PREFIX}/indexByCategoryId`, { params: { category_id: categoryId } });
+  getByCategory(data) {
+    return httpClient.get(`${PREFIX}/indexByCategoryId`, { params: data });
   },
   
-  getInfo(productId) {
-    return httpClient.get(`${PREFIX}/getProductInfo`, { params: { product_id: productId } });
+  getInfo(data) {
+    return httpClient.get(`${PREFIX}/getProductInfo`, { params: data });
   },
 
   // Thao tác CRUD
@@ -25,7 +25,7 @@ export const productAPI = {
     return httpClient.put(`${PREFIX}/update`, data);
   },
   
-  delete(id) {
-    return httpClient.delete(`${PREFIX}/delete`, { params: { id } });
+  delete(data) {
+    return httpClient.delete(`${PREFIX}/delete`, { params: data });
   }
 };

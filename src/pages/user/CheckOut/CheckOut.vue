@@ -247,7 +247,6 @@ export default {
           }))
         }
         
-        console.log(orderData)
         const { data: { order_id } } = await orderAPI.create(orderData)
 
         if (this.paymentMethod === 'cod') {
