@@ -3,7 +3,8 @@
         <v-row>
             <v-col cols="12" md="4" lg="3" class="mt-8">
                 <v-treeview
-                    v-model:active="activeCategory"
+                    v-model="activeCategory"
+                    @update:active="handleCategorySelect"
                     :open="openCategories"
                     :items="menuItems"
                     item-children="children"
@@ -12,7 +13,6 @@
                     activatable
                     open-on-click
                     transition
-                    @update:active="handleCategorySelect"
                     @update:open="handleCategoryOpen"
                 >
                     <template #prepend="{ item }">
@@ -49,14 +49,21 @@
 
 <script>
 import { removeVietnameseTones } from "@/utils/format";
-import { categoryAPI } from "@/api/category";
 import { productAPI } from "@/api/product";
 import ProductCard from "@/components/Products/ProductCard.vue";
+import { useCategoryStore } from "@/stores/category";
+import { storeToRefs } from "pinia";
 
 export default {
     name: "MenuCategory",
     components: {
         ProductCard,
+    },
+
+    setup() {
+        const categoryStore = useCategoryStore();
+        const { categories } = storeToRefs(categoryStore);
+        return { categoryStore, categories };
     },
 
     data() {
@@ -65,7 +72,6 @@ export default {
             openCategories: ['public'],
             currentProductId: null,
             dialog: false,
-            categories: [],
             products: [],
             menuItems: [],
         }
@@ -77,20 +83,10 @@ export default {
 
     methods: {
         async initializeMenu() {
-            await this.fetchCategories()
+            await this.categoryStore.fetchCategories()
             await this.fetchProducts()
+            this.buildMenuItems()
             this.handleInitialRoute()
-        },
-
-        async fetchCategories() {
-            try {
-                const { data } = await categoryAPI.getAll()
-                console.log(data)
-                this.categories = data.categories
-                this.buildMenuItems()
-            } catch (error) {
-                console.error('Error fetching categories:', error)
-            }
         },
 
         async fetchProducts(categoryId = null) {

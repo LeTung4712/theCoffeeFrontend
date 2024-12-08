@@ -87,81 +87,81 @@ import { productAPI } from "@/api/product";
 import ProductCard from "@/components/Products/ProductCard.vue";
 import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
-// /* global axios */
+
 export default {
   name: "ProductList",
   components: {
     ProductCard
   },
+
   props: {
     currentID: Number,
     dialog: Boolean,
   },
+
   setup() {
     const categoryStore = useCategoryStore()
-    const { categories, loading: loadingCategories } = storeToRefs(categoryStore)
+    const { rootCategories, loading: loadingCategories } = storeToRefs(categoryStore)
     
     return {
-      categories,
-      loadingCategories
+      categories: rootCategories,
+      loadingCategories,
+      categoryStore
     }
   },
+
   data() {
     return {
       dialogSearch: false,
       category_type: 1,
-      products: [
-        {
-          "id": 1,
-          "name": "The Coffee House Sữa Nóng",
-          "category_id": 1,
-          "description": "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ. Càng hấp dẫn hơn với topping thạch 100% cà phê nguyên chất giúp giữ trọn vị ngon đến ngụm cuối cùng.",
-          "price": 39000,
-          "price_sale": 0,
-          "active": 1,
-          "image_url": "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-        }
-
-      ],
+      products: [],
       searchProduct: null,
-      product_searchs: [
-        {
-          id: 5,
-          name: "Hi-Tea Thơm",
-          description: "Sự kết hợp ăn ý giữa Trà xanh Nhật Bản và những miếng thơm thật mọng nước.",
-          price: 49000,
-          image_url: "https://minio.thecoffeehouse.com/image/admin/1732197236_caphe_400x400.jpg",
-          category_id: 4
-        }
-      ],
+      product_searchs: [],
       imageSize: 155,
       loadingProducts: false,
+      error: null
     }
   },
 
   async created() {
     try {
+      // Tải categories và products song song
       await Promise.all([
-        this.useCategoryStore().fetchCategories(),
+        this.initializeCategories(),
         this.getAllProducts()
       ])
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu:', error)
+      this.error = 'Có lỗi xảy ra khi tải dữ liệu'
+      console.error('Lỗi khởi tạo:', error)
     }
   },
 
   methods: {
+    async initializeCategories() {
+      try {
+        await this.categoryStore.fetchCategories()
+        // Nếu không có category được chọn, chọn category đầu tiên
+        if (!this.category_type && this.categories.length) {
+          this.category_type = this.categories[0].id
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải categories:', error)
+        throw error
+      }
+    },
+
     async getProductsByCategoryId() {
       this.loadingProducts = true
+      this.error = null
+
       try {
         const response = await productAPI.getByCategory({ category_id: this.category_type })
-
-        if (response?.data?.products?.length) {
+        if (response?.data?.products) {
           this.products = response.data.products
-          //console.log('hello this products', this.products);
         }
       } catch (error) {
         console.error('Lỗi khi lấy sản phẩm:', error)
+        this.error = 'Không thể tải sản phẩm'
       } finally {
         this.loadingProducts = false
       }
@@ -169,15 +169,13 @@ export default {
 
     async getAllProducts() {
       try {
-        // Thêm delay 1s để test loading
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
         const response = await productAPI.getAll()
-        if (response?.data?.products?.length) {
+        if (response?.data?.products) {
           this.product_searchs = response.data.products
         }
       } catch (error) {
         console.error('Lỗi khi lấy tất cả sản phẩm:', error)
+        throw error
       }
     },
 

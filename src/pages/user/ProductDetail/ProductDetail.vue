@@ -268,9 +268,7 @@ export default {
         async loadProductData() {
             this.isLoading = true;
             try {
-                const response = await productAPI.getInfo({
-                    params: { product_id: this.product_id }
-                });
+                const response = await productAPI.getInfo({ product_id: this.product_id });
                 const data = response.data;
                 this.product = {
                     ...data.product,
