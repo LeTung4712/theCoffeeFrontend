@@ -83,9 +83,10 @@
 
 <script>
 import { removeVietnameseTones } from "@/utils/format";
-import { categoryAPI } from "@/api/category";
 import { productAPI } from "@/api/product";
 import ProductCard from "@/components/Products/ProductCard.vue";
+import { useCategoryStore } from '@/stores/category'
+import { storeToRefs } from 'pinia'
 // /* global axios */
 export default {
   name: "ProductList",
@@ -96,18 +97,19 @@ export default {
     currentID: Number,
     dialog: Boolean,
   },
+  setup() {
+    const categoryStore = useCategoryStore()
+    const { categories, loading: loadingCategories } = storeToRefs(categoryStore)
+    
+    return {
+      categories,
+      loadingCategories
+    }
+  },
   data() {
     return {
       dialogSearch: false,
       category_type: 1,
-      categories: [
-        {
-          id: 1,
-          name: "Cà Phê",
-          image_url: "https://minio.thecoffeehouse.com/image/admin/1732167866_iconcate-caphe.png",
-          parent_id: 0
-        }
-      ],
       products: [
         {
           "id": 1,
@@ -133,7 +135,6 @@ export default {
         }
       ],
       imageSize: 155,
-      loadingCategories: false,
       loadingProducts: false,
     }
   },
@@ -141,7 +142,7 @@ export default {
   async created() {
     try {
       await Promise.all([
-        this.getCategories(),
+        this.useCategoryStore().fetchCategories(),
         this.getAllProducts()
       ])
     } catch (error) {
@@ -150,21 +151,6 @@ export default {
   },
 
   methods: {
-    async getCategories() {
-      this.loadingCategories = true
-      try {
-        const response = await categoryAPI.getByParentId({ parent_id: null })
-        if (response?.data?.categories?.length) {
-          this.categories = response.data.categories
-          //console.log('hello this', this.categories);
-        }
-      } catch (error) {
-        console.error('Lỗi khi lấy danh mục:', error)
-      } finally {
-        this.loadingCategories = false
-      }
-    },
-
     async getProductsByCategoryId() {
       this.loadingProducts = true
       try {
