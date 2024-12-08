@@ -50,7 +50,7 @@ export default {
                 
                 }
             }));
-            this.$router.push('/pages/login') // đăng xuất xong quay về trang login
+            this.$router.push('/login') // đăng xuất xong quay về trang login
         }
     }
 }

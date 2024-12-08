@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { ROUTES } from '@/constants/routes'
+import { createRouter, createWebHistory } from "vue-router";
+import { ROUTES } from "@/constants/routes";
 
 const routes = [
   {
@@ -34,11 +34,53 @@ const routes = [
       },
     ],
   },
-] 
+  {
+    path: "/admin",
+    redirect: ROUTES.ADMIN.PROFILE,
+    component: () => import("@/layouts/LayoutAdmin"),
+    children: [
+      // {
+      //   name: "Login",
+      //   path: ROUTES.ADMIN.LOGIN,
+      //   component: () => import("@/pages/Auth/LoginAdmin"),
+      // },
+      {
+        name: "Profile",
+        path: ROUTES.ADMIN.PROFILE,
+        component: () => import("@/pages/admin/Profile/ShopProfile"),
+      },
+      // {
+      //   name: "OrderDetails",
+      //   path: "order-detail/:order_detail_id",
+      //   component: () => import("@/views/pages_admin/OrderDetails"),
+      // },
+      // {
+      //   name: "Icons",
+      //   path: "pages/icons",
+      //   component: () => import("@/views/pages_admin/Icons"),
+      // },
+      // {
+      //   name: "NewOrders",
+      //   path: "pages/new-orders",
+      //   component: () => import("@/views/pages_admin/NewOrders"),
+      // },
+      // {
+      //   name: "PaymentHistory",
+      //   path: "pages/payment-history",
+      //   component: () => import("@/views/pages_admin/PaymentHistory"),
+      // },
+      // {
+      //   name: "Login",
+      //   path: "pages/login",
+      //   component: () => import("@/views/pages_admin/Login"),
+      // },
+    ],
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-})
+});
 
-export default router
+export default router;
