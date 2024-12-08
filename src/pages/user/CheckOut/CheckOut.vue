@@ -247,12 +247,12 @@ export default {
           }))
         }
         
-        const { data: { order_id } } = await orderAPI.create(orderData)
+        const { data: { order_code } } = await orderAPI.create(orderData)
 
         if (this.paymentMethod === 'cod') {
           await this.handleCodPayment()
         } else {
-          await this.handleOnlinePayment(order_id)
+          await this.handleOnlinePayment(order_code)
         }
       } catch (error) {
         this.notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message, 3000)
@@ -268,18 +268,18 @@ export default {
         this.voucherStore.clearVoucher()
 
         this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
-        this.$router.push('/mainpage')
+        this.$router.push('/user/lich-su')
       } catch (error) {
         this.notificationStore.error('Lỗi khi xử lý thanh toán COD: ' + error.message)
       }
     },
 
-    async handleOnlinePayment(orderId) {
+    async handleOnlinePayment(order_code) {
       try {
         const paymentData = {
-          order_id: orderId,
+          order_id: order_code,
           total_price: this.totalAmount,
-          return_url: `${window.location.origin}/payment/callback`
+          return_url: `${window.location.origin}/user/lich-su`
         }
         const { data: paymentUrl } = await paymentAPI.createMomoPayment(paymentData)
 
@@ -291,7 +291,7 @@ export default {
         this.voucherStore.clearVoucher()
         window.location.href = paymentUrl
       } catch (error) {
-        this.notificationStore.error('Lỗi khi tạo thanh toán online: ' + error.message)
+        this.notificationStore.error('Lỗi khi tạo thanh toán online',2000)
       }
     },
 

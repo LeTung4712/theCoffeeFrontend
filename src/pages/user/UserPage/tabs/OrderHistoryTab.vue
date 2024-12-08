@@ -176,11 +176,11 @@ export default {
     // Lấy text tương ứng với trạng thái đơn hàng
     getStatusText(status) {
       const statuses = {
-        0: 'Chờ giao hàng',
-        1: 'Đã xác nhận',
-        2: 'Đang giao hàng',
-        3: 'Đã giao hàng',
-        1: 'Đã hủy'
+        '0': 'Chờ giao hàng',
+        '1': 'Đã thanh toán - chờ giao hàng ',
+        '2': 'Đang giao hàng',
+        '3': 'Thành công',
+        '-1': 'Đã hủy'
       }
       return statuses[status] || 'Không xác định'
     },
@@ -188,11 +188,11 @@ export default {
     // Lấy màu tương ứng với trạng thái đơn hàng
     getStatusColor(status) {
       const colors = {
-        0: 'warning',
-        1: 'info',
-        2: 'purple',
-        3: 'success',
-        4: 'error'
+        '0': 'warning',
+        '1': 'info',
+        '2': 'purple',
+        '3': 'success',
+        '-1': 'error'
       }
       return colors[status] || 'grey'
     },

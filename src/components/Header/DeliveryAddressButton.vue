@@ -65,7 +65,7 @@
                   }}
                 </v-icon>
               </template>
-              <v-list-item-subtitle class="text-caption">{{ address.address }}</v-list-item-subtitle>
+              <v-list-item-title class="text-caption">{{ address.address }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </div>

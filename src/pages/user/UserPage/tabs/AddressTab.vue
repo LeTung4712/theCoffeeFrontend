@@ -51,7 +51,7 @@
       </v-list-item>
     </v-list>
 
-    <v-alert v-else type="info" text="Bạn chưa có địa chỉ giao hàng nào" class="mt-4"></v-alert>
+    <v-alert v-else type="info" text="B��n chưa có địa chỉ giao hàng nào" class="mt-4"></v-alert>
 
     <!-- Dialog để thêm hoặc chỉnh sửa địa chỉ -->
     <v-dialog v-model="dialog" max-width="600px">
@@ -210,6 +210,11 @@ export default {
     },
 
     async saveAddress() {
+      // Kiểm tra số lượng địa chỉ hiện tại
+      if (this.addresses.length >= 4) {
+        this.notificationStore.error('Bạn chỉ được phép thêm tối đa 4 địa chỉ.', 3000);
+        return;
+      }
       // Kiểm tra xem tất cả các trường có được điền hay không
       if (!this.newAddress.user_name || !this.newAddress.mobile_no || !this.newAddress.address) {
         this.notificationStore.error('Vui lòng điền đầy đủ thông tin.', 3000);

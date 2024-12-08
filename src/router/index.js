@@ -17,21 +17,16 @@ const routes = [
         path: ROUTES.PRODUCT_DETAIL,
         component: () => import("@/pages/user/ProductDetail/ProductDetail"),
       },
-      // {
-      //   name: "userAcount",
-      //   path: ROUTES.USER_ACCOUNT,
-      //   component: () => import("@/components/userComponents/accountUser"),
-      // },
       {
         name: "UserInfo",
         path: ROUTES.USER_PAGE,
         component: () => import("@/pages/user/UserPage/UserInfo"),
       },
-      // {
-      //   name: "menuMenu",
-      //   path: ROUTES.MENU,
-      //   component: () => import("@/components/productComponents/menuMenu"),
-      // },
+      {
+        name: "Menu",
+        path: ROUTES.MENU,
+        component: () => import("@/pages/user/MenuPage/Menu"),
+      },
       {
         name: "ThanhToan",
         path: ROUTES.CHECKOUT,

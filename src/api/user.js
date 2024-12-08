@@ -28,7 +28,6 @@ export const userAPI = {
   },
 
   updateAddressNote(data) {
-    console.log(data)
     return httpClient.put(`${PREFIX}/info/updateAddressNote`, data);
   },
 
@@ -37,7 +36,6 @@ export const userAPI = {
   },
 
   getOrdersUser(data) {
-    console.log('call orders')
     return httpClient.get(`${PREFIX}/info/getOrderHistory`, { params: data });
   },
 };
