@@ -51,7 +51,7 @@
       </v-list-item>
     </v-list>
 
-    <v-alert v-else type="info" text="B��n chưa có địa chỉ giao hàng nào" class="mt-4"></v-alert>
+    <v-alert v-else type="info" text="Bạn chưa có địa chỉ giao hàng nào" class="mt-4"></v-alert>
 
     <!-- Dialog để thêm hoặc chỉnh sửa địa chỉ -->
     <v-dialog v-model="dialog" max-width="600px">
