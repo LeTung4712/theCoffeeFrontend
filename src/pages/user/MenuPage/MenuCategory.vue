@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-row>
-            <v-col cols="12" md="4" lg="3" class="mt-8">
+            <v-col cols="12" md="4" lg="3">
                 <div v-if="loadingCategories" class="d-flex justify-center">
                     <v-progress-circular indeterminate color="primary"></v-progress-circular>
                 </div>
@@ -20,9 +20,9 @@
                 </div>
 
                 <v-row v-else>
-                    <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="4" lg="3">
-                        <ProductCard :product="product" :currentID="product.id" :dialog="dialog" :image-size="155"
-                            class="product-card-responsive" />
+                    <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="3">
+                        <ProductCard :currentID="product.id" :dialog="dialog" :product="product" :isInProductListing="1"
+                      class="product-card-responsive" />
                     </v-col>
                 </v-row>
             </v-col>
@@ -163,4 +163,18 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Thêm styles mới cho responsive */
+.product-card-responsive {
+  height: auto !important;
+}
+@media (max-width: 600px) {
+  .product-card-responsive {
+    margin-bottom: 12px;
+  }
+
+  .v-col {
+    padding: 6px 12px !important;
+  }
+}
+</style>

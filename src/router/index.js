@@ -59,11 +59,11 @@ const routes = [
       //   path: "pages/icons",
       //   component: () => import("@/views/pages_admin/Icons"),
       // },
-      // {
-      //   name: "NewOrders",
-      //   path: "pages/new-orders",
-      //   component: () => import("@/views/pages_admin/NewOrders"),
-      // },
+      {
+        name: "NewOrders",
+        path: ROUTES.ADMIN.NEW_ORDERS,
+        component: () => import("@/pages/admin/NewOrder/NewOrderPage"),
+      },
       // {
       //   name: "PaymentHistory",
       //   path: "pages/payment-history",
