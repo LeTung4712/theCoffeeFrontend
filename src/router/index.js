@@ -36,7 +36,7 @@ const routes = [
   },
   {
     path: "/admin",
-    redirect: ROUTES.ADMIN.PROFILE,
+    redirect: { name: "Profile" },
     component: () => import("@/layouts/LayoutAdmin"),
     children: [
       // {

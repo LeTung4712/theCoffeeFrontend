@@ -1,11 +1,11 @@
 <template>
-    <v-app class="bg-white">
+    <v-app>
         <admin-header />
+        <!-- Xóa navigation drawer khỏi đây -->
         <notification-list class="notification-container" />
-        <v-main class="bg-white main-content">
+        <v-main>
             <router-view />
         </v-main>
-        <Footer />
     </v-app>
 </template>
 
@@ -21,7 +21,11 @@ export default {
         NotificationList,
         Footer,
     },
-
+    data() {
+        return {
+            
+        }
+    },
 }
 </script>
 
@@ -32,12 +36,14 @@ export default {
 
 .v-main {
     background-color: white !important;
+    padding-left: 256px !important;
     padding-top: calc(42px + 80px) !important;
 }
 
 /* Thêm padding bottom cho main content trên mobile */
 @media (max-width: 599px) {
   .v-main {
+    padding-left: 0 !important;
     padding-bottom: 56px !important;
   }
 }
@@ -45,8 +51,9 @@ export default {
 /* Thêm style mới cho notification-list */
 :deep(.notification-list) {
     position: fixed;
-    top: calc(42px + 80px); /* 42px từ header-intro + 80px từ user-header */
+    top: calc(42px + 80px);
     right: 20px;
     z-index: 99;
+    margin-left: 256px; /* Thêm margin để tránh bị đè bởi drawer */
 }
 </style>

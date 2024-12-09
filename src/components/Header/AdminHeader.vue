@@ -1,65 +1,79 @@
 <template>
-<div class="fixed_header" style="top: -12px;margin: 12px -12px;display: flex;background-color: white;height: 64px;align-items: center;border-style: ridge;height: 54px">
-    <v-spacer></v-spacer>
+    <div>
+        <v-app-bar app color="primary" dark>
+            <v-app-bar-nav-icon @click="toggleDrawer" />
+            <v-toolbar-title>Admin Dashboard</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+                <v-icon>mdi-bell</v-icon>
+            </v-btn>
+            <v-btn icon>
+                <v-icon>mdi-account-circle</v-icon>
+            </v-btn>
+        </v-app-bar>
 
-    <v-alert color="white" dark style=" padding-bottom: 0;display: flex;align-items: center;" height="32" text>
-        <span style="color: black;">{{ currentDateTime }} </span>
-    </v-alert>
-    <v-alert color="white" dark style=" padding-bottom: 0;display: flex;align-items: center" height="32" text>
-        <v-icon left color="black">mdi-account</v-icon>
-        <span style="color: black;"><strong>Tung</strong>, Welcome </span>
-    </v-alert>
-    <v-btn height="36" flat color="black">
-        <span style="color: white" @click="handleLogout">Log out </span>
-        <v-icon right color="white">mdi-exit-to-app</v-icon>
-    </v-btn>
-</div>
+        <v-navigation-drawer :model-value="drawer" app>
+            <v-list>
+                <v-list-item v-for="item in menuItems" :key="item.title" :to="item.to" link>
+                    <template v-slot:prepend>
+                        <v-icon>{{ item.icon }}</v-icon>
+                    </template>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item>
+            </v-list>
+            
+            <!-- Nút Logout -->
+            <v-btn
+                block
+                color="error"
+                class="logout-btn"
+                @click="logout"
+                prepend-icon="mdi-logout"
+            >
+                Logout
+            </v-btn>
+        </v-navigation-drawer>
+    </div>
 </template>
 
 <script>
 export default {
-    name: "View_Header",
+    name: 'AdminHeader',
+
     data() {
         return {
-            currentDateTime: null,
+            drawer: true,
+            menuItems: [
+                { title: "Profile", icon: "mdi-account-circle", to: "/admin/profile" },
+                { title: "Analyze", icon: "mdi mdi-chart-bar", to: "/admin/dashboard" },
+                { title: "Products", icon: "mdi-emoticon", to: "/admin/icons" },
+                { title: "Payment History", icon: "mdi-table-column-width", to: "/admin/payment-history" },
+                { title: "New Orders", icon: "mdi-order-bool-ascending-variant", to: "/admin/new-orders" },
+            ],
         }
     },
-    mounted() {
-        setInterval(() => {
-            let dt = new Date();
-            // ensure date comes as 01, 09 etc
-            let DD = ("0" + dt.getDate()).slice(-2);
-            // getMonth returns month from 0
-            let MM = ("0" + (dt.getMonth() + 1)).slice(-2);
-            let YYYY = dt.getFullYear();
-            let hh = ("0" + dt.getHours()).slice(-2);
-            let mm = ("0" + dt.getMinutes()).slice(-2);
-            let ss = ("0" + dt.getSeconds()).slice(-2);
-            let date_string = YYYY + "-" + MM + "-" + DD + " " + hh + ":" + mm + ":" + ss;
-
-            this.currentDateTime = date_string;
-        }, 1);
-    },
-
     methods: {
-        handleLogout() {
-            localStorage.setItem("AdminLoggedIn", "false")
-            window.dispatchEvent(new CustomEvent('admin-logged-in', {
-                detail: {
-                    logged_in: false
-                
-                }
-            }));
-            this.$router.push('/login') // đăng xuất xong quay về trang login
+        toggleDrawer() {
+            this.drawer = !this.drawer;
+        },
+        logout() {
+            console.log("User logged out");
         }
     }
 }
 </script>
 
-<style>
-.fixed_header {
-    width: calc(100% - 280px);
-    position: fixed;
-    z-index: 1;
+<style scoped>
+.v-app-bar {
+    background-color: #1976D2 !important;
+    /* Màu xanh dương */
+}
+
+.logout-btn {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%;
 }
 </style>

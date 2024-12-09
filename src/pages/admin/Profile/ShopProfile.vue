@@ -2,22 +2,22 @@
     <v-container fluid class="down-top-padding">
         <v-row style="background-color: white">
             <v-col cols="12" lg="4">
-                <v-card>
+                <v-card class="elevation-2">
                     <v-card-text class="text-center pa-7">
                         <v-img
                             :src="logo"
                             alt="user"
                             width="300"
-                            class="mx-auto shadow-sm"
+                            class="mx-auto shadow-sm rounded"
                         />
-                        <v-card-title class="justify-center mt-2">The XinhLounge</v-card-title>
-                        <v-card-subtitle>Bách Khoa</v-card-subtitle>
+                        <v-card-title class="justify-center mt-2 text-h5 font-weight-bold">The XinhLounge</v-card-title>
+                        <v-card-subtitle class="text-subtitle-1">Bách Khoa</v-card-subtitle>
                     </v-card-text>
                 </v-card>
             </v-col>
 
             <v-col cols="12" lg="8">
-                <v-card flat>
+                <v-card flat class="elevation-1">
                     <v-card-title class="store_infor text-h4 font-weight-medium">
                         Thông tin cửa hàng
                     </v-card-title>
@@ -32,6 +32,7 @@
                                         readonly
                                         variant="outlined"
                                         density="comfortable"
+                                        class="mb-4"
                                     />
 
                                     <v-text-field
@@ -40,6 +41,7 @@
                                         readonly
                                         variant="outlined"
                                         density="comfortable"
+                                        class="mb-4"
                                     />
 
                                     <v-text-field
@@ -48,6 +50,7 @@
                                         readonly
                                         variant="outlined"
                                         density="comfortable"
+                                        class="mb-4"
                                     />
 
                                     <v-text-field
@@ -56,6 +59,7 @@
                                         readonly
                                         variant="outlined"
                                         density="comfortable"
+                                        class="mb-4"
                                     />
                                 </v-col>
                             </v-row>
@@ -68,7 +72,7 @@
 </template>
 
 <script>
-import logoImage from '@/assets/logo.png'
+import logoImage from '@/assets/logo.jpg'
 export default {
     name: "ShopProfile",
     
@@ -83,18 +87,6 @@ export default {
             }
         }
     },
-
-    created() {
-        this.checkAuth()
-    },
-
-    methods: {
-        checkAuth() {
-            if (localStorage.getItem("AdminLoggedIn") === "false") {
-                this.$router.push("/admin/login")
-            }
-        }
-    }
 }
 </script>
 
@@ -102,6 +94,7 @@ export default {
 .store_infor {
     text-align: left;
     position: relative;
+    color: var(--v-theme-primary);
 }
 
 .store_infor::before {
