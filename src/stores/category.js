@@ -4,6 +4,7 @@ import { categoryAPI } from '@/api/category'
 export const useCategoryStore = defineStore('category', {
   state: () => ({
     categories: [],
+    menuItems: [],
     loading: false,
     lastFetchTime: null,
     error: null
@@ -52,6 +53,36 @@ export const useCategoryStore = defineStore('category', {
       const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 phút
       return !this.lastFetchTime || 
         (Date.now() - this.lastFetchTime) > REFRESH_INTERVAL;
-    }
+    },
+
+    buildMenuItems() {
+      if (!this.categories.length) return;
+
+      const allProducts = {
+        title: "Tất cả",
+        id: 0,
+      };
+
+      const parentCategories = this.categories
+        .filter(cat => cat.parent_id === 0 || cat.parent_id === null)
+        .map(parent => ({
+          title: parent.name,
+          id: parent.id,
+          children: this.getMenuChildCategories(parent.id)
+        }))
+        .filter(category => category.children.length > 0);
+
+      this.menuItems = [allProducts, ...parentCategories];
+    },
+
+    getMenuChildCategories(parentId) {
+      return this.categories
+        .filter(cat => cat.parent_id === parentId)
+        .map(child => ({
+          title: child.name,
+          id: child.id,
+          file: 'dots'
+        }));
+    },
   }
 }) 

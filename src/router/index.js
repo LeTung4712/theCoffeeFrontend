@@ -25,7 +25,7 @@ const routes = [
       {
         name: "Menu",
         path: ROUTES.MENU,
-        component: () => import("@/pages/user/MenuPage/Menu"),
+        component: () => import("@/pages/user/MenuPage/MenuCategory"),
       },
       {
         name: "ThanhToan",
