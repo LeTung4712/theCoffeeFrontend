@@ -21,19 +21,19 @@ export const orderAPI = {
   },
 
   // Thao tác với đơn hàng
-  create(data) {
+  createOrder(data) {
     return httpClient.post(`${PREFIX}/addOrder`, data);
   },
 
-  accept(data) {
+  acceptOrder(data) {
     return httpClient.put(`${PREFIX}/acceptOrder`, data);
   },
 
-  success(data) {
+  successOrder(data) {
     return httpClient.put(`${PREFIX}/successOrder`, data);
   },
 
-  cancel(data) {
+  cancelOrder(data) {
     return httpClient.put(`${PREFIX}/cancelOrder`, data);
   }
 };

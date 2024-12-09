@@ -8,7 +8,7 @@ export const ROUTES = {
   // routes cho admin
   ADMIN: {
     PROFILE: "profile",
-    ORDER_DETAIL: "order-detail/:order_detail_id",
+    ORDER_DETAIL: "order-detail/:order_code",
     ICONS: "icons",
     NEW_ORDERS: "new-orders", 
     PAYMENT_HISTORY: "payment-history",

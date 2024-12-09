@@ -1,6 +1,12 @@
 <template>
     <div>
-        <v-app-bar app color="primary" dark>
+        <v-app-bar 
+            app 
+            color="primary" 
+            dark
+            elevation="4"
+            class="fixed-header"
+        >
             <v-app-bar-nav-icon @click="toggleDrawer" />
             <v-toolbar-title>Admin Dashboard</v-toolbar-title>
             <v-spacer></v-spacer>
@@ -67,6 +73,14 @@ export default {
 .v-app-bar {
     background-color: #1976D2 !important;
     /* Màu xanh dương */
+}
+
+.fixed-header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 .logout-btn {

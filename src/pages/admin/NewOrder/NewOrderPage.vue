@@ -49,7 +49,7 @@
               class="text-primary text-decoration-underline cursor-pointer"
               @click="navigateToDetails(item.order_code)"
             >
-              {{ item.order_code }}
+                {{ item.order_code }}
             </div>
           </template>
         </v-data-table>
@@ -110,10 +110,10 @@ export default {
       }
     },
 
-    navigateToDetails(orderId) {
+    navigateToDetails(orderCode) {
       this.$router.push({
         name: "OrderDetails",
-        params: { order_detail_id: orderId },
+        params: { order_code: orderCode },
       }).catch(() => {});
     },
   },

@@ -49,21 +49,22 @@ const routes = [
         path: ROUTES.ADMIN.PROFILE,
         component: () => import("@/pages/admin/Profile/ShopProfile"),
       },
-      // {
-      //   name: "OrderDetails",
-      //   path: "order-detail/:order_detail_id",
-      //   component: () => import("@/views/pages_admin/OrderDetails"),
-      // },
-      // {
-      //   name: "Icons",
-      //   path: "pages/icons",
-      //   component: () => import("@/views/pages_admin/Icons"),
-      // },
       {
         name: "NewOrders",
         path: ROUTES.ADMIN.NEW_ORDERS,
         component: () => import("@/pages/admin/NewOrder/NewOrderPage"),
       },
+      {
+        name: "OrderDetails",
+        path: ROUTES.ADMIN.ORDER_DETAIL,
+        component: () => import("@/pages/admin/NewOrder/OrderDetail"),
+      },
+      // {
+      //   name: "Icons",
+      //   path: "pages/icons",
+      //   component: () => import("@/views/pages_admin/Icons"),
+      // },
+      
       // {
       //   name: "PaymentHistory",
       //   path: "pages/payment-history",

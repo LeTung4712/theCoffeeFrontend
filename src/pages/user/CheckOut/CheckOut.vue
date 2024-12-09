@@ -247,7 +247,7 @@ export default {
           }))
         }
         
-        const { data: { order_code } } = await orderAPI.create(orderData)
+        const { data: { order_code } } = await orderAPI.createOrder(orderData)
 
         if (this.paymentMethod === 'cod') {
           await this.handleCodPayment()
