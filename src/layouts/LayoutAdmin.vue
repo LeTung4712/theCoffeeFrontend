@@ -1,7 +1,6 @@
 <template>
     <v-app>
         <admin-header />
-        <!-- Xóa navigation drawer khỏi đây -->
         <notification-list class="notification-container" />
         <v-main>
             <router-view />

@@ -70,7 +70,15 @@
                     <v-row align="center" class="mb-2">
                         <v-col cols="8" class="text-subtitle-1">Tổng tiền hàng:</v-col>
                         <v-col cols="4" class="text-right">
-                            <span class="text-subtitle-1">+ {{ formattedPrice(userOrderInfor.order_total_price) }} đ</span>
+                            <span class="text-subtitle-1">{{ formattedPrice(userOrderInfor.order_total_price) }} đ</span>
+                        </v-col>
+                    </v-row>
+
+                    <!-- Shipping Fee -->
+                    <v-row align="center" class="mb-2">
+                        <v-col cols="8" class="text-subtitle-1">Phí giao hàng:</v-col>
+                        <v-col cols="4" class="text-right">
+                            <span class="text-subtitle-1">{{ formattedPrice(userOrderInfor.order_shipping_fee) }} đ</span>
                         </v-col>
                     </v-row>
 
@@ -81,14 +89,6 @@
                             <span class="text-subtitle-1 error--text">- {{
                                 formattedPrice(userOrderInfor.order_discount_amount) }}
                                 đ</span>
-                        </v-col>
-                    </v-row>
-
-                    <!-- Shipping Fee -->
-                    <v-row align="center" class="mb-2">
-                        <v-col cols="8" class="text-subtitle-1">Phí giao hàng:</v-col>
-                        <v-col cols="4" class="text-right">
-                            <span class="text-subtitle-1">+ {{ formattedPrice(userOrderInfor.order_shipping_fee) }} đ</span>
                         </v-col>
                     </v-row>
 
@@ -167,12 +167,12 @@ export default {
             headers: [
                 { title: 'STT', key: 'number', align: 'center', width: '10%' },
                 { title: 'TÊN SẢN PHẨM', key: 'name', align: 'center', width: '20%' },
-                { title: 'Topping', key: 'topping_name', align: 'center', width: '25%' },
+                { title: 'Topping', key: 'topping_name', align: 'center', width: '30%' },
                 { title: 'Ghi chú', key: 'item_note', align: 'center', width: '20%' },
                 { title: 'CỠ', key: 'size', align: 'center', width: '10%' },
                 { title: 'SỐ LƯỢNG', key: 'quantity', align: 'center', width: '10%' },
                 { title: 'ĐƠN GIÁ', key: 'price', align: 'center', width: '10%' },
-                { title: 'GIẢM GIÁ', key: 'discount', align: 'center', width: '15%' },
+                { title: 'GIẢM GIÁ', key: 'discount', align: 'center', width: '10%' },
             ],
             payment_headers: [
                 { title: 'PHƯƠNG THỨC THANH TOÁN', key: 'method', align: 'center', width: '60%' },
@@ -199,20 +199,12 @@ export default {
     },
 
     created() {
-        this.checkAuth();
+        this.getOrderInfo();
     },
 
     methods: {
         formattedPrice(price) {
             return formatPrice(price);
-        },
-
-        checkAuth() {
-            if (localStorage.getItem("AdminLoggedIn") === "false") {
-                this.$router.push("/pages/login");
-                return;
-            }
-            this.getOrderInfo();
         },
 
         async getOrderInfo() {

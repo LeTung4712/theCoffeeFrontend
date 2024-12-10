@@ -41,42 +41,42 @@ export const userRoutes = {
 
 export const adminRoutes = {
   path: "/admin",
-  redirect: { name: "Login" }, // Đổi redirect về trang login
-  component: () => import("@/layouts/LayoutAdmin"),
+  redirect: { name: "Profile" },
   children: [
-    // {
-    //   name: "Login",
-    //   path: ROUTES.ADMIN.LOGIN,
-    //   component: () => import("@/pages/Auth/LoginAdmin"),
-    // },
     {
-      name: "Profile",
-      path: ROUTES.ADMIN.PROFILE,
-      component: () => import("@/pages/admin/Profile/ShopProfile"),
-      meta: { requiresAuth: true }, // Thêm meta để đánh dấu route cần auth
+      path: ROUTES.ADMIN.LOGIN,
+      name: "Login",
+      component: () => import("@/pages/admin/Auth/LoginAdmin"),
     },
     {
-      name: "NewOrders",
-      path: ROUTES.ADMIN.NEW_ORDERS,
-      component: () => import("@/pages/admin/NewOrder/NewOrderPage"),
-      meta: { requiresAuth: true },
-    },
-    {
-      name: "OrderDetails",
-      path: ROUTES.ADMIN.ORDER_DETAIL,
-      component: () => import("@/pages/admin/NewOrder/OrderDetail"),
-      meta: { requiresAuth: true },
-    },
-    // {
-    //   name: "Icons",
-    //   path: "pages/icons",
-    //   component: () => import("@/views/pages_admin/Icons"),
-    // },
-
-    // {
-    //   name: "PaymentHistory",
-    //   path: "pages/payment-history",
-    //   component: () => import("@/views/pages_admin/PaymentHistory"),
-    // },
+      path: "pages",
+      component: () => import("@/layouts/LayoutAdmin"),
+      children: [
+        {
+          name: "Profile",
+          path: ROUTES.ADMIN.PROFILE,
+          component: () => import("@/pages/admin/Profile/ShopProfile"),
+          meta: { requiresAuth: true },
+        },
+        {
+          name: "NewOrders",
+          path: ROUTES.ADMIN.NEW_ORDERS,
+          component: () => import("@/pages/admin/NewOrder/NewOrderPage"),
+          meta: { requiresAuth: true },
+        },
+        {
+          name: "OrderDetails",
+          path: ROUTES.ADMIN.ORDER_DETAIL,
+          component: () => import("@/pages/admin/NewOrder/OrderDetail"),
+          meta: { requiresAuth: true },
+        },
+        {
+          name: "PaymentHistory",
+          path: ROUTES.ADMIN.PAYMENT_HISTORY,
+          component: () => import("@/pages/admin/PaymentHistory/PaymentHistoryPage"),
+          meta: { requiresAuth: true },
+        },
+      ]
+    }
   ],
 };
