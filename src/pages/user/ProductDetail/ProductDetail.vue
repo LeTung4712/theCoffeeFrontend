@@ -177,49 +177,9 @@ export default {
             product_id: null,
             checked_topping: [],
             selectedSize: 'S',
-            product: {
-                id: 1,
-                name: "The Coffee House Sữa Đá",
-                category_id: 1,
-                description: "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
-                price: "39000.00",
-                image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-            },
-            product_relations: [
-                {
-                    id: 1,
-                    name: "The Coffee Sữa Đá",
-                    category_id: 1,
-                    description: "Thức uống giúp tỉnh táo tức thì ",
-                    price: "39000.00",
-                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-                },
-                {
-                    id: 1,
-                    name: "The Đá",
-                    category_id: 1,
-                    description: "Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
-                    price: "39000.00",
-                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-                },
-            ],
-            topping_items: [
-                {
-                    id: 1,
-                    name: "Sữa tươi",
-                    price: "10000.00",
-                },
-                {
-                    id: 2,
-                    name: "Sữa bánh flan",
-                    price: "10000.00",
-                },
-                {
-                    id: 3,
-                    name: "Sữa tươi bánh flan",
-                    price: "10000.00",
-                }
-            ],
+            product: null,
+            product_relations: [],
+            topping_items: [],
             isLoading: false,
         }
     },
@@ -244,20 +204,27 @@ export default {
     },
 
     watch: {
-        // 'product_id': {
-        //     handler() {
-        //         window.scrollTo({
-        //             top: 0,
-        //             behavior: 'smooth'
-        //         });
-        //         this.isLoading = true;
-        //         this.loadProductData().finally(() => {
-        //             this.isLoading = false;
-        //         });
-        //     },
-        //     immediate: true,
-        //     deep: true
-        // }
+        '$route': {
+            immediate: true,
+            handler() {
+                const productStore = useProductStore()
+                if (productStore.getCurrentProductId && productStore.hasProductIdChanged) {
+                    this.product_id = productStore.getCurrentProductId
+                    this.isLoading = true
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    })
+                    this.loadProductData()
+                }
+            }
+        }
+    },
+
+    beforeUnmount() {
+        // Clear product id khi rời khỏi trang
+        const productStore = useProductStore()
+        productStore.clearProductId()
     },
 
     methods: {
@@ -266,7 +233,6 @@ export default {
         },
 
         async loadProductData() {
-            this.isLoading = true;
             try {
                 const response = await productAPI.getInfo({ product_id: this.product_id });
                 const data = response.data;
@@ -393,16 +359,6 @@ export default {
     font-size: 14px;
 }
 
-/* .product-info {
-    .text-h4 {
-        color: rgb(var(--v-theme-text-primary));
-    }
-    
-    .primary-text {
-        color: rgb(var(--v-theme-primary)) !important;
-    }
-} */
-
 .product_des_title {
     color: rgb(var(--v-theme-text-primary));
     margin: 1rem 0;
@@ -418,23 +374,6 @@ hr {
     opacity: 0.12;
 }
 
-/* .product-carousel {
-    .product-image {
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .thumb {
-        border-radius: 4px;
-        border: 2px solid transparent;
-        cursor: pointer;
-        transition: border-color 0.2s ease;
-        
-        &:hover {
-            border-color: rgb(var(--v-theme-primary));
-        }
-    }
-} */
 
 @media (max-width: 600px) {
     .mobile-card-height :deep(.v-card) {
@@ -447,14 +386,6 @@ hr {
         height: 100%;
     }
 }
-
-/* .v-btn.v-btn--variant-outlined {
-    border-color: rgb(var(--v-theme-border-color));
-    
-    &:hover {
-        border-color: rgb(var(--v-theme-primary));
-    }
-} */
 
 .v-btn.v-btn--variant-flat {
     background-color: rgb(var(--v-theme-primary));

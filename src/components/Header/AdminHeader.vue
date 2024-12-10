@@ -55,11 +55,11 @@ export default {
         return {
             drawer: true,
             menuItems: [
-                { title: "Profile", icon: "mdi-account-circle", to: "/admin/profile" },
-                { title: "Analyze", icon: "mdi mdi-chart-bar", to: "/admin/dashboard" },
-                { title: "Products", icon: "mdi-emoticon", to: "/admin/icons" },
-                { title: "Payment History", icon: "mdi-table-column-width", to: "/admin/payment-history" },
-                { title: "New Orders", icon: "mdi-order-bool-ascending-variant", to: "/admin/new-orders" },
+                { title: "Profile", icon: "mdi-account", to: "/admin/profile" },
+                { title: "Analyze", icon: "mdi-chart-bar", to: "/admin/dashboard" },
+                { title: "Products", icon: "mdi-package-variant", to: "/admin/icons" },
+                { title: "Payment History", icon: "mdi-history", to: "/admin/payment-history" },
+                { title: "New Orders", icon: "mdi-cart", to: "/admin/new-orders" },
             ],
         }
     },
