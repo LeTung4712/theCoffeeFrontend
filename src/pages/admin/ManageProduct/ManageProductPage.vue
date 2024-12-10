@@ -33,15 +33,17 @@
 
         <v-row>
             <v-col cols="12" md="4" lg="3">
-                <div v-if="loadingCategories" class="d-flex justify-center">
-                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                <div class="sticky-treeview">
+                    <div v-if="loadingCategories" class="d-flex justify-center">
+                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                    </div>
+                    <v-treeview :items="menuItems" activatable item-key="id" open-on-click v-model="activeItems"
+                        @update:active="handleActiveChange">
+                        <template #prepend="{ item }">
+                            <v-icon>{{ getItemIcon(item) }}</v-icon>
+                        </template>
+                    </v-treeview>
                 </div>
-                <v-treeview :items="menuItems" activatable item-key="id" open-on-click v-model="activeItems"
-                    @update:active="handleActiveChange">
-                    <template #prepend="{ item }">
-                        <v-icon>{{ getItemIcon(item) }}</v-icon>
-                    </template>
-                </v-treeview>
             </v-col>
 
             <!-- Products column -->
@@ -241,5 +243,12 @@ export default {
     .v-card-text {
         padding: 8px;
     }
+}
+
+.sticky-treeview {
+    position: sticky;
+    top: 80px; /* Điều chỉnh khoảng cách từ top tùy theo layout header */
+    max-height: calc(100vh - 100px); /* Đảm bảo treeview không dài quá màn hình */
+    overflow-y: auto;
 }
 </style>

@@ -26,10 +26,10 @@ export const useCategoryStore = defineStore('category', {
 
   actions: {
     async fetchCategories(forceRefresh = false) {
-      // Kiểm tra cache
-      if (!forceRefresh && this.categories.length && !this.shouldRefreshData()) {
-        return;
-      }
+      // // Kiểm tra cache
+      // if (!forceRefresh && this.categories.length && !this.shouldRefreshData()) {
+      //   return;
+      // }
 
       this.loading = true;
       this.error = null;
@@ -50,7 +50,7 @@ export const useCategoryStore = defineStore('category', {
     },
 
     shouldRefreshData() {
-      const REFRESH_INTERVAL = 1 * 60 * 1000; // 1 phút
+      const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 phút
       return !this.lastFetchTime || 
         (Date.now() - this.lastFetchTime) > REFRESH_INTERVAL;
     },

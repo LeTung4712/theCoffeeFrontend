@@ -101,7 +101,7 @@ export default {
         resetForm() {
             this.formData = {
                 name: '',
-                price: 0
+                price: '',
             }
             if (this.$refs.form) {
                 this.$refs.form.reset()

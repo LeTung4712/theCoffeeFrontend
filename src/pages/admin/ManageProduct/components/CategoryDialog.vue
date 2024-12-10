@@ -28,7 +28,6 @@
                     <v-text-field
                         v-model="formData.image_url"
                         label="URL hình ảnh"
-                        :rules="[v => !!v || 'Vui lòng nhập URL hình ảnh']"
                         required
                     ></v-text-field>
 
@@ -117,12 +116,12 @@ export default {
             }
         },
         categoryOptions() {
-            return [
-                ...this.categories.map(cat => ({
+            return this.categories
+                .filter(cat => cat.parent_id === null)
+                .map(cat => ({
                     id: cat.id,
                     name: cat.name
                 }))
-            ]
         }
     },
 
