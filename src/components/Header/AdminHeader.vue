@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import { adminAPI } from "@/api/admin";
 export default {
     name: 'AdminHeader',
 
@@ -57,7 +58,7 @@ export default {
             menuItems: [
                 { title: "Profile", icon: "mdi-account", to: "/admin/pages/profile" },
                 { title: "Analyze", icon: "mdi-chart-bar", to: "/admin/pages/dashboard" },
-                { title: "Products", icon: "mdi-package-variant", to: "/admin/pages/icons" },
+                { title: "Management Products", icon: "mdi-package-variant", to: "/admin/pages/manage-products" },
                 { title: "Payment History", icon: "mdi-history", to: "/admin/pages/payment-history" },
                 { title: "New Orders", icon: "mdi-cart", to: "/admin/pages/new-orders" },
             ],
@@ -67,8 +68,9 @@ export default {
         toggleDrawer() {
             this.drawer = !this.drawer;
         },
-        logout() {
-            console.log("User logged out");
+        async logout() {
+            const response = await adminAPI.logout();
+            console.log(response)
         }
     }
 }

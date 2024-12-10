@@ -50,7 +50,7 @@ export const useCategoryStore = defineStore('category', {
     },
 
     shouldRefreshData() {
-      const REFRESH_INTERVAL = 15 * 60 * 1000; // 15 phút
+      const REFRESH_INTERVAL = 1 * 60 * 1000; // 1 phút
       return !this.lastFetchTime || 
         (Date.now() - this.lastFetchTime) > REFRESH_INTERVAL;
     },

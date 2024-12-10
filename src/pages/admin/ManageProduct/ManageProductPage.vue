@@ -1,5 +1,36 @@
 <template>
     <v-container>
+        <!-- Thêm toolbar buttons -->
+        <v-row >
+            <v-col cols="12">
+                <v-card flat>
+                    <v-card-text class="d-flex flex-wrap gap-2">
+                        <v-btn
+                            color="primary"
+                            prepend-icon="mdi-plus"
+                            @click="dialogs.product = true"
+                        >
+                            Thêm sản phẩm
+                        </v-btn>
+                        <v-btn
+                            color="success"
+                            prepend-icon="mdi-folder-plus"
+                            @click="dialogs.category = true"
+                        >
+                            Thêm danh mục
+                        </v-btn>
+                        <v-btn
+                            color="info"
+                            prepend-icon="mdi-plus-circle"
+                            @click="dialogs.topping = true"
+                        >
+                            Thêm topping
+                        </v-btn>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
         <v-row>
             <v-col cols="12" md="4" lg="3">
                 <div v-if="loadingCategories" class="d-flex justify-center">
@@ -22,25 +53,43 @@
                 <v-row v-else>
                     <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="3">
                         <ProductCard :currentID="product.id" :dialog="dialog" :product="product" :isInProductListing="1"
-                      class="product-card-responsive" />
+                            class="product-card-responsive" />
                     </v-col>
                 </v-row>
             </v-col>
         </v-row>
+
+        <!-- Add dialogs -->
+        <ProductDialog
+            v-model="dialogs.product"
+            @refresh="fetchProducts"
+        />
+        <CategoryDialog
+            v-model="dialogs.category"
+            @refresh="initializeMenu"
+        />
+        <ToppingDialog
+            v-model="dialogs.topping"
+        />
     </v-container>
 </template>
 
 <script>
-import { removeVietnameseTones } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import ProductCard from "@/components/Products/ProductCard.vue";
 import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
+//import ProductDialog from './components/ProductDialog.vue'
+import CategoryDialog from './components/CategoryDialog.vue'
+import ToppingDialog from './components/ToppingDialog.vue'
 
 export default {
-    name: "MenuCategory",
+    name: "ManageProductPage",
     components: {
         ProductCard,
+        //ProductDialog,
+        CategoryDialog,
+        ToppingDialog,
     },
 
     data() {
@@ -50,6 +99,11 @@ export default {
             products: [],
             loadingProducts: false,
             activeItems: [],
+            dialogs: {
+                product: false,
+                category: false,
+                topping: false,
+            },
         }
     },
 
@@ -134,11 +188,11 @@ export default {
             console.log('handleActiveChange được gọi');
             console.log('items là:', items);
             console.log('kiểu dữ liệu của items:', typeof items, Array.isArray(items));
-            
+
             if (items.length > 0) {
                 const selectedId = items[items.length - 1];
                 this.fetchProducts(selectedId.toString());
-                
+
                 // Tìm category tương ứng để cập nhật URL
                 const selectedCategory = this.categories.find(cat => cat.id === selectedId);
                 if (selectedCategory) {
@@ -166,15 +220,26 @@ export default {
 <style scoped>
 /* Thêm styles mới cho responsive */
 .product-card-responsive {
-  height: auto !important;
+    height: auto !important;
 }
-@media (max-width: 600px) {
-  .product-card-responsive {
-    margin-bottom: 12px;
-  }
 
-  .v-col {
-    padding: 6px 12px !important;
-  }
+@media (max-width: 600px) {
+    .product-card-responsive {
+        margin-bottom: 12px;
+    }
+
+    .v-col {
+        padding: 6px 12px !important;
+    }
+}
+
+.gap-2 {
+    gap: 8px;
+}
+
+@media (max-width: 600px) {
+    .v-card-text {
+        padding: 8px;
+    }
 }
 </style>

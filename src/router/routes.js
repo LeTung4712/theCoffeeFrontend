@@ -59,6 +59,12 @@ export const adminRoutes = {
           meta: { requiresAuth: true },
         },
         {
+          name: "ManageProducts",
+          path: ROUTES.ADMIN.MANAGE_PRODUCTS,
+          component: () => import("@/pages/admin/ManageProduct/ManageProductPage"),
+          meta: { requiresAuth: true },
+        },
+        {
           name: "NewOrders",
           path: ROUTES.ADMIN.NEW_ORDERS,
           component: () => import("@/pages/admin/NewOrder/NewOrderPage"),

@@ -53,10 +53,15 @@
 
 <script>
 import { adminAPI } from "@/api/admin";
-
+import { useNotificationStore } from '@/stores/notification';
 export default {
   name: "LoginAdmin",
-  
+  setup() {
+    const notificationStore = useNotificationStore();
+    return {
+      notificationStore
+    }
+  },
   data: () => ({
     admin: {
       email: "",
@@ -78,13 +83,14 @@ export default {
           username: this.admin.email,
           password: this.admin.password
         });
-
+        console.log(response)
         if (!response.data.error) {
           localStorage.setItem("AdminLoggedIn", "true");
           window.dispatchEvent(new CustomEvent('admin-logged-in', {
             detail: { logged_in: true }
           }));
-          this.$router.push('/admin/pages/profile');
+          this.notificationStore.success("Đăng nhập thành công",3000);
+          this.$router.push('/admin');
         } else {
           this.$toast.error('Sai email hoặc mật khẩu');
         }

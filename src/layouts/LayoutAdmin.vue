@@ -36,7 +36,7 @@ export default {
 .v-main {
     background-color: white !important;
     padding-left: 256px !important;
-    padding-top: calc(42px + 80px) !important;
+    padding-top: calc(42px + 18px) !important;
 }
 
 /* Thêm padding bottom cho main content trên mobile */
