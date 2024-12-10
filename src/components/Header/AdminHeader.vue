@@ -18,17 +18,22 @@
             </v-btn>
         </v-app-bar>
 
-        <v-navigation-drawer :model-value="drawer" app>
-            <v-list>
-                <v-list-item v-for="item in menuItems" :key="item.title" :to="item.to" link>
-                    <template v-slot:prepend>
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </template>
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                </v-list-item>
-            </v-list>
+        <v-navigation-drawer 
+            :model-value="drawer" 
+            app
+            class="navigation-drawer"
+        >
+            <div class="drawer-content">
+                <v-list>
+                    <v-list-item v-for="item in menuItems" :key="item.title" :to="item.to" link>
+                        <template v-slot:prepend>
+                            <v-icon>{{ item.icon }}</v-icon>
+                        </template>
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </div>
             
-            <!-- Nút Logout -->
             <v-btn
                 block
                 color="error"
@@ -83,11 +88,22 @@ export default {
     z-index: 1000;
 }
 
+.navigation-drawer {
+    height: calc(100vh - 64px) !important;
+    margin-top: 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+}
+
+.drawer-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
 .logout-btn {
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30%;
+    margin: 16px auto;
+    width: 80%;
+    max-width: 200px;
 }
 </style>

@@ -8,49 +8,49 @@
         </v-row>
       </v-col>
 
-      <!-- Order Counter -->
-      <v-col cols="12" sm="6" offset-sm="3">
-        <v-card flat class="text-center pa-4">
-          <div class="text-grey-darken-2 text-body-1 mb-2">
-            TỔNG SỐ ORDER TRONG NGÀY
-          </div>
-          <div class="text-h5 font-weight-medium">
-            {{ new_orders.length }}
-          </div>
-        </v-card>
-      </v-col>
+      <!-- Order Counter and Search Bar Row -->
+      <v-col cols="12">
+        <v-row>
+          <!-- Order Counter -->
+          <v-col cols="12" sm="6">
+            <v-card flat class="text-center pa-4">
+              <div class="text-grey-darken-2 text-body-1 mb-2">
+                TỔNG SỐ ORDER TRONG NGÀY
+              </div>
+              <div class="text-h5 font-weight-medium">
+                <v-skeleton-loader v-if="loading" type="text" width="50"></v-skeleton-loader>
+                <template v-else>{{ new_orders.length }}</template>
+              </div>
+            </v-card>
+          </v-col>
 
-      <!-- Search Bar -->
-      <v-col cols="12" sm="6" offset-sm="3">
-        <v-text-field
-          v-model="search"
-          prepend-inner-icon="mdi-magnify"
-          label="Nhập mã đơn hàng"
-          density="compact"
-          variant="outlined"
-          hide-details
-        ></v-text-field>
+          <!-- Search Bar -->
+          <v-col cols="12" sm="6" class="d-flex align-center">
+            <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Nhập mã đơn hàng" density="compact"
+              variant="outlined" hide-details class="max-width-300"
+              :disabled="loading"></v-text-field>
+          </v-col>
+
+        </v-row>
       </v-col>
     </v-row>
 
     <!-- Data Table -->
     <v-row class="mt-4">
       <v-col cols="12">
-        <v-data-table
-          :headers="headers"
-          :items="tableItems"
-          :search="search"
-          :items-per-page="5"
-          hover
-          class="elevation-1"
-        >
+        <v-skeleton-loader v-if="loading" type="table"></v-skeleton-loader>
+        <v-data-table v-else :headers="headers" :items="tableItems" :search="search" :items-per-page="5" hover
+          class="elevation-1">
           <template v-slot:item.order_code="{ item }">
-            <div 
-              class="text-primary text-decoration-underline cursor-pointer"
-              @click="navigateToDetails(item.order_code)"
-            >
-                {{ item.order_code }}
+            <div class="text-primary text-decoration-underline cursor-pointer"
+              @click="navigateToDetails(item.order_code)">
+              {{ item.order_code }}
             </div>
+          </template>
+          <template v-slot:item.status="{ item }">
+            <v-chip :color="getStatusColor(item.status)" size="small">
+              {{ getStatusText(item.status) }}
+            </v-chip>
           </template>
         </v-data-table>
       </v-col>
@@ -63,9 +63,10 @@ import { orderAPI } from "@/api/order";
 
 export default {
   name: "NewOrderPage",
-  
+
   data() {
     return {
+      loading: true,
       search: '',
       headers: [
         { title: 'STT', key: 'number', align: 'center', width: '10%' },
@@ -73,6 +74,7 @@ export default {
         { title: 'Thời gian', key: 'order_time', align: 'center', width: '20%' },
         { title: 'SỐ ĐIỆN THOẠI', key: 'mobile_no', align: 'center', width: '15%' },
         { title: 'ĐỊA CHỈ', key: 'address', align: 'center', width: '40%' },
+        { title: 'TRẠNG THÁI', key: 'status', align: 'center', width: '15%' },
       ],
       new_orders: [],
     }
@@ -107,14 +109,32 @@ export default {
       } catch (error) {
         console.error('Error fetching orders:', error);
         // Có thể thêm xử lý lỗi ở đây (hiển thị thông báo lỗi)
+      } finally {
+        this.loading = false;
       }
+    },
+
+    getStatusColor(status) {
+      const statusColors = {
+        '0': 'warning',
+        '1': 'info'
+      };
+      return statusColors[status] || 'grey';
+    },
+
+    getStatusText(status) {
+      const statusTexts = {
+        '0': 'CHỜ XÁC NHẬN',
+        '1': 'ĐÃ THANH TOÁN'
+      };
+      return statusTexts[status] || 'KHÔNG XÁC ĐỊNH';
     },
 
     navigateToDetails(orderCode) {
       this.$router.push({
         name: "OrderDetails",
         params: { order_code: orderCode },
-      }).catch(() => {});
+      }).catch(() => { });
     },
   },
 };
@@ -123,5 +143,9 @@ export default {
 <style scoped>
 .cursor-pointer {
   cursor: pointer;
+}
+
+.max-width-300 {
+  max-width: 300px;
 }
 </style>

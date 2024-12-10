@@ -9,7 +9,7 @@ export const orderAPI = {
   },
 
   getOrderInfo(data) {
-    return httpClient.get(`${PREFIX}/getOrderInfo`, { params: data });
+    return httpClient.get(`${PREFIX}/getOrderInfo`, { params: { order_code: data } });
   },
 
   getSuccessOrders(data) {
