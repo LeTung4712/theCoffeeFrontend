@@ -291,9 +291,6 @@ export default {
             const statusColors = {
                 '0': 'warning',
                 '1': 'info',
-                '2': 'purple',
-                '3': 'success',
-                '-1': 'error'
             };
             return statusColors[status] || 'grey';
         },
@@ -302,9 +299,6 @@ export default {
             const statusTexts = {
                 '0': 'CHỜ XÁC NHẬN',
                 '1': 'ĐÃ THANH TOÁN CHỜ XÁC NHẬN',
-                '2': 'ĐANG GIAO HÀNG',
-                '3': 'HOÀN THÀNH',
-                '-1': 'ĐÃ HỦY'
             };
             return statusTexts[status] || 'KHÔNG XÁC ĐỊNH';
         },

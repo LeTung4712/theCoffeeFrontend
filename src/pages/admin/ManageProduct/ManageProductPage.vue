@@ -81,7 +81,7 @@ import { productAPI } from "@/api/product";
 import ProductCard from "@/components/Products/ProductCard.vue";
 import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
-//import ProductDialog from './components/ProductDialog.vue'
+import ProductDialog from './components/ProductDialog.vue'
 import CategoryDialog from './components/CategoryDialog.vue'
 import ToppingDialog from './components/ToppingDialog.vue'
 
@@ -89,7 +89,7 @@ export default {
     name: "ManageProductPage",
     components: {
         ProductCard,
-        //ProductDialog,
+        ProductDialog,
         CategoryDialog,
         ToppingDialog,
     },
@@ -106,6 +106,16 @@ export default {
                 category: false,
                 topping: false,
             },
+            newProduct: {
+                name: "trà đá",
+                category_id: 21,
+                description: "Thức uống",
+                image_url: "https://",
+                price: 39000,
+                price_sale: 0,
+                active: 1,
+                toppings: []
+            }
         }
     },
 

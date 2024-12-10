@@ -59,6 +59,7 @@
                 </v-btn>
                 <v-btn
                     color="primary"
+                    :disabled="!valid"
                     :loading="loading"
                     @click="handleSubmit"
                 >
