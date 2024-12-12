@@ -23,7 +23,17 @@
                         clearable
                         :hint="!formData.parent_id ? 'Không chọn sẽ tạo danh mục gốc' : ''"
                         persistent-hint
-                    ></v-select>
+                    >
+                        <template v-slot:item="{ item, props }">
+                            <v-list-item v-bind="props">
+                                <template v-slot:prepend>
+                                    <v-avatar size="32" class="me-3">
+                                        <v-img :src="item.raw.image_url" cover></v-img>
+                                    </v-avatar>
+                                </template>
+                            </v-list-item>
+                        </template>
+                    </v-select>
 
                     <v-text-field
                         v-model="formData.image_url"
@@ -35,9 +45,11 @@
                     <v-img
                         v-if="formData.image_url"
                         :src="formData.image_url"
-                        height="200"
-                        cover
-                        class="mt-2 rounded-lg"
+                        height="120"
+                        width="120"
+                        class="mt-4 rounded-circle mx-auto border-primary"
+                        :class="{'elevation-2': formData.image_url}"
+                        style="border: 3px solid rgb(var(--v-theme-primary))"
                     >
                         <template v-slot:placeholder>
                             <v-row class="fill-height ma-0" align="center" justify="center">
@@ -121,7 +133,8 @@ export default {
                 .filter(cat => cat.parent_id === null)
                 .map(cat => ({
                     id: cat.id,
-                    name: cat.name
+                    name: cat.name,
+                    image_url: cat.image_url
                 }))
         }
     },
@@ -149,7 +162,7 @@ export default {
             this.loading = true
             try {
                 await categoryAPI.create(this.formData)
-                await this.categoryStore.fetchCategories()
+                //await this.categoryStore.fetchCategories()
                 this.$emit('refresh')
                 this.closeDialog()
                 this.notificationStore.success('Thêm danh mục thành công!', 3000);

@@ -82,6 +82,12 @@ export const adminRoutes = {
           component: () => import("@/pages/admin/PaymentHistory/PaymentHistoryPage"),
           meta: { requiresAuth: true },
         },
+        {
+          name: "DeliveryOrders",
+          path: ROUTES.ADMIN.DELIVERY_ORDERS,
+          component: () => import("@/pages/admin/DeliveryOrder/DeliveryOrderPage"),
+          meta: { requiresAuth: true },
+        },
       ]
     }
   ],

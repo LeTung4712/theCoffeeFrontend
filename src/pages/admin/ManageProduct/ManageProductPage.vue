@@ -1,29 +1,24 @@
 <template>
     <v-container>
+        <!-- Header Section -->
+        <v-col cols="12">
+            <v-row justify="center" class="pa-4">
+                <h2>QUẢN LÝ SẢN PHẨM</h2>
+            </v-row>
+        </v-col>
+        
         <!-- Thêm toolbar buttons -->
-        <v-row >
+        <v-row>
             <v-col cols="12">
                 <v-card flat>
                     <v-card-text class="d-flex flex-wrap gap-2">
-                        <v-btn
-                            color="primary"
-                            prepend-icon="mdi-plus"
-                            @click="dialogs.product = true"
-                        >
+                        <v-btn color="primary" prepend-icon="mdi-plus" @click="dialogs.product = true">
                             Thêm sản phẩm
                         </v-btn>
-                        <v-btn
-                            color="success"
-                            prepend-icon="mdi-folder-plus"
-                            @click="dialogs.category = true"
-                        >
+                        <v-btn color="success" prepend-icon="mdi-folder-plus" @click="dialogs.category = true">
                             Thêm danh mục
                         </v-btn>
-                        <v-btn
-                            color="info"
-                            prepend-icon="mdi-plus-circle"
-                            @click="dialogs.topping = true"
-                        >
+                        <v-btn color="info" prepend-icon="mdi-plus-circle" @click="dialogs.topping = true">
                             Thêm topping
                         </v-btn>
                     </v-card-text>
@@ -62,17 +57,9 @@
         </v-row>
 
         <!-- Add dialogs -->
-        <ProductDialog
-            v-model="dialogs.product"
-            @refresh="fetchProducts"
-        />
-        <CategoryDialog
-            v-model="dialogs.category"
-            @refresh="initializeMenu"
-        />
-        <ToppingDialog
-            v-model="dialogs.topping"
-        />
+        <ProductDialog v-model="dialogs.product" @refresh="fetchProducts" />
+        <CategoryDialog v-model="dialogs.category" @refresh="initializeMenu" />
+        <ToppingDialog v-model="dialogs.topping" />
     </v-container>
 </template>
 
@@ -257,8 +244,10 @@ export default {
 
 .sticky-treeview {
     position: sticky;
-    top: 80px; /* Điều chỉnh khoảng cách từ top tùy theo layout header */
-    max-height: calc(100vh - 100px); /* Đảm bảo treeview không dài quá màn hình */
+    top: 80px;
+    /* Điều chỉnh khoảng cách từ top tùy theo layout header */
+    max-height: calc(100vh - 100px);
+    /* Đảm bảo treeview không dài quá màn hình */
     overflow-y: auto;
 }
 </style>

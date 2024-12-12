@@ -6,35 +6,45 @@
             </v-card-title>
 
             <v-card-text>
-                <div class="d-flex justify-center mb-4">
-                    <div class="image-preview-container">
-                        <v-img
-                            v-if="productData.image_url"
-                            :src="productData.image_url"
-                            :width="200"
-                            :height="200"
-                            cover
-                            class="rounded-lg"
-                        >
-                            <template v-slot:placeholder>
-                                <v-row class="fill-height ma-0" align="center" justify="center">
-                                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                                </v-row>
-                            </template>
-                        </v-img>
-                        <v-sheet
-                            v-else
-                            :width="200"
-                            :height="200"
-                            class="d-flex align-center justify-center rounded-lg bg-grey-lighten-2"
-                        >
-                            <v-icon size="80" color="grey-darken-2">mdi-image</v-icon>
-                        </v-sheet>
-                    </div>
-                </div>
-
                 <v-form ref="form" v-model="valid">
                     <v-container>
+                        <v-row>
+                            <v-col cols="7">
+                                <v-text-field 
+                                    v-model="productData.image_url" 
+                                    label="URL hình ảnh" 
+                                    required
+                                    :rules="[v => !!v || 'Vui lòng nhập URL hình ảnh']"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="5" class="d-flex justify-center align-center">
+                                <div class="image-preview-container">
+                                    <v-img
+                                        v-if="productData.image_url"
+                                        :src="productData.image_url"
+                                        :width="200"
+                                        :height="200"
+                                        cover
+                                        class="rounded-lg"
+                                    >
+                                        <template v-slot:placeholder>
+                                            <v-row class="fill-height ma-0" align="center" justify="center">
+                                                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                                            </v-row>
+                                        </template>
+                                    </v-img>
+                                    <v-sheet
+                                        v-else
+                                        :width="200"
+                                        :height="200"
+                                        class="d-flex align-center justify-center rounded-lg bg-grey-lighten-2"
+                                    >
+                                        <v-icon size="80" color="grey-darken-2">mdi-image</v-icon>
+                                    </v-sheet>
+                                </div>
+                            </v-col>
+                        </v-row>
+
                         <v-text-field v-model="productData.name" label="Tên sản phẩm" required
                             :rules="[v => !!v || 'Vui lòng nhập tên sản phẩm']"></v-text-field>
 
@@ -43,9 +53,6 @@
                             :rules="[v => !!v || 'Vui lòng chọn danh mục']"></v-select>
 
                         <v-textarea v-model="productData.description" label="Mô tả" rows="3"></v-textarea>
-
-                        <v-text-field v-model="productData.image_url" label="URL hình ảnh" required
-                            :rules="[v => !!v || 'Vui lòng nhập URL hình ảnh']"></v-text-field>
 
                         <v-text-field v-model.number="productData.price" label="Giá" type="number" required
                             :rules="[v => !!v || 'Vui lòng nhập giá']"></v-text-field>
@@ -98,8 +105,8 @@ export default {
                 category_id: null,
                 description: '',
                 image_url: '',
-                price: 0,
-                price_sale: 0,
+                price: null,
+                price_sale: null,
                 active: 1,
                 toppings: []
             }
@@ -145,8 +152,8 @@ export default {
         async saveProduct() {
             if (!this.$refs.form.validate()) return
             this.loading = true
-            console.log(this.productData)
-            return
+            //console.log(this.productData)
+            //return
             try {
                 await productAPI.create(this.productData)
                 this.$emit('refresh')
@@ -165,7 +172,21 @@ export default {
 
         closeDialog() {
             this.dialog = false
+            this.resetForm()
             this.$emit('update:modelValue', false)
+        },
+
+        resetForm() {
+            this.productData = {
+                name: '',
+                category_id: null,
+                description: '',
+                image_url: '',
+                price: null,
+                price_sale: null,
+                active: 1,
+                toppings: []
+            }
         }
     }
 }

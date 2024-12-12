@@ -12,6 +12,7 @@ export const ROUTES = {
     MANAGE_PRODUCTS: "manage-products",
     NEW_ORDERS: "new-orders", 
     PAYMENT_HISTORY: "payment-history",
+    DELIVERY_ORDERS: "delivery-orders",
     LOGIN: "login"
   }
 };

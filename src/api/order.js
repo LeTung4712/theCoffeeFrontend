@@ -20,6 +20,10 @@ export const orderAPI = {
     return httpClient.get(`${PREFIX}/getUnsuccessOrders`, { params: data });
   },
 
+  getDeliveryOrders(data) {
+    return httpClient.get(`${PREFIX}/getDeliveryOrders`, { params: data });
+  },
+
   // Thao tác với đơn hàng
   createOrder(data) {
     return httpClient.post(`${PREFIX}/addOrder`, data);

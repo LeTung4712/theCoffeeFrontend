@@ -4,7 +4,7 @@
     <v-row class="bg-white">
       <v-col cols="12">
         <v-row justify="center" class="pa-4">
-          <h2>New Orders</h2>
+          <h2>ĐƠN HÀNG CHỜ XÁC NHẬN</h2>
         </v-row>
       </v-col>
 
@@ -27,8 +27,7 @@
           <!-- Search Bar -->
           <v-col cols="12" sm="6" class="d-flex align-center">
             <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Nhập mã đơn hàng" density="compact"
-              variant="outlined" hide-details class="max-width-300"
-              :disabled="loading"></v-text-field>
+              variant="outlined" hide-details class="max-width-300" :disabled="loading"></v-text-field>
           </v-col>
 
         </v-row>
@@ -90,18 +89,10 @@ export default {
   },
 
   created() {
-    this.checkAuth();
+    this.fetchOrders();
   },
 
   methods: {
-    checkAuth() {
-      if (localStorage.getItem("AdminLoggedIn") === "false") {
-        this.$router.push("/pages/login");
-        return;
-      }
-      this.fetchOrders();
-    },
-
     async fetchOrders() {
       try {
         const { data } = await orderAPI.getUnsuccessOrders();
