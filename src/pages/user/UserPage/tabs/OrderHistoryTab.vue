@@ -90,6 +90,28 @@
                     </v-col>
                   </v-row>
 
+                  <!-- Thêm các nút hành động -->
+                  <v-row v-if="isDetailsVisible(order.order_code) && canShowActionButtons(order.status)" class="mt-3">
+                    <v-col cols="12" class="d-flex justify-end">
+                      <v-btn
+                        v-if="canReceiveOrder(order.status)"
+                        color="success"
+                        class="mr-2"
+                        @click.stop="confirmReceiveOrder(order.id)"
+                      >
+                        <v-icon left>mdi-check-circle</v-icon>
+                        Đã nhận hàng
+                      </v-btn>
+                      <v-btn
+                        v-if="canCancelOrder(order.status)"
+                        color="error"
+                        @click.stop="confirmCancelOrder(order.id)"
+                      >
+                        <v-icon left>mdi-close-circle</v-icon>
+                        Hủy đơn
+                      </v-btn>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-expand-transition>
@@ -110,6 +132,8 @@
 
 <script>
 import { formatPrice } from '@/utils/format'
+import { orderAPI } from '@/api/order'
+import { useNotificationStore } from '@/stores/notification'
 export default {
   name: 'OrderHistoryTab',
   props: {
@@ -121,6 +145,11 @@ export default {
       type: String,
       default: ''
     }
+  },
+
+  setup() {
+    const notificationStore = useNotificationStore()
+    return { notificationStore }
   },
 
   data() {
@@ -216,6 +245,42 @@ export default {
       const toppingPrice = product.topping_items.reduce((total, topping) => total + parseFloat(topping.price), 0)
       const sizePrice = product.size === 'S' ? 0 : product.size === 'M' ? 6000 : 10000
       return formatPrice((basePrice + toppingPrice + sizePrice) * product.product_quantity)
+    },
+
+    canShowActionButtons(status) {
+      return ['0', '1', '2'].includes(status.toString())
+    },
+
+    canReceiveOrder(status) {
+      return status.toString() === '2' // Chỉ cho phép nhận đơn khi đang giao hàng
+    },
+
+    canCancelOrder(status) {
+      return ['0', '1', '2'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng
+    },
+
+    async confirmReceiveOrder(orderCode) {
+      if (confirm('Bạn xác nhận đã nhận được đơn hàng này?')) {
+        try {
+          await orderAPI.successOrder({ order_id: orderCode });
+          this.notificationStore.success("Xác nhận giao hàng thành công", 3000);
+          this.$router.push('/user/lich-su');
+        } catch (error) {
+          console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error)
+        }
+      }
+    },
+
+    async confirmCancelOrder(orderCode) {
+      if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+        try {
+          await orderAPI.cancelOrder({ order_id: orderCode });
+          this.notificationStore.success("Xác nhận hủy đơn hàng thành công", 3000);
+          this.$router.push('/user/lich-su');
+        } catch (error) {
+          console.error('Lỗi khi hủy đơn hàng:', error)
+        }
+      }
     },
   }
 }

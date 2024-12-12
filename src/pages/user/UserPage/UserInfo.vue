@@ -88,7 +88,7 @@
 
                         <!-- Order History Tab -->
                         <v-window-item :value="4">
-                            <OrderHistoryTab :orders="listOrders" />
+                            <OrderHistoryTab :orders="listOrders" @order-status-updated="handleOrderStatusUpdated" />
                         </v-window-item>
                     </v-window>
                 </v-card>
@@ -286,6 +286,10 @@ export default {
 
         async handleAddressUpdated() {
             await this.getAddresses(this.userInfomation.id);
+        },
+
+        async handleOrderStatusUpdated() {
+            await this.getOrders(this.userInfomation.id);
         }
     },
 

@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="500px" @click:outside="closeDialog">
         <v-card>
-            <v-card-title class="text-h5 bg-primary py-3 text-white">
+            <v-card-title class="text-h5 bg-success py-3 text-white">
                 Thêm danh mục mới
             </v-card-title>
 

@@ -271,7 +271,7 @@ export default {
             try {
                 await orderAPI.acceptOrder({ order_id: this.userOrderInfor.order_id });
                 this.notificationStore.success("Xác nhận giao hàng thành công", 3000);
-                this.$router.push('/admin/new-orders');
+                this.$router.push('/admin/pages/new-orders');
             } catch (error) {
                 console.error("Error accepting order:", error);
             }
@@ -281,7 +281,7 @@ export default {
             try {
                 await orderAPI.cancelOrder({ order_id: this.userOrderInfor.order_id });
                 this.notificationStore.success("Xác nhận hủy đơn hàng thành công", 3000);
-                this.$router.push('/admin/new-orders');
+                this.$router.push('/admin/pages/new-orders');
             } catch (error) {
                 console.error("Error canceling order:", error);
             }
