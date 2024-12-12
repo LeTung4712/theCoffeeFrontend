@@ -259,11 +259,12 @@ export default {
       return ['0', '1', '2'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng
     },
 
-    async confirmReceiveOrder(orderCode) {
+    async confirmReceiveOrder(orderId) {
       if (confirm('Bạn xác nhận đã nhận được đơn hàng này?')) {
         try {
-          await orderAPI.successOrder({ order_id: orderCode });
+          await orderAPI.successOrder({ order_id: orderId });
           this.notificationStore.success("Xác nhận giao hàng thành công", 3000);
+          this.$emit('order-status-updated', { orderId, status: '3' })
           this.$router.push('/user/lich-su');
         } catch (error) {
           console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error)
@@ -271,11 +272,12 @@ export default {
       }
     },
 
-    async confirmCancelOrder(orderCode) {
+    async confirmCancelOrder(orderId) {
       if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
         try {
-          await orderAPI.cancelOrder({ order_id: orderCode });
+          await orderAPI.cancelOrder({ order_id: orderId });
           this.notificationStore.success("Xác nhận hủy đơn hàng thành công", 3000);
+          this.$emit('order-status-updated', { orderId, status: '-1' })
           this.$router.push('/user/lich-su');
         } catch (error) {
           console.error('Lỗi khi hủy đơn hàng:', error)

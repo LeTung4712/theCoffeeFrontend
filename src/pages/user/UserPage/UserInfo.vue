@@ -288,8 +288,14 @@ export default {
             await this.getAddresses(this.userInfomation.id);
         },
 
-        async handleOrderStatusUpdated() {
+        async handleOrderStatusUpdated(orderId, status) {
             await this.getOrders(this.userInfomation.id);
+            this.listOrders = this.listOrders.map(order => {
+                if (order.id === orderId) {
+                    order.status = status;
+                }
+                return order;
+            });
         }
     },
 
