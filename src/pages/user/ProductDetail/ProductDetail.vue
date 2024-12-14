@@ -117,7 +117,7 @@
             </div>
         </div>
 
-        <div class="product_describe">
+        <div v-if="product" class="product_describe">
             <div class="product_des_wrap">
                 <v-row>
                     <v-col cols="12" sm="12" lg="12" md="12">
@@ -205,7 +205,7 @@ export default {
 
     watch: {
         '$route': {
-            immediate: true,
+            immediate: true, // Đảm bảo watcher được gọi ngay khi component được tạo
             handler() {
                 const productStore = useProductStore()
                 if (productStore.getCurrentProductId && productStore.hasProductIdChanged) {
@@ -221,11 +221,11 @@ export default {
         }
     },
 
-    beforeUnmount() {
-        // Clear product id khi rời khỏi trang
-        const productStore = useProductStore()
-        productStore.clearProductId()
-    },
+    // beforeUnmount() {
+    //     // Clear product id khi rời khỏi trang
+    //     const productStore = useProductStore()
+    //     productStore.clearProductId()
+    // },
 
     methods: {
         formattedPrice(price) {

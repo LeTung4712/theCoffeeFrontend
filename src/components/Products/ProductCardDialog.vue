@@ -126,7 +126,7 @@ export default {
     image_url: String,
     name: String,
     description: String,
-    price: String,
+    price: Number,
     dialog: {
       type: Boolean,
       default: false

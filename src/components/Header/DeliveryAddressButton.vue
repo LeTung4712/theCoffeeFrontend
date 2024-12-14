@@ -126,18 +126,6 @@ export default {
       showDialog: false,
       searchAddress: "",
       searchResults: [],
-      savedAddresses: [
-        {
-          type: "home",
-          name: "Nhà riêng",
-          fullAddress: "123 Đường ABC, Quận 1, TP.HCM"
-        },
-        {
-          type: "office",
-          name: "Văn phòng",
-          fullAddress: "456 Đường XYZ, Quận 2, TP.HCM"
-        }
-      ]
     };
   },
 

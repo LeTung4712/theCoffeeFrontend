@@ -73,7 +73,6 @@ export default {
                 { title: 'Thời gian', key: 'order_time', align: 'center', width: '20%' },
                 { title: 'SỐ ĐIỆN THOẠI', key: 'mobile_no', align: 'center', width: '15%' },
                 { title: 'ĐỊA CHỈ', key: 'address', align: 'center', width: '25%' },
-                { title: 'NGƯỜI GIAO', key: 'shipper_name', align: 'center', width: '15%' },
                 { title: 'TRẠNG THÁI', key: 'status', align: 'center', width: '15%' },
             ],
             delivery_orders: [],

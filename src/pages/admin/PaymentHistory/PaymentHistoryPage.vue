@@ -78,6 +78,11 @@
                                     {{ item.order_code }}
                                 </span>
                             </template>
+                            <template v-slot:item.status="{ item }">
+                                <v-chip :color="getStatusColor(item.status)" size="small">
+                                    {{ getStatusText(item.status) }}
+                                </v-chip>
+                            </template>
                         </v-data-table>
                     </v-card-text>
                 </v-card>
@@ -109,10 +114,11 @@ export default {
             search: '',
             headers: [
                 { title: 'THỜI GIAN', key: 'order_time', width: '15%' },
-                { title: 'Mã ĐƠN HÀNG', key: 'order_code', width: '15%' },
-                { title: 'SỐ TIỀN', key: 'final_price', width: '15%' },
+                { title: 'Mã ĐƠN', key: 'order_code', width: '15%' },
+                { title: 'SỐ TIỀN', key: 'final_price', width: '10%' },
                 { title: 'TÊN KHÁCH HÀNG', key: 'user_name', width: '20%' },
-                { title: 'ĐỊA CHỈ', key: 'address', width: '40%' },
+                { title: 'ĐỊA CHỈ', key: 'address', width: '30%' },
+                { title: 'TRẠNG THÁI', key: 'status', width: '30%' },
             ],
             contents: [],
             showDialog: false,
@@ -138,9 +144,11 @@ export default {
             return this.filteredOrders.length;
         },
     },
+
     created() {
         this.getOrders();
     },
+
     methods: {
         formattedPrice(price) {
             return formatPrice(price);
@@ -157,9 +165,18 @@ export default {
                 console.log("END\n");
             }
         },
+
         openOrderDetail(item) {
             this.selectedOrder = item;
             this.showDialog = true;
+        },
+
+        getStatusColor(status) {
+            return status === '3' ? 'success' : 'error';
+        },
+
+        getStatusText(status) {
+            return status === '3' ? 'Thành công' : 'Đã Hủy';
         },
     }
 };

@@ -20,6 +20,7 @@ export const userRoutes = {
       name: "ProductDetail",
       path: ROUTES.PRODUCT_DETAIL,
       component: () => import("@/pages/user/ProductDetail/ProductDetail"),
+      props: true,
     },
     {
       name: "UserInfo",

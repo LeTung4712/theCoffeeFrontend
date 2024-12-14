@@ -19,7 +19,7 @@
                         </v-col>
                         <v-col cols="6">
                             <p><strong>Tổng tiền:</strong>{{ formatPrice(orderDetail.final_price) }}VNĐ</p>
-                            <p><strong>Trạng thái:</strong> Đã thanh toán</p>
+                            <p><strong>Trạng thái:</strong> {{ orderDetail.status === '3' ? 'Thành công' : 'Đã Hủy' }}</p>
                         </v-col>
                     </v-row>
 
