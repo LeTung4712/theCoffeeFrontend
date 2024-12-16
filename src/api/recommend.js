@@ -3,12 +3,12 @@ import httpClient from './index';
 const PREFIX = '/recommenderSystem';
 
 export const recommendAPI = {
-  createRecommendation(data) {
-    return httpClient.post(`${PREFIX}/recommendation`, data);
+  getRecommendation(data) {
+    return httpClient.get(`${PREFIX}/recommendation`, { params: data });
   },
 
-  getAssociationRules() {
-    return httpClient.get(`${PREFIX}/getAssociationRules`);
+  getAssociationRules(data) {
+    return httpClient.get(`${PREFIX}/associationRules`, { params: data });
   },
 
   analyzeApriori(data) {

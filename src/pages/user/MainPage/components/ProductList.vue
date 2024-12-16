@@ -71,7 +71,7 @@
           </template>
           <template v-else>
             <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4" lg="2">
-              <ProductCard :product="product" :currentID="currentID" :dialog="dialog" :imageSize="imageSize"
+              <ProductCard :product="product" :currentID="product.id" :dialog="dialog" 
                 class="product-card-responsive" />
             </v-col>
           </template>
@@ -117,7 +117,6 @@ export default {
       products: [],
       searchProduct: null,
       product_searchs: [],
-      imageSize: 155,
       loadingProducts: false,
       error: null
     }

@@ -5,8 +5,8 @@
             <div class="image-container">
                 <v-img 
                     :src="product.image_url" 
-                    :width="imageSize" 
-                    :height="imageSize" 
+                    :width="155" 
+                    :height="155" 
                     cover
                     class="rounded-lg bg-grey-lighten-3"
                     :lazy-src="product.image_url"
@@ -98,10 +98,6 @@ export default {
             type: Boolean,
             default: false
         },
-        imageSize: {
-            type: Number,
-            default: 155
-        }
     },
 
     setup() {

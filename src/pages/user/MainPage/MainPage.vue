@@ -24,6 +24,7 @@
         </v-carousel>
       </v-col>
     </v-row>
+    <RecommendList />
     <ProductList />
     <IntroductionSection />
     <IntroductionSection />
@@ -33,12 +34,14 @@
 <script>
 import ProductList from './components/ProductList.vue'
 import IntroductionSection from './components/IntroductionSection.vue'
+import RecommendList from './components/RecommendList.vue'
 
 export default {
   name: "MainPage",
   components: {
     ProductList,
-    IntroductionSection
+    IntroductionSection,
+    RecommendList
   },
 
   data() {

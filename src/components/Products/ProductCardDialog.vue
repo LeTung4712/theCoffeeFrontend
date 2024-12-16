@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialogVisible" :width="$vuetify.display.mobile ? '100%' : '530'" >
+    <v-dialog v-model="dialogVisible" :width="$vuetify.display.mobile ? '100%' : '530'">
       <!-- Activator -->
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props" icon="mdi-plus-circle" color="primary" variant="text" size="x-large"
