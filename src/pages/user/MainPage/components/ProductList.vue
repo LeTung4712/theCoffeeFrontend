@@ -4,14 +4,14 @@
       <v-col>
         <!-- Header -->
         <v-row align="center" justify="center" class="mb-8">
-          <v-icon class="mr-3" color="primary">mdi-beer-outline</v-icon>
+          <v-icon class="mr-3" color="primary" size="35">mdi-beer-outline</v-icon>
           <span class="text-h4 font-weight-bold">Sản phẩm từ Nhà</span>
 
           <!-- Search Dialog -->
           <v-dialog v-model="dialogSearch" max-width="700" class="mt-16">
             <template v-slot:activator="{ props }">
               <v-btn v-bind="props" icon variant="text" class="ml-4" color="primary">
-                <v-icon size="32">mdi-magnify</v-icon>
+                <v-icon size="40">mdi-magnify</v-icon>
               </v-btn>
             </template>
 

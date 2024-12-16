@@ -4,12 +4,10 @@ const PREFIX = '/category';
 
 export const categoryAPI = {
   getAll() {
-    console.log('getcategory')
     return httpClient.get(`${PREFIX}/index`);
   },
 
   getByParentId(data) {
-    console.log('getcategory')
     return httpClient.get(`${PREFIX}/indexByParentId`, { params: data });
   },
 

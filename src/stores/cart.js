@@ -6,7 +6,8 @@ export const useCartStore = defineStore('cart', {
   }),
 
   getters: {
-    itemCount: (state) => state.items.length
+    itemCount: (state) => state.items.length, // Số lượng sản phẩm trong giỏ hàng
+    cartItemIds: (state) => state.items.map(item => item.product_item.id) // Lấy danh sách id các sản phẩm trong giỏ hàng
   },
 
   actions: {

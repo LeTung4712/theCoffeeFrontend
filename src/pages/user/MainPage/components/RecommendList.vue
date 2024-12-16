@@ -1,9 +1,8 @@
 <template>
     <v-container v-if="recommendProducts.length > 0">
-        <v-row>
-            <v-col cols="12">
-                <h2 class="text-h4 font-weight-bold mb-6">Gợi ý cho bạn</h2>
-            </v-col>
+        <v-row align="center" justify="center">
+            <v-icon class="mr-3" color="primary" size="40">mdi-star</v-icon>
+            <span class="text-h4 font-weight-bold">Gợi ý cho bạn</span>
         </v-row>
         <!-- Products Grid -->
         <v-row class="mt-1">
@@ -25,6 +24,7 @@
 <script>
 import { formatPrice } from '@/utils/format'
 import { recommendAPI } from '@/api/recommend'
+import { useCartStore } from '@/stores/cart'
 import ProductCard from '@/components/Products/ProductCard.vue'
 
 export default {
@@ -33,25 +33,26 @@ export default {
         ProductCard
     },
 
-    data() {
+    setup() {
+        const cartStore = useCartStore()
         return {
-            recommendProducts: [
-                {
-                    id: 1,
-                    name: 'Cà phê sữa đá',
-                    price: 29000,
-                    image_url: 'https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg'
-                },
-                {
-                    id: 2,
-                    name: 'Trà đào cam sả',
-                    price: 45000,
-                    image_url: 'https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg'
-                },
-                // Thêm các sản phẩm khác vào đây
-            ]
+            cartStore
         }
     },
+
+    data() {
+        return {
+            recommendProducts: [],
+            loadingProducts: false
+        }
+    },
+
+    computed: {
+        cartItems() {
+            return this.cartStore.cartItemIds
+        }
+    },
+
     created() {
         this.getRecommendProducts()
     },
@@ -62,14 +63,18 @@ export default {
         },
 
         async getRecommendProducts() {
+            this.loadingProducts = true
             try {
+                //console.log(this.cartItems)
                 const response = await recommendAPI.getRecommendation({
-                    product_id: this.product_id
+                    cartItems: this.cartItems
                 })
-                console.log(response)
-                this.recommendProducts = response.data
+                //console.log(response)
+                this.recommendProducts = response.data.recommend_products
             } catch (error) {
                 console.error('Error fetching recommend products:', error)
+            } finally {
+                this.loadingProducts = false
             }
         }
     }
