@@ -60,6 +60,12 @@ export const adminRoutes = {
           meta: { requiresAuth: true },
         },
         {
+          name: "Analyze",
+          path: ROUTES.ADMIN.ANALYZE,
+          component: () => import("@/pages/admin/Analyze/AnalyzePage"),
+          meta: { requiresAuth: true },
+        },
+        {
           name: "ManageProducts",
           path: ROUTES.ADMIN.MANAGE_PRODUCTS,
           component: () => import("@/pages/admin/ManageProduct/ManageProductPage"),

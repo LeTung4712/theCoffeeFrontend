@@ -9,6 +9,7 @@ export const ROUTES = {
   ADMIN: {
     PROFILE: "profile",
     ORDER_DETAIL: "order-detail/:order_code",
+    ANALYZE: "analyze",
     MANAGE_PRODUCTS: "manage-products",
     MANAGE_VOUCHERS: "manage-vouchers",
     MANAGE_TOPPINGS: "manage-toppings",
