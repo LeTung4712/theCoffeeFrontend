@@ -24,6 +24,12 @@
                         <template v-slot:item.image_url="{ item }">
                             <v-img :src="item.image_url" height="50" width="50" cover></v-img>
                         </template>
+                        <template v-slot:item.max_discount_amount="{ item }">
+                            {{ formattedPrice(item.max_discount_amount) }}
+                        </template>
+                        <template v-slot:item.min_order_amount="{ item }">
+                            {{ formattedPrice(item.min_order_amount) }}
+                        </template>
                         <template v-slot:item.active="{ item }">
                             <v-chip :color="item.active ? 'success' : 'error'">
                                 {{ item.active ? 'Hoạt động' : 'Không hoạt động' }}
@@ -135,6 +141,7 @@
 <script>
 import { voucherAPI } from "@/api/voucher";
 import { useNotificationStore } from "@/stores/notification";
+import { formatPrice } from "@/utils/format";
 
 export default {
     name: "ManageVoucherPage",
@@ -189,6 +196,10 @@ export default {
     },
 
     methods: {
+        formattedPrice(price) {
+            return formatPrice(price);
+        },
+
         async fetchVouchers() {
             try {
                 const { data } = await voucherAPI.getAllVouchers();

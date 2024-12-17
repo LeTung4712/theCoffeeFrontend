@@ -78,6 +78,9 @@
                                     {{ item.order_code }}
                                 </span>
                             </template>
+                            <template v-slot:item.final_price="{ item }">
+                                {{ formattedPrice(item.final_price) }}
+                            </template>
                             <template v-slot:item.status="{ item }">
                                 <v-chip :color="getStatusColor(item.status)" size="small">
                                     {{ getStatusText(item.status) }}

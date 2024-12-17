@@ -24,6 +24,9 @@
                         <template v-slot:item.image="{ item }">
                             <v-img :src="item.image" height="50" width="50" cover></v-img>
                         </template>
+                        <template v-slot:item.price="{ item }">
+                            {{ formattedPrice(item.price) }}
+                        </template>
                         <template v-slot:item.active="{ item }">
                             <v-chip :color="item.active ? 'success' : 'error'">
                                 {{ item.active ? 'Hoạt động' : 'Không hoạt động' }}
@@ -116,6 +119,7 @@
 
 <script>
 import { toppingAPI } from "@/api/topping";
+import { formatPrice } from "@/utils/format";
 import { useNotificationStore } from "@/stores/notification";
 
 export default {
@@ -158,6 +162,10 @@ export default {
     },
 
     methods: {
+        formattedPrice(price) {
+            return formatPrice(price);
+        },
+
         async fetchToppings() {
             try {
                 const { data } = await toppingAPI.getAllToppings();
