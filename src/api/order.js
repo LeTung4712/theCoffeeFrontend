@@ -39,5 +39,10 @@ export const orderAPI = {
 
   cancelOrder(data) {
     return httpClient.put(`${PREFIX}/cancelOrder`, data);
+  },
+
+  //thao tác thống kê
+  getAnalyzeOrders(data) {
+    return httpClient.get(`${PREFIX}/analytics`, { params: data });
   }
 };
