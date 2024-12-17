@@ -142,7 +142,7 @@ export default {
     methods: {
         async fetchToppings() {
             try {
-                const response = await toppingAPI.getAll()
+                const response = await toppingAPI.getActiveToppings()
                 this.toppings = response.data.toppings
             } catch (error) {
                 console.error('Lỗi khi lấy danh sách topping:', error)

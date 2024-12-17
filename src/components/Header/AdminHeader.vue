@@ -60,6 +60,7 @@ export default {
                 { title: "Dashboard", icon: "mdi-view-dashboard", to: "/admin/pages/dashboard" },
                 { title: "Analyze", icon: "mdi-chart-bar", to: "/admin/pages/analyze" },
                 { title: "Manage Products", icon: "mdi-package-variant", to: "/admin/pages/manage-products" },
+                { title: "Manage Toppings", icon: "mdi-pizza", to: "/admin/pages/manage-toppings" },
                 { title: "Manage Vouchers", icon: "mdi-ticket", to: "/admin/pages/manage-vouchers" },
                 { title: "New Orders", icon: "mdi-cart", to: "/admin/pages/new-orders" },
                 { title: "Delivery Orders", icon: "mdi-truck", to: "/admin/pages/delivery-orders" },
@@ -73,8 +74,10 @@ export default {
             this.drawer = !this.drawer;
         },
         async logout() {
-            const response = await adminAPI.logout();
-            console.log(response)
+            //const response = await adminAPI.logout();
+            localStorage.removeItem("AdminLoggedIn");
+            this.$router.push({ name: 'Login' });
+            //console.log(response)
         }
     }
 }

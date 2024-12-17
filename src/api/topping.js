@@ -3,19 +3,23 @@ import httpClient from './index';
 const PREFIX = '/topping';
 
 export const toppingAPI = {
-  getAll() {
+  getAllToppings() {
     return httpClient.get(`${PREFIX}/index`);
   },
 
-  create(data) {
+  getActiveToppings() {
+    return httpClient.get(`${PREFIX}/indexActive`);
+  },
+
+  createTopping(data) {
     return httpClient.post(`${PREFIX}/create`, data);
   },
 
-  update(data) {
+  updateTopping(data) {
     return httpClient.put(`${PREFIX}/update`, data);
   },
 
-  delete(params) {
-    return httpClient.delete(`${PREFIX}/delete`, { params });
+  deleteTopping(data) {
+    return httpClient.delete(`${PREFIX}/delete`, { params: data });
   }
 };

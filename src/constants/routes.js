@@ -11,6 +11,7 @@ export const ROUTES = {
     ORDER_DETAIL: "order-detail/:order_code",
     MANAGE_PRODUCTS: "manage-products",
     MANAGE_VOUCHERS: "manage-vouchers",
+    MANAGE_TOPPINGS: "manage-toppings",
     NEW_ORDERS: "new-orders", 
     PAYMENT_HISTORY: "payment-history",
     DELIVERY_ORDERS: "delivery-orders",

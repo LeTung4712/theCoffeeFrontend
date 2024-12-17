@@ -66,6 +66,12 @@ export const adminRoutes = {
           meta: { requiresAuth: true },
         },
         {
+          name: "ManageToppings",
+          path: ROUTES.ADMIN.MANAGE_TOPPINGS,
+          component: () => import("@/pages/admin/ManageTopping/ManageToppingPage"),
+          meta: { requiresAuth: true },
+        },
+        {
           name: "ManageVouchers",
           path: ROUTES.ADMIN.MANAGE_VOUCHERS,
           component: () => import("@/pages/admin/ManageVoucher/ManageVoucherPage"),

@@ -18,9 +18,6 @@
                         <v-btn color="success" prepend-icon="mdi-folder-plus" @click="dialogs.category = true">
                             Thêm danh mục
                         </v-btn>
-                        <v-btn color="info" prepend-icon="mdi-plus-circle" @click="dialogs.topping = true">
-                            Thêm topping
-                        </v-btn>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -59,7 +56,6 @@
         <!-- Add dialogs -->
         <ProductDialog v-model="dialogs.product" @refresh="fetchProducts" />
         <CategoryDialog v-model="dialogs.category" @refresh="initializeMenu" />
-        <ToppingDialog v-model="dialogs.topping" />
     </v-container>
 </template>
 
@@ -70,7 +66,6 @@ import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
 import ProductDialog from './components/ProductDialog.vue'
 import CategoryDialog from './components/CategoryDialog.vue'
-import ToppingDialog from './components/ToppingDialog.vue'
 
 export default {
     name: "ManageProductPage",
@@ -78,7 +73,6 @@ export default {
         ProductCard,
         ProductDialog,
         CategoryDialog,
-        ToppingDialog,
     },
 
     data() {
@@ -91,7 +85,6 @@ export default {
             dialogs: {
                 product: false,
                 category: false,
-                topping: false,
             },
             newProduct: {
                 name: "trà đá",

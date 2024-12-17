@@ -6,7 +6,7 @@
           <v-img
             cover
             height="200"
-            src="https://file.hstatic.net/1000075078/file/combo89_desktop_fb9f6ae2a13a4068a4a2a84d50f21fe3.jpg"
+            src="https://order.thecoffeehouse.com/_nuxt/img/thumbnail-login-pop-up.e10d0dd.png"
           ></v-img>
 
           <v-card-text class="text-center pt-4">
@@ -92,11 +92,13 @@ export default {
           this.notificationStore.success("Đăng nhập thành công",3000);
           this.$router.push('/admin');
         } else {
-          this.$toast.error('Sai email hoặc mật khẩu');
+          this.notificationStore.error("Sai email hoặc mật khẩu",3000);
         }
       } catch (error) {
-        console.error('Lỗi đăng nhập:', error);
-        this.$toast.error('Có lỗi xảy ra khi đăng nhập');
+        if (error.response && error.response.status === 401) {
+          window.alert('Sai email hoặc mật khẩu');
+          this.$toast.error('Sai email hoặc mật khẩu');
+        } 
       } finally {
         this.loading = false;
         this.admin.password = "";
