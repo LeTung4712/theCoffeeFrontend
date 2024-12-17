@@ -66,6 +66,12 @@ export const adminRoutes = {
           meta: { requiresAuth: true },
         },
         {
+          name: "ManageVouchers",
+          path: ROUTES.ADMIN.MANAGE_VOUCHERS,
+          component: () => import("@/pages/admin/ManageVoucher/ManageVoucherPage"),
+          meta: { requiresAuth: true },
+        },
+        {
           name: "NewOrders",
           path: ROUTES.ADMIN.NEW_ORDERS,
           component: () => import("@/pages/admin/NewOrder/NewOrderPage"),
