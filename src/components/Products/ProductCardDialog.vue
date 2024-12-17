@@ -1,30 +1,17 @@
 <template>
   <div>
-    <v-dialog v-model="dialogVisible" :width="$vuetify.display.mobile ? '100%' : '530'" persistent>
+    <v-dialog v-model="dialogVisible" :width="$vuetify.display.mobile ? '100%' : '530'">
       <!-- Activator -->
       <template v-slot:activator="{ props }">
-        <v-btn
-          v-bind="props"
-          icon="mdi-plus-circle"
-          color="primary"
-          variant="text"
-          size="x-large"
-          title="thêm vào giỏ hàng"
-          class="scale-button"
-        />
+        <v-btn v-bind="props" icon="mdi-plus-circle" color="primary" variant="text" size="x-large"
+          title="thêm vào giỏ hàng" class="scale-button" />
       </template>
 
       <!-- Dialog Content -->
       <v-card class="rounded-lg dialog-card d-flex flex-column">
         <!-- Header -->
         <v-card-title class="d-flex align-center py-3 px-4 bg-white border-bottom dialog-header">
-          <v-btn
-            icon="mdi-close"
-            variant="text"
-            density="comfortable"
-            @click="closeDialog"
-            class="mr-2"
-          />
+          <v-btn icon="mdi-close" variant="text" density="comfortable" @click="closeDialog" class="mr-2" />
           <span class="mx-auto text-subtitle-1 font-weight-bold text-primary">Thêm món mới</span>
         </v-card-title>
 
@@ -33,44 +20,29 @@
           <!-- Product Info -->
           <v-row no-gutters class="rounded-lg pa-3 border">
             <v-col cols="5" sm="5">
-              <v-img
-                :src="image_url"
-                :height="$vuetify.display.mobile ? '150' : '204'"
-                :width="$vuetify.display.mobile ? '150' : '204'"
-                cover
-                class="rounded-lg bg-grey-lighten-3 mx-auto"
-              />
+              <v-img :src="image_url" :height="$vuetify.display.mobile ? '150' : '204'"
+                :width="$vuetify.display.mobile ? '150' : '204'" cover class="rounded-lg bg-grey-lighten-3 mx-auto" />
             </v-col>
 
             <v-col cols="7" sm="7" class="pl-4">
               <div class="d-flex flex-column h-100">
                 <div class="text-subtitle-1 font-weight-bold mb-1">{{ name }}</div>
                 <div class="text-body-2 text-grey-darken-1 mb-auto description-container">
-                  <div :class="{'truncated': !showFullDescription}" ref="descriptionText">{{ description }}</div>
+                  <div :class="{ 'truncated': !showFullDescription }" ref="descriptionText">{{ description }}</div>
                   <div v-if="isDescriptionLong" @click="toggleDescription" class="read-more-btn">
                     {{ showFullDescription ? 'Thu gọn' : 'Xem thêm' }}
                   </div>
                 </div>
-                
+
                 <div class="d-flex justify-space-between align-center mt-2">
-                  <span class="text-subtitle-1 font-weight-bold">{{ formatPrice(price) }}đ</span>
+                  <span class="text-subtitle-1 font-weight-bold">{{ formattedPrice(price) }}đ</span>
                   <v-btn-group variant="outlined" color="primary" rounded="lg" class="quantity-group">
-                    <v-btn
-                      icon="mdi-minus"
-                      variant="text"
-                      @click="decreaseQuantity"
-                      :disabled="quantity <= 1"
-                      density="comfortable"
-                    />
+                    <v-btn icon="mdi-minus" variant="text" @click="decreaseQuantity" :disabled="quantity <= 1"
+                      density="comfortable" />
                     <v-card-text class="quantity-text">
                       {{ quantity }}
                     </v-card-text>
-                    <v-btn
-                      icon="mdi-plus"
-                      variant="text"
-                      @click="increaseQuantity"
-                      density="comfortable"
-                    />
+                    <v-btn icon="mdi-plus" variant="text" @click="increaseQuantity" density="comfortable" />
                   </v-btn-group>
                 </div>
               </div>
@@ -78,41 +50,23 @@
           </v-row>
 
           <!-- Note -->
-          <v-text-field
-            v-model="note"
-            placeholder="Ghi chú thêm cho món này"
-            variant="outlined"
-            density="comfortable"
-            prepend-inner-icon="mdi-note-text"
-            class="mt-6"
-            hide-details
-            bg-color="grey-lighten-4"
-          />
+          <v-text-field v-model="item_note" placeholder="Ghi chú thêm cho món này" variant="outlined"
+            density="comfortable" prepend-inner-icon="mdi-note-text" class="mt-6" hide-details
+            bg-color="grey-lighten-4" />
 
           <!-- Size Selection -->
           <template v-if="hasToppings">
             <div class="text-overline mt-6 mb-2 font-weight-medium">
               CHỌN SIZE (BẮT BUỘC)
             </div>
-            <v-radio-group
-              v-model="size"
-              inline
-              mandatory
-              class="mt-0 size-radio-group" 
-              density="comfortable"
-            >
-              <v-radio
-                v-for="option in sizeOptions"
-                :key="option.value"
-                :value="option.value"
-                color="primary"
-                class="flex-grow-1 mx-4"
-              >
+            <v-radio-group v-model="size" inline mandatory class="mt-0 size-radio-group" density="comfortable">
+              <v-radio v-for="option in sizeOptions" :key="option.value" :value="option.value" color="primary"
+                class="flex-grow-1 mx-4">
                 <template v-slot:label>
                   <div class="d-flex flex-column">
                     <span class="font-weight-medium">{{ option.label }}</span>
                     <span class="text-caption text-grey-darken-1">
-                      + {{ formatPrice(option.price) }}đ
+                      + {{ formattedPrice(option.price) }}đ
                     </span>
                   </div>
                 </template>
@@ -125,21 +79,13 @@
             <div class="text-overline mt-6 mb-2 font-weight-medium">
               CHỌN TOPPING (TÙY CHỌN)
             </div>
-            <v-checkbox
-              v-for="topping in topping_items"
-              :key="topping.id"
-              v-model="checked_topping"
-              :value="topping"
-              color="primary"
-              density="comfortable"
-              hide-details
-              class="mb-2"
-            >
+            <v-checkbox v-for="topping in topping_items" :key="topping.id" v-model="checked_topping" :value="topping"
+              color="primary" density="comfortable" hide-details class="mb-2">
               <template v-slot:label>
                 <div class="d-flex flex-column">
                   <span class="font-weight-medium">{{ topping.name }}</span>
                   <span class="text-caption text-grey-darken-1">
-                    + {{ formatPrice(topping.price) }}đ
+                    + {{ formattedPrice(topping.price) }}đ
                   </span>
                 </div>
               </template>
@@ -149,19 +95,11 @@
 
         <!-- Footer -->
         <v-card-actions class="pa-4 bg-white border-top dialog-footer">
-          <v-btn
-            block
-            color="primary"
-            variant="flat"
-            :height="$vuetify.display.mobile ? '48' : '52'"
-            rounded="pill"
-            class="text-capitalize font-weight-bold text-white"
-            @click="addToCart"
-            :loading="isLoading"
-            :disabled="isLoading"
-          >
+          <v-btn block color="primary" variant="flat" :height="$vuetify.display.mobile ? '48' : '52'" rounded="pill"
+            class="text-capitalize font-weight-bold text-white" @click="addToCart" :loading="isLoading"
+            :disabled="isLoading">
             <template v-if="!isLoading">
-              {{ formatPrice(calculateTotalPrice()) }}đ - Thêm vào giỏ hàng
+              {{ formattedPrice(calculateTotalPrice()) }}đ - Thêm vào giỏ hàng
             </template>
             <template v-else>
               Đang tải...
@@ -174,19 +112,20 @@
 </template>
 
 <script>
+import { formatPrice } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 
 export default {
   name: "ProductCardDialog",
-  
+
   props: {
-    currentID: String,
+    currentID: Number,
     id: Number,
     image_url: String,
     name: String,
-    description: String, 
+    description: String,
     price: Number,
     dialog: {
       type: Boolean,
@@ -199,7 +138,7 @@ export default {
     return {
       dialogVisible: false,
       quantity: 1,
-      note: "",
+      item_note: "",
       product: {
         id: 0,
         name: "",
@@ -223,7 +162,7 @@ export default {
 
   computed: {
     hasToppings() {
-      return this.topping_items.length > 1
+      return this.topping_items.length > 0
     }
   },
 
@@ -249,23 +188,24 @@ export default {
   },
 
   methods: {
+    formattedPrice(price) {
+      return formatPrice(price)
+    },
+
     async fetchProductInfo() {
       if (!this.id) return;
-      
+
       this.isLoading = true;
-      
+
       try {
-        const response = await productAPI.getInfo({
-          params: { product_id: this.id }
-        });
+        const response = await productAPI.getInfo({ product_id: this.id });
         const data = response.data;
         this.product = {
           ...data.product,
           price: this.price
         };
-        this.topping_items = data.toppings.map(topping => ({
+        this.topping_items = data.product.toppings.map(topping => ({
           ...topping,
-          count: 0
         }));
       } catch (error) {
         console.error("Failed to fetch product info:", error);
@@ -293,15 +233,11 @@ export default {
 
     calculateTotalPrice() {
       const basePrice = parseInt(this.price || 0);
-      const toppingPrice = this.checked_topping.reduce((sum, topping) => 
-        sum + parseInt(topping.price), 0);
+      const toppingPrice = this.checked_topping.reduce((sum, topping) =>
+        sum + Number(topping.price), 0);
       const sizePrice = this.sizeOptions.find(opt => opt.value === this.size)?.price || 0;
-      
-      return (basePrice + toppingPrice + sizePrice) * this.quantity;
-    },
 
-    formatPrice(price) {
-      return price?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return (basePrice + toppingPrice + sizePrice) * this.quantity;
     },
 
     addToCart() {
@@ -319,13 +255,10 @@ export default {
             price: this.price
           },
           size: this.size,
-          count: this.quantity,
+          quantity: this.quantity,
           total_amount: this.calculateTotalPrice(),
-          topping_items: this.topping_items.map(topping => ({
-            ...topping,
-            count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
-          })),
-          note: this.note
+          topping_items: this.checked_topping,
+          item_note: this.item_note
         };
 
         // Sử dụng cartStore thay vì localStorage
@@ -346,8 +279,6 @@ export default {
       this.size = 'S';
       this.note = '';
       this.checked_topping = [];
-      localStorage.setItem('info_size', 'S');
-      localStorage.setItem('topping_counts', JSON.stringify([0, 0, 0, 0, 0]));
     },
 
     closeDialog() {
@@ -363,7 +294,7 @@ export default {
 </script>
 
 <style scoped>
-.v-dialog > .v-card {
+.v-dialog>.v-card {
   overflow: hidden !important;
 }
 
@@ -476,6 +407,7 @@ export default {
 
 /* Animation cho bottom sheet trên mobile */
 @media (max-width: 600px) {
+
   .v-dialog-transition-enter-active,
   .v-dialog-transition-leave-active {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -613,7 +545,8 @@ export default {
 }
 
 .quantity-group .v-btn:hover {
-  background-color: rgba(76, 175, 80, 0.05) !important; /* --tch-primary với opacity */
+  background-color: rgba(76, 175, 80, 0.05) !important;
+  /* --tch-primary với opacity */
 }
 
 /* Thêm styles mới cho dialog layout */
@@ -650,7 +583,8 @@ export default {
 
   .dialog-content {
     padding: 12px !important;
-    max-height: none !important; /* Xóa max-height cũ */
+    max-height: none !important;
+    /* Xóa max-height cũ */
   }
 }
 </style>

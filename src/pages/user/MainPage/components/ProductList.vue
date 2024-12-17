@@ -4,14 +4,14 @@
       <v-col>
         <!-- Header -->
         <v-row align="center" justify="center" class="mb-8">
-          <v-icon class="mr-3" color="primary">mdi-beer-outline</v-icon>
+          <v-icon class="mr-3" color="primary" size="35">mdi-beer-outline</v-icon>
           <span class="text-h4 font-weight-bold">Sản phẩm từ Nhà</span>
 
           <!-- Search Dialog -->
           <v-dialog v-model="dialogSearch" max-width="700" class="mt-16">
             <template v-slot:activator="{ props }">
               <v-btn v-bind="props" icon variant="text" class="ml-4" color="primary">
-                <v-icon size="32">mdi-magnify</v-icon>
+                <v-icon size="40">mdi-magnify</v-icon>
               </v-btn>
             </template>
 
@@ -26,9 +26,9 @@
               <v-divider></v-divider>
 
               <v-card-text class="search-dialog-content">
-                <v-text-field v-model="searchProduct" prepend-icon="mdi-magnify"
-                  placeholder="Nhập tên sản phẩm" variant="outlined" density="comfortable"
-                  @keydown.delete="updateSearch" hide-details class="sticky-search">
+                <v-text-field v-model="searchProduct" prepend-icon="mdi-magnify" placeholder="Nhập tên sản phẩm"
+                  variant="outlined" density="comfortable" @keydown.delete="updateSearch" hide-details
+                  class="sticky-search">
                 </v-text-field>
 
                 <v-row class="mt-4">
@@ -71,7 +71,7 @@
           </template>
           <template v-else>
             <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4" lg="2">
-              <ProductCard :product="product" :currentID="currentID" :dialog="dialog" :imageSize="imageSize"
+              <ProductCard :product="product" :currentID="product.id" :dialog="dialog" 
                 class="product-card-responsive" />
             </v-col>
           </template>
@@ -83,107 +83,84 @@
 
 <script>
 import { removeVietnameseTones } from "@/utils/format";
-import { categoryAPI } from "@/api/category";
 import { productAPI } from "@/api/product";
 import ProductCard from "@/components/Products/ProductCard.vue";
-// /* global axios */
+import { useCategoryStore } from '@/stores/category'
+import { storeToRefs } from 'pinia'
+
 export default {
   name: "ProductList",
   components: {
     ProductCard
   },
+
   props: {
-    currentID: String,
+    currentID: Number,
     dialog: Boolean,
   },
+
+  setup() {
+    const categoryStore = useCategoryStore()
+    const { rootCategories, loading: loadingCategories } = storeToRefs(categoryStore)
+    
+    return {
+      categories: rootCategories,
+      loadingCategories,
+      categoryStore
+    }
+  },
+
   data() {
     return {
       dialogSearch: false,
       category_type: 1,
-      categories: [
-        {
-          id: 1,
-          name: "Cà Phê",
-          image_url: "https://minio.thecoffeehouse.com/image/admin/1732167866_iconcate-caphe.png",
-          parent_id: 0
-        }
-      ],
-      products: [
-        {
-          "id": 1,
-          "name": "The Coffee House Sữa Nóng",
-          "category_id": 1,
-          "description": "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ. Càng hấp dẫn hơn với topping thạch 100% cà phê nguyên chất giúp giữ trọn vị ngon đến ngụm cuối cùng.",
-          "price": 39000,
-          "price_sale": 0,
-          "active": 1,
-          "image_url": "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-        }
-
-      ],
+      products: [],
       searchProduct: null,
-      product_searchs: [
-        {
-          id: 5,
-          name: "Hi-Tea Thơm",
-          description: "Sự kết hợp ăn ý giữa Trà xanh Nhật Bản và những miếng thơm thật mọng nước.",
-          price: 49000,
-          image_url: "https://minio.thecoffeehouse.com/image/admin/1732197236_caphe_400x400.jpg",
-          category_id: 4
-        }
-      ],
-      imageSize: 155,
-      loadingCategories: false,
+      product_searchs: [],
       loadingProducts: false,
+      error: null
     }
   },
 
   async created() {
     try {
+      // Tải categories và products song song
       await Promise.all([
-        this.getCategories(),
-        this.getProductsByCategoryId(),
+        this.initializeCategories(),
         this.getAllProducts()
       ])
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu:', error)
-      // Giữ lại dữ liệu mẫu nếu API fails
+      this.error = 'Có lỗi xảy ra khi tải dữ liệu'
+      console.error('Lỗi khởi tạo:', error)
     }
   },
 
   methods: {
-    async getCategories() {
-      this.loadingCategories = true
+    async initializeCategories() {
       try {
-        // Thêm delay 1.5s để test loading
-        //await new Promise(resolve => setTimeout(resolve, 1500))
-
-        const response = await categoryAPI.getByParentId({ params: { parent_id: 0 } })
-        if (response?.data?.categories?.length) {
-          this.categories = response.data.categories
-          //console.log('hello this', this.categories);
+        await this.categoryStore.fetchCategories()
+        // Nếu không có category được chọn, chọn category đầu tiên
+        if (!this.category_type && this.categories.length) {
+          this.category_type = this.categories[0].id
         }
       } catch (error) {
-        console.error('Lỗi khi lấy danh mục:', error)
-      } finally {
-        this.loadingCategories = false
+        console.error('Lỗi khi tải categories:', error)
+        throw error
       }
     },
 
     async getProductsByCategoryId() {
       this.loadingProducts = true
+      this.error = null
+
       try {
-        // Thêm delay 2s để test loading
-        //await new Promise(resolve => setTimeout(resolve, 2000))
-
-        const response = await productAPI.getByCategory({ params: { category_id: this.category_type } })
-
-        if (response?.data?.products?.length) {
+        const response = await productAPI.getByCategory({ category_id: this.category_type })
+        if (response?.data?.products) {
           this.products = response.data.products
-          //console.log('hello this products', this.products);
         }
       } catch (error) {
         console.error('Lỗi khi lấy sản phẩm:', error)
+        this.error = 'Không thể tải sản phẩm'
       } finally {
         this.loadingProducts = false
       }
@@ -191,15 +168,13 @@ export default {
 
     async getAllProducts() {
       try {
-        // Thêm delay 1s để test loading
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
         const response = await productAPI.getAll()
-        if (response?.data?.products?.length) {
+        if (response?.data?.products) {
           this.product_searchs = response.data.products
         }
       } catch (error) {
         console.error('Lỗi khi lấy tất cả sản phẩm:', error)
+        throw error
       }
     },
 

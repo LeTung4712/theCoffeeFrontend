@@ -18,10 +18,24 @@ export const userAPI = {
   },
 
   getAddressNote(data) {
-    return httpClient.post(`${PREFIX}/info/getAddressNote`, data);
+    console.log('call address')
+    return httpClient.get(`${PREFIX}/info/getAddressNote`, { params: data });
+  },
+
+  createAddressNote(data) {
+    console.log(data)
+    return httpClient.post(`${PREFIX}/info/createAddressNote`, data);
+  },
+
+  updateAddressNote(data) {
+    return httpClient.put(`${PREFIX}/info/updateAddressNote`, data);
+  },
+
+  deleteAddressNote(data) {
+    return httpClient.delete(`${PREFIX}/info/deleteAddressNote`, { params: data });
   },
 
   getOrdersUser(data) {
-    return httpClient.post(`${PREFIX}/info/getOrders`, data);
+    return httpClient.get(`${PREFIX}/info/getOrderHistory`, { params: data });
   },
 };

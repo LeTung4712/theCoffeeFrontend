@@ -1,9 +1,16 @@
 <template>
-    <v-card elevation="2" class="product-card" @click="navigateToProduct" :ripple="true" style="cursor: pointer">
+    <v-card v-if="product" elevation="2" class="product-card" @click="navigateToProduct" :ripple="true" style="cursor: pointer">
         <!-- Desktop Layout -->
         <div class="d-none d-sm-flex flex-column h-100">
             <div class="image-container">
-                <v-img :src="product.image_url" :width="imageSize" :height="imageSize" cover class="rounded-lg bg-grey-lighten-3" />
+                <v-img 
+                    :src="product.image_url" 
+                    :width="155" 
+                    :height="155" 
+                    cover
+                    class="rounded-lg bg-grey-lighten-3"
+                    :lazy-src="product.image_url"
+                />
             </div>
 
             <v-card-text class="d-flex flex-column h-100">
@@ -16,7 +23,13 @@
                         {{ formattedPrice }}đ
                     </span>
                     <div class="add-button-wrapper">
-                        <ProductCardDialog :currentID="currentID" :dialog="dialog" v-bind="product" :isInProductListing="1" />
+                        <ProductCardDialog 
+                            v-if="currentID" 
+                            :currentID="currentID" 
+                            :dialog="dialog" 
+                            v-bind="product"
+                            :isInProductListing="1" 
+                        />
                     </div>
                 </div>
             </v-card-text>
@@ -25,7 +38,13 @@
         <!-- Mobile Layout -->
         <div class="d-flex d-sm-none">
             <div class="mobile-image-container">
-                <v-img :src="product.image_url" cover class="rounded-lg bg-grey-lighten-3" height="100%" />
+                <v-img 
+                    :src="product.image_url" 
+                    cover 
+                    class="rounded-lg bg-grey-lighten-3" 
+                    height="100%"
+                    :lazy-src="product.image_url"
+                />
             </div>
 
             <v-card-text class="mobile-content">
@@ -38,7 +57,13 @@
                         {{ formattedPrice }}đ
                     </span>
                     <div class="add-button-wrapper">
-                        <ProductCardDialog :currentID="currentID" :dialog="dialog" v-bind="product" :isInProductListing="1" />
+                        <ProductCardDialog 
+                            v-if="currentID"
+                            :currentID="currentID" 
+                            :dialog="dialog" 
+                            v-bind="product"
+                            :isInProductListing="1" 
+                        />
                     </div>
                 </div>
             </v-card-text>
@@ -47,40 +72,74 @@
 </template>
 
 <script>
-import { removeVietnameseTones } from "@/utils/format";
+import { removeVietnameseTones, formatPrice } from "@/utils/format";
 import ProductCardDialog from "./ProductCardDialog.vue";
+import { useProductStore } from '@/stores/product'
 
 export default {
     name: "ProductCard",
     components: {
         ProductCardDialog
     },
+    
     props: {
         product: {
             type: Object,
-            required: true
+            required: true,
+            validator(value) {
+                return value && value.name && value.price && value.image_url
+            }
         },
-        currentID: String,
-        dialog: Boolean,
-        imageSize: {
+        currentID: {
             type: Number,
-            default: 155
-        }
+            default: null
+        },
+        dialog: {
+            type: Boolean,
+            default: false
+        },
     },
+
+    setup() {
+        const productStore = useProductStore()
+        return { productStore }
+    },
+
     computed: {
         formattedPrice() {
-            return this.product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return this.product?.price ? formatPrice(this.product.price) : 0;
         }
     },
-    methods: {
-        navigateToProduct() {
-            const productNameInUrl = removeVietnameseTones(this.product.name)
-                .replaceAll(' ', '-')
-                .toLowerCase();
 
-            this.$router.push({
-                path: `/products/${productNameInUrl}`
-            });
+    methods: {
+        async navigateToProduct() {
+            try {
+                if (!this.product?.name) return;
+                
+                const productNameInUrl = removeVietnameseTones(this.product.name)
+                    .replaceAll(' ', '-')
+                    .toLowerCase();
+                
+                await this.productStore.setProductId(this.product.id);
+
+                if (this.$route.name === 'ProductDetail') {
+                    await this.$router.push({
+                        name: "ProductDetail",
+                        params: {
+                            product_name_convert: productNameInUrl
+                        }
+                    });
+                } else {
+                    await this.$router.push({
+                        name: "ProductDetail",
+                        params: {
+                            product_name_convert: productNameInUrl
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Navigation error:', error);
+            }
         }
     }
 }

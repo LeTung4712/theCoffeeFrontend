@@ -60,12 +60,12 @@
               <template v-slot:prepend>
                 <v-icon color="primary" class="mr-2">
                   {{
-                  address.type === 'home' ? 'mdi-home' :
-                  address.type === 'office' ? 'mdi-office-building' : 'mdi-map-marker'
+                  address.address_type === 'home' ? 'mdi-home' :
+                  address.address_type === 'office' ? 'mdi-office-building' : 'mdi-map-marker'
                   }}
                 </v-icon>
               </template>
-              <v-list-item-subtitle class="text-caption">{{ address.address }}</v-list-item-subtitle>
+              <v-list-item-title class="text-caption">{{ address.address }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </div>
@@ -126,18 +126,6 @@ export default {
       showDialog: false,
       searchAddress: "",
       searchResults: [],
-      savedAddresses: [
-        {
-          type: "home",
-          name: "Nhà riêng",
-          fullAddress: "123 Đường ABC, Quận 1, TP.HCM"
-        },
-        {
-          type: "office",
-          name: "Văn phòng",
-          fullAddress: "456 Đường XYZ, Quận 2, TP.HCM"
-        }
-      ]
     };
   },
 
@@ -151,8 +139,8 @@ export default {
       }
     },
     savedAddresses() {
-        // Lấy danh sách địa chỉ đã lưu từ store nhưng chỉ lấy 3 địa chỉ đầu tiên mới nhất
-        return this.addressStore.addressNote.slice(0, 3);
+        // Lấy danh sách địa chỉ đã lưu từ store nhưng chỉ lấy 4 địa chỉ đầu tiên mới nhất
+        return this.addressStore.addressNote.slice(0, 4);
     }
   },
 

@@ -1,65 +1,118 @@
 <template>
-<div class="fixed_header" style="top: -12px;margin: 12px -12px;display: flex;background-color: white;height: 64px;align-items: center;border-style: ridge;height: 54px">
-    <v-spacer></v-spacer>
+    <div>
+        <v-app-bar 
+            app 
+            color="primary" 
+            dark
+            elevation="4"
+            class="fixed-header"
+        >
+            <v-app-bar-nav-icon @click="toggleDrawer" />
+            <v-toolbar-title>Admin Dashboard</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+                <v-icon>mdi-bell</v-icon>
+            </v-btn>
+            <v-btn icon>
+                <v-icon>mdi-account-circle</v-icon>
+            </v-btn>
+        </v-app-bar>
 
-    <v-alert color="white" dark style=" padding-bottom: 0;display: flex;align-items: center;" height="32" text>
-        <span style="color: black;">{{ currentDateTime }} </span>
-    </v-alert>
-    <v-alert color="white" dark style=" padding-bottom: 0;display: flex;align-items: center" height="32" text>
-        <v-icon left color="black">mdi-account</v-icon>
-        <span style="color: black;"><strong>Tung</strong>, Welcome </span>
-    </v-alert>
-    <v-btn height="36" flat color="black">
-        <span style="color: white" @click="handleLogout">Log out </span>
-        <v-icon right color="white">mdi-exit-to-app</v-icon>
-    </v-btn>
-</div>
+        <v-navigation-drawer 
+            :model-value="drawer" 
+            app
+            class="navigation-drawer"
+        >
+            <div class="drawer-content">
+                <v-list>
+                    <v-list-item v-for="item in menuItems" :key="item.title" :to="item.to" link>
+                        <template v-slot:prepend>
+                            <v-icon>{{ item.icon }}</v-icon>
+                        </template>
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </div>
+            
+            <v-btn
+                block
+                color="error"
+                class="logout-btn"
+                @click="logout"
+                prepend-icon="mdi-logout"
+            >
+                Logout
+            </v-btn>
+        </v-navigation-drawer>
+    </div>
 </template>
 
 <script>
+import { adminAPI } from "@/api/admin";
 export default {
-    name: "View_Header",
+    name: 'AdminHeader',
+
     data() {
         return {
-            currentDateTime: null,
+            drawer: true,
+            menuItems: [
+                { title: "Profile", icon: "mdi-account", to: "/admin/pages/profile" },
+                { title: "Dashboard", icon: "mdi-view-dashboard", to: "/admin/pages/dashboard" },
+                { title: "Analyze", icon: "mdi-chart-bar", to: "/admin/pages/analyze" },
+                { title: "Manage Products", icon: "mdi-package-variant", to: "/admin/pages/manage-products" },
+                { title: "Manage Toppings", icon: "mdi-pizza", to: "/admin/pages/manage-toppings" },
+                { title: "Manage Vouchers", icon: "mdi-ticket", to: "/admin/pages/manage-vouchers" },
+                { title: "New Orders", icon: "mdi-cart", to: "/admin/pages/new-orders" },
+                { title: "Delivery Orders", icon: "mdi-truck", to: "/admin/pages/delivery-orders" },
+                { title: "Payment History", icon: "mdi-history", to: "/admin/pages/payment-history" },
+                
+            ],
         }
     },
-    mounted() {
-        setInterval(() => {
-            let dt = new Date();
-            // ensure date comes as 01, 09 etc
-            let DD = ("0" + dt.getDate()).slice(-2);
-            // getMonth returns month from 0
-            let MM = ("0" + (dt.getMonth() + 1)).slice(-2);
-            let YYYY = dt.getFullYear();
-            let hh = ("0" + dt.getHours()).slice(-2);
-            let mm = ("0" + dt.getMinutes()).slice(-2);
-            let ss = ("0" + dt.getSeconds()).slice(-2);
-            let date_string = YYYY + "-" + MM + "-" + DD + " " + hh + ":" + mm + ":" + ss;
-
-            this.currentDateTime = date_string;
-        }, 1);
-    },
-
     methods: {
-        handleLogout() {
-            localStorage.setItem("AdminLoggedIn", "false")
-            window.dispatchEvent(new CustomEvent('admin-logged-in', {
-                detail: {
-                    logged_in: false
-                
-                }
-            }));
-            this.$router.push('/pages/login') // đăng xuất xong quay về trang login
+        toggleDrawer() {
+            this.drawer = !this.drawer;
+        },
+        async logout() {
+            //const response = await adminAPI.logout();
+            localStorage.removeItem("AdminLoggedIn");
+            this.$router.push({ name: 'Login' });
+            //console.log(response)
         }
     }
 }
 </script>
 
-<style>
-.fixed_header {
-    width: calc(100% - 280px);
-    position: fixed;
-    z-index: 1;
+<style scoped>
+.v-app-bar {
+    background-color: #1976D2 !important;
+    /* Màu xanh dương */
+}
+
+.fixed-header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.navigation-drawer {
+    height: calc(100vh - 64px) !important;
+    margin-top: 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+}
+
+.drawer-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.logout-btn {
+    margin: 16px auto;
+    width: 80%;
+    max-width: 200px;
 }
 </style>

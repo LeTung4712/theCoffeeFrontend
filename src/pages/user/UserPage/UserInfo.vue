@@ -78,7 +78,7 @@
 
                         <!-- Address Tab -->
                         <v-window-item :value="2">
-                            <AddressTab :addresses="listAddresses" />
+                            <AddressTab :addresses="listAddresses" @address-updated="handleAddressUpdated" />
                         </v-window-item>
 
                         <!-- Benefits Tab -->
@@ -88,7 +88,7 @@
 
                         <!-- Order History Tab -->
                         <v-window-item :value="4">
-                            <OrderHistoryTab :orders="listOrders" />
+                            <OrderHistoryTab :orders="listOrders" @order-status-updated="handleOrderStatusUpdated" />
                         </v-window-item>
                     </v-window>
                 </v-card>
@@ -198,31 +198,50 @@ export default {
 
     methods: {
         async initializeUserData() {
-            const userData = this.authStore.userInfo
-            this.userInfomation = userData
-            if (!userData) {
-                this.$router.push('/')
-                return
+            try {
+                const userData = this.authStore.userInfo
+                if (!userData) {
+                    this.$router.push('/')
+                    return
+                }
+                this.userInfomation = userData
+                
+                await Promise.all([
+                    this.getAddresses(userData.id),
+                    this.getOrders(userData.id)
+                ])
+            } catch (error) {
+                this.notificationStore.error('Không thể t�i thông tin người dùng', 3000)
+                console.error('Lỗi khi khởi tạo dữ liệu:', error)
             }
-            await Promise.all([
-                this.getAddresses(userData.id),
-                this.getOrders(userData.id)
-            ])
         },
 
         // Lấy danh sách địa chỉ của người dùng
         async getAddresses(userId) {
-            if (this.addressStore.addressNote.length === 0) {
+            try {
                 const response = await userAPI.getAddressNote({ user_id: userId })
                 this.addressStore.setAddressNote(response.data.address_note)
+                this.listAddresses = this.addressStore.addressNote
+                
+                const defaultAddress = this.listAddresses.find(address => address.is_default)
+                if (defaultAddress) {
+                    this.addressStore.updateAddress(defaultAddress.address)
+                }
+            } catch (error) {
+                this.notificationStore.error('Không thể tải danh sách địa chỉ', 3000)
+                console.error('Lỗi khi lấy địa chỉ:', error)
             }
-            this.listAddresses = this.addressStore.addressNote
         },
 
         // Lấy danh sách đơn hàng của người dùng
         async getOrders(userId) {
-            const response = await userAPI.getOrdersUser({ user_id: userId })
-            this.listOrders = response.data.orders
+            try {
+                const response = await userAPI.getOrdersUser({ user_id: userId })
+                this.listOrders = response.data.orders
+            } catch (error) {
+                this.notificationStore.error('Không thể tải lịch sử đơn hàng', 3000)
+                console.error('Lỗi khi lấy đơn hàng:', error)
+            }
         },
 
         // Chuyển đến trang tương ứng với item trong menu
@@ -263,6 +282,20 @@ export default {
                 displayValue: false
             })
             this.barcodeUrl = canvas.toDataURL("image/png")
+        },
+
+        async handleAddressUpdated() {
+            await this.getAddresses(this.userInfomation.id);
+        },
+
+        async handleOrderStatusUpdated(orderId, status) {
+            await this.getOrders(this.userInfomation.id);
+            this.listOrders = this.listOrders.map(order => {
+                if (order.id === orderId) {
+                    order.status = status;
+                }
+                return order;
+            });
         }
     },
 

@@ -4,36 +4,40 @@ const PREFIX = '/order';
 
 export const orderAPI = {
   // Lấy thông tin đơn hàng
-  getOrders(params) {
-    return httpClient.get(`${PREFIX}/getOrders`, { params });
+  getOrders(data) {
+    return httpClient.get(`${PREFIX}/getOrders`, { params: data });
   },
 
-  getOrderInfo(params) {
-    return httpClient.get(`${PREFIX}/getOrderInfo`, { params });
+  getOrderInfo(data) {
+    return httpClient.get(`${PREFIX}/getOrderInfo`, { params: { order_code: data } });
   },
 
-  getSuccessOrders(params) {
-    return httpClient.get(`${PREFIX}/getSuccessOrders`, { params });
+  getSuccessOrders(data) {
+    return httpClient.get(`${PREFIX}/getSuccessOrders`, { params: data });
   },
 
-  getUnsuccessOrders(params) {
-    return httpClient.get(`${PREFIX}/getUnsuccessOrders`, { params });
+  getUnsuccessOrders(data) {
+    return httpClient.get(`${PREFIX}/getUnsuccessOrders`, { params: data });
+  },
+
+  getDeliveryOrders(data) {
+    return httpClient.get(`${PREFIX}/getDeliveryOrders`, { params: data });
   },
 
   // Thao tác với đơn hàng
-  create(data) {
+  createOrder(data) {
     return httpClient.post(`${PREFIX}/addOrder`, data);
   },
 
-  accept(data) {
+  acceptOrder(data) {
     return httpClient.put(`${PREFIX}/acceptOrder`, data);
   },
 
-  markAsPaid(data) {
-    return httpClient.put(`${PREFIX}/paidOrder`, data);
+  successOrder(data) {
+    return httpClient.put(`${PREFIX}/successOrder`, data);
   },
 
-  cancel(data) {
+  cancelOrder(data) {
     return httpClient.put(`${PREFIX}/cancelOrder`, data);
   }
 };

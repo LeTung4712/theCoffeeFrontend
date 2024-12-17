@@ -3,61 +3,64 @@
     <v-text-field v-model="searchLocal" label="Tìm kiếm đơn hàng" prepend-inner-icon="mdi-magnify" outlined dense
       clearable />
     <v-list>
-      <v-list-item v-for="order in paginatedOrders" :key="order.order_id" class="mb-4">
-        <v-card width="100%" class="order-card" elevation="2" @click="toggleDetails(order.order_id)">
+      <v-list-item v-for="order in paginatedOrders" :key="order.order_code" class="mb-4">
+        <v-card width="100%" class="order-card" elevation="2" @click="toggleDetails(order.order_code)">
           <v-card-title class="d-flex justify-space-between py-2 px-4">
             <span class="text-subtitle-1 font-weight-bold bg-secondary px-2 py-1 rounded">
-              Mã đơn: {{ order.order_id }}
+              Mã đơn: {{ order.order_code }}
             </span>
-            <v-chip :color="getStateColor(order.state)" text-color="white" small>
-              {{ getStateText(order.state) }}
+            <v-chip :color="getStatusColor(order.status)" text-color="white" small>
+              {{ getStatusText(order.status) }}
             </v-chip>
           </v-card-title>
 
           <v-card-text class="pt-2">
             <v-row dense>
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="12">
                 <v-icon small class="mr-2">mdi-clock-outline</v-icon>
                 {{ formatDateTime(order.order_time) }}
               </v-col>
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="12">
                 <v-icon small class="mr-2">mdi-map-marker</v-icon>
                 {{ order.address }}
               </v-col>
             </v-row>
 
             <v-expand-transition>
-              <v-row v-if="isDetailsVisible(order.order_id)" class="order-details">
+              <v-row v-if="isDetailsVisible(order.order_code)" class="order-details">
                 <v-col cols="12">
                   <div class="customer-info">
                     <div class="info-line"><strong>Khách hàng:</strong> {{ order.user_name }}</div>
                     <div class="info-line"><strong>Số điện thoại:</strong> {{ order.mobile_no }}</div>
                     <div class="info-line"><strong>Ghi chú:</strong> {{ order.note || 'Không có' }}</div>
                   </div>
+
                   <v-divider class="my-3"></v-divider>
+
                   <v-row class="products-list mt-3">
                     <v-col cols="12">
                       <div class="products-section">
                         <div class="section-title mb-2">Sản phẩm đã đặt:</div>
-                        <v-row v-for="product in order.products" :key="product.id" class="product-item py-2">
+                        <v-row v-for="product in order.order_items" :key="product.product_id" class="product-item py-2">
                           <v-col cols="12">
                             <v-row align="center" justify="space-between" no-gutters>
                               <v-col>
                                 <div class="product-name">
-                                  {{ product.product_count }} x {{ product.product_name }}
+                                  {{ product.product_quantity }} x {{ product.product_name }}
                                   <span class="size-tag">(Size {{ product.size }})</span>
                                 </div>
+                                <div class="product-note">
+                                  Ghi chú: {{ product.item_note }}
+                                </div>
 
-                                <div v-if="getActiveTopping(product).length > 0" class="topping-list mt-1">
-                                  <div v-for="(topping, index) in getActiveTopping(product)" :key="index"
-                                    class="topping-item">
-                                    + {{ topping.name }}
-                                  </div>
+                                <div v-for="topping in product.topping_items" :key="topping.id"
+                                  class="topping-list mt-1">
+                                  + {{ topping.name }} ({{ formattedPrice(topping.price) }}đ)
                                 </div>
                               </v-col>
 
                               <v-col cols="auto">
-                                <div class="product-price">{{ formatPrice(product.price) }}đ</div>
+                                <div class="product-price">{{ calculateTotalPrice(product) }}đ</div>
                               </v-col>
                             </v-row>
                           </v-col>
@@ -70,27 +73,50 @@
                     <v-col cols="12">
                       <div class="price-line">
                         <span><strong>Tổng tiền hàng:</strong></span>
-                        <span>{{ formatPrice(calculateProductsTotal(order)) }}đ</span>
+                        <span>{{ formattedPrice(order.total_price) }}đ</span>
                       </div>
                       <div class="price-line">
                         <span><strong>Phí ship:</strong></span>
-                        <span>{{ formatPrice(order.shipcost) }}đ</span>
+                        <span>{{ formattedPrice(order.shipping_fee) }}đ</span>
                       </div>
                       <div class="price-line">
                         <span><strong>Giảm giá:</strong></span>
-                        <span>- {{ formatPrice(order.discount_money) }}đ</span>
+                        <span>- {{ formattedPrice(order.discount_amount) }}đ</span>
                       </div>
                       <div class="price-line total">
                         <span><strong>Tổng thanh toán:</strong></span>
-                        <span>{{ formatPrice(order.total_price) }}đ</span>
+                        <span>{{ formattedPrice(order.final_price) }}đ</span>
                       </div>
+                    </v-col>
+                  </v-row>
+
+                  <!-- Thêm các nút hành động -->
+                  <v-row v-if="isDetailsVisible(order.order_code) && canShowActionButtons(order.status)" class="mt-3">
+                    <v-col cols="12" class="d-flex justify-end">
+                      <v-btn
+                        v-if="canReceiveOrder(order.status)"
+                        color="success"
+                        class="mr-2"
+                        @click.stop="confirmReceiveOrder(order.id)"
+                      >
+                        <v-icon left>mdi-check-circle</v-icon>
+                        Đã nhận hàng
+                      </v-btn>
+                      <v-btn
+                        v-if="canCancelOrder(order.status)"
+                        color="error"
+                        @click.stop="confirmCancelOrder(order.id)"
+                      >
+                        <v-icon left>mdi-close-circle</v-icon>
+                        Hủy đơn
+                      </v-btn>
                     </v-col>
                   </v-row>
                 </v-col>
               </v-row>
             </v-expand-transition>
 
-            <v-icon class="expand-icon" :class="{ 'rotated': isDetailsVisible(order.order_id) }">
+            <v-icon class="expand-icon" :class="{ 'rotated': isDetailsVisible(order.order_code) }">
               mdi-chevron-down
             </v-icon>
           </v-card-text>
@@ -105,6 +131,9 @@
 </template>
 
 <script>
+import { formatPrice } from '@/utils/format'
+import { orderAPI } from '@/api/order'
+import { useNotificationStore } from '@/stores/notification'
 export default {
   name: 'OrderHistoryTab',
   props: {
@@ -116,6 +145,11 @@ export default {
       type: String,
       default: ''
     }
+  },
+
+  setup() {
+    const notificationStore = useNotificationStore()
+    return { notificationStore }
   },
 
   data() {
@@ -133,12 +167,12 @@ export default {
     totalPages() {
       return Math.ceil(this.filteredOrders.length / this.itemsPerPage)
     },
-    
+
     // Lọc đơn hàng theo mã đơn hàng
     filteredOrders() {
       if (!this.searchLocal) return this.orders;
-      return this.orders.filter(order => 
-        order.order_id.toString().toLowerCase().includes(this.searchLocal.toLowerCase())
+      return this.orders.filter(order =>
+        order.order_code.toString().toLowerCase().includes(this.searchLocal.toLowerCase())
       );
     },
 
@@ -147,7 +181,9 @@ export default {
       const start = (this.currentPage - 1) * this.itemsPerPage
       const end = start + this.itemsPerPage
       return this.filteredOrders.slice(start, end)
-    }
+    },
+
+    
   },
 
   watch: {
@@ -157,9 +193,8 @@ export default {
   },
 
   methods: {
-    // Định dạng giá tiền theo định dạng Việt Nam
-    formatPrice(price) {
-      return new Intl.NumberFormat('vi-VN').format(price)
+    formattedPrice(price) {
+      return formatPrice(price)
     },
 
     // Định dạng ngày giờ theo định dạng Việt Nam
@@ -168,55 +203,86 @@ export default {
     },
 
     // Lấy text tương ứng với trạng thái đơn hàng
-    getStateText(state) {
-      const states = {
-        0: 'Chờ xác nhận',
-        1: 'Đã xác nhận',
-        2: 'Đang giao hàng',
-        3: 'Đã giao hàng',
-        4: 'Đã hủy'
+    getStatusText(status) {
+      const statuses = {
+        '0': 'Chờ giao hàng',
+        '1': 'Đã thanh toán - chờ giao hàng ',
+        '2': 'Đang giao hàng',
+        '3': 'Thành công',
+        '-1': 'Đã hủy'
       }
-      return states[state] || 'Không xác định'
+      return statuses[status] || 'Không xác định'
     },
 
     // Lấy màu tương ứng với trạng thái đơn hàng
-    getStateColor(state) {
+    getStatusColor(status) {
       const colors = {
-        0: 'warning',
-        1: 'info',
-        2: 'purple',
-        3: 'success',
-        4: 'error'
+        '0': 'warning',
+        '1': 'info',
+        '2': 'purple',
+        '3': 'success',
+        '-1': 'error'
       }
-      return colors[state] || 'grey'
+      return colors[status] || 'grey'
     },
 
-    // Hiển thị chi tiết đơn hàng
-    toggleDetails(orderId) {
+    // Hiển thị hoặc ẩn chi tiết đơn hàng
+    toggleDetails(orderCode) {
       this.visibleDetails = {
         ...this.visibleDetails,
-        [orderId]: !this.visibleDetails[orderId]
+        [orderCode]: !this.visibleDetails[orderCode]
       }
     },
 
     // Kiểm tra xem chi tiết đơn hàng có hiển thị hay không
-    isDetailsVisible(orderId) {
-      return !!this.visibleDetails[orderId];
+    isDetailsVisible(orderCode) {
+      return !!this.visibleDetails[orderCode]; //neu co gia tri thi tra ve true, nguoc lai tra ve false
     },
 
-    // Lấy topping có sử dụng trong đơn hàng
-    getActiveTopping(product) {
-      return product.topping_id.map((topping, index) => ({
-        ...topping,
-        count: product.topping_count[index]
-      })).filter(topping => topping.count > 0);
+    // Tính tổng tiền của từng sản phẩm trong đơn hàng chưa tính phí ship và giảm giá
+    calculateTotalPrice(product) {
+      const basePrice = parseFloat(product.product_price)
+      const toppingPrice = product.topping_items.reduce((total, topping) => total + parseFloat(topping.price), 0)
+      const sizePrice = product.size === 'S' ? 0 : product.size === 'M' ? 6000 : 10000
+      return formatPrice((basePrice + toppingPrice + sizePrice) * product.product_quantity)
     },
 
-    // Tính tổng tiền của các sản phẩm trong đơn hàng chưa tính phí ship và giảm giá
-    calculateProductsTotal(order) {
-      return order.products.reduce((total, product) => {
-        return total + (product.price * product.product_count);
-      }, 0);
+    canShowActionButtons(status) {
+      return ['0', '1', '2'].includes(status.toString())
+    },
+
+    canReceiveOrder(status) {
+      return status.toString() === '2' // Chỉ cho phép nhận đơn khi đang giao hàng
+    },
+
+    canCancelOrder(status) {
+      return ['0', '1', '2'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng
+    },
+
+    async confirmReceiveOrder(orderId) {
+      if (confirm('Bạn xác nhận đã nhận được đơn hàng này?')) {
+        try {
+          await orderAPI.successOrder({ order_id: orderId });
+          this.notificationStore.success("Xác nhận giao hàng thành công", 3000);
+          this.$emit('order-status-updated', { orderId, status: '3' })
+          this.$router.push('/user/lich-su');
+        } catch (error) {
+          console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error)
+        }
+      }
+    },
+
+    async confirmCancelOrder(orderId) {
+      if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+        try {
+          await orderAPI.cancelOrder({ order_id: orderId });
+          this.notificationStore.success("Xác nhận hủy đơn hàng thành công", 3000);
+          this.$emit('order-status-updated', { orderId, status: '-1' })
+          this.$router.push('/user/lich-su');
+        } catch (error) {
+          console.error('Lỗi khi hủy đơn hàng:', error)
+        }
+      }
     },
   }
 }
@@ -310,6 +376,7 @@ export default {
 .product-name {
   font-size: 0.95rem;
   line-height: 1.4;
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .topping-list {
@@ -321,8 +388,7 @@ export default {
   color: rgba(0, 0, 0, 0.6);
   padding: 2px 0;
 }
-
-.product-price {
+styleduct-price {
   font-weight: 600;
   font-size: 0.95rem;
 }

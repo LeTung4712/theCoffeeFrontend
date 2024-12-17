@@ -113,6 +113,7 @@
 </template>
 
 <script>
+import { formatPrice } from '@/utils/format'
 import { useVoucherStore } from '@/stores/voucher'
 import { useNotificationStore } from '@/stores/notification'
 
@@ -165,8 +166,8 @@ export default {
   },
 
   methods: {
-    formatPrice(price) {
-      return new Intl.NumberFormat('vi-VN').format(price)
+    formattedPrice(price) {
+      return formatPrice(price)
     },
 
     formatDate(date) {
@@ -191,7 +192,7 @@ export default {
       if (this.totalPrice < voucher.min_order_amount) {
         const remaining = voucher.min_order_amount - this.totalPrice
         return this.notificationStore.info(
-          `Mua thêm ${this.formatPrice(remaining)}đ để sử dụng voucher`,
+          `Mua thêm ${this.formattedPrice(remaining)}đ để sử dụng voucher`,
           3000
         )
       }
@@ -207,7 +208,8 @@ export default {
         discount_type: voucher.discount_type,
         code: voucher.code,
         min_order_amount: voucher.min_order_amount,
-        max_discount_amount: voucher.max_discount_amount
+        max_discount_amount: voucher.max_discount_amount,
+        limit_per_user: voucher.limit_per_user,
       }
 
       this.voucherStore.setSelectedVoucher(voucherData)

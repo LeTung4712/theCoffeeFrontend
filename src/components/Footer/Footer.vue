@@ -86,25 +86,29 @@
   </v-footer>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-
-const introLinks = [
-  { title: 'Về Chúng Tôi', href: '#' },
-  { title: 'Sản phẩm', href: '#' },
-  { title: 'Khuyến mại', href: '#' },
-  { title: 'Chuyện cà phê', href: '#' },
-  { title: 'Cửa Hàng', href: '#' },
-  { title: 'Tuyển dụng', href: '#' },
-]
-
-const termsLinks = [
-  { title: 'Điều khoản sử dụng', href: '#' },
-  { title: 'Chính sách bảo mật thông tin', href: '#' },
-]
+<script>
+export default {
+  name: 'Footer',
+  data() {
+    return {
+      introLinks: [
+        { title: 'Về Chúng Tôi', href: '/about' },
+        { title: 'Sản phẩm', href: '/collections/menu' },
+        { title: 'Khuyến mại', href: '/promotion' },
+        { title: 'Chuyện cà phê', href: '/blogs' },
+        { title: 'Cửa Hàng', href: '/store' },
+        { title: 'Tuyển dụng', href: '/job' },
+      ],
+      termsLinks: [
+        { title: 'Điều khoản sử dụng', href: '/terms' },
+        { title: 'Chính sách bảo mật thông tin', href: '/privacy' },
+      ]
+    }
+  }
+}
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .v-list-item {
   min-height: 32px !important;
 }

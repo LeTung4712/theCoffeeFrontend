@@ -126,6 +126,7 @@ export default {
     address() {
       return this.addressStore.address
     },
+    
     userData() {
       if (this.authStore.isLoggedIn) {
         const user = this.authStore.userInfo

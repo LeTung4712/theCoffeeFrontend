@@ -50,7 +50,7 @@
                                     <v-btn icon="mdi-minus" color="primary" variant="text" @click="decreaseQuantity" />
                                 </v-col>
                                 <v-col cols="auto">
-                                    <span class="text-h6">{{ count }}</span>
+                                    <span class="text-h6">{{ quantity }}</span>
                                 </v-col>
                                 <v-col cols="auto">
                                     <v-btn icon="mdi-plus" color="primary" variant="text" @click="increaseQuantity" />
@@ -91,7 +91,7 @@
                                         <v-btn :color="isSelectedTopping(topping) ? 'primary' : 'grey-darken-1'"
                                             :variant="isSelectedTopping(topping) ? 'flat' : 'outlined'"
                                             @click="toggleTopping(topping)" class="text-none" height="48">
-                                            {{ topping.name }} +{{ formatPrice(topping.price) }}đ
+                                            {{ topping.name }} +{{ formattedPrice(topping.price) }}đ
                                         </v-btn>
                                     </v-col>
                                 </v-row>
@@ -117,7 +117,7 @@
             </div>
         </div>
 
-        <div class="product_describe">
+        <div v-if="product" class="product_describe">
             <div class="product_des_wrap">
                 <v-row>
                     <v-col cols="12" sm="12" lg="12" md="12">
@@ -132,17 +132,9 @@
                 <div id="product_des_title">
                     <h4 class="product_des_title">Sản phẩm liên quan</h4>
                     <v-row>
-                        <v-col 
-                            v-for="product in product_relations" 
-                            :key="product.id"
-                            cols="12" sm="6" md="4" lg="3"
-                            class="mobile-card-height"
-                        >
-                            <ProductCard 
-                                :product="product"
-                                :currentID="product.id"
-                                :dialog="false"
-                            />
+                        <v-col v-for="product in product_relations" :key="product.id" cols="12" sm="6" md="4" lg="3"
+                            class="mobile-card-height">
+                            <ProductCard :product="product" :currentID="product.id" :dialog="false" />
                         </v-col>
                     </v-row>
                 </div>
@@ -154,11 +146,12 @@
 </template>
 
 <script>
-import { removeVietnameseTones } from "@/utils/format";
+import { formatPrice } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import ProductCard from '@/components/Products/ProductCard.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
+import { useProductStore } from '@/stores/product'
 
 export default {
     name: "ProductDetail",
@@ -167,105 +160,103 @@ export default {
         ProductCard
     },
 
+    setup() {
+        const CartStore = useCartStore();
+        const NotificationStore = useNotificationStore();
+        const ProductStore = useProductStore();
+        return {
+            NotificationStore,
+            CartStore,
+            ProductStore
+        }
+    },
+
     data() {
         return {
-            count: 1,
+            quantity: 1,
             product_id: null,
             checked_topping: [],
             selectedSize: 'S',
-            products: [
-                {
-                    id: 1,
-                    name: "The Coffee House Sữa Đá",
-                    category_id: 1,
-                    description: "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
-                    price: 39000,
-                    image_url: "https://product.hstatic.net/1000075078/product/1696220615_bg-product-1_927a4fb05e4f445586c85486ac2549dd_large.jpg",
-                },
-                // Thêm các sản phẩm mẫu khác...
-            ],
-            product: {
-                id: 1,
-                name: "The Coffee House Sữa Đá",
-                category_id: 1,
-                description: "Thức uống giúp tỉnh táo tức thì để bắt đầu ngày mới thật hứng khởi. Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
-                price: 39000,
-                image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-            },
-            product_relations: [
-                {
-                    id: 1,
-                    name: "The Coffee Sữa Đá",
-                    category_id: 1,
-                    description: "Thức uống giúp tỉnh táo tức thì ",
-                    price: 39000,
-                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-                },
-                {
-                    id: 1,
-                    name: "The Đá",
-                    category_id: 1,
-                    description: "Không đắng khét như cà phê truyền thống, The Coffee House Sữa Đá mang hương vị hài hoà đầy lôi cuốn. Là sự đậm đà của 100% cà phê Arabica Cầu Đất rang vừa tới, biến tấu tinh tế với sữa đặc và kem sữa ngọt ngào cực quyến rũ.",
-                    price: 39000,
-                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-                },
-            ],
-            topping_items: [
-                {
-                    id: 1,
-                    name: "Sữa tươi",
-                    price: 10000,
-                },
-                {
-                    id: 2,
-                    name: "Sữa bánh flan",
-                    price: 10000,
-                },
-                {
-                    id: 3,
-                    name: "Sữa tươi bánh flan",
-                    price: 10000,
-                }
-            ],
+            product: null,
+            product_relations: [],
+            topping_items: [],
             isLoading: false,
         }
     },
 
     computed: {
         hasToppings() {
-            return this.topping_items.length > 1
+            return this.topping_items.length > 0
         },
 
         formattedTotalPrice() {
-            return this.formatPrice(this.calculateTotalPrice())
-        },
-
-        productNameFromRoute() {
-            return this.$route.params.product_name_convert
+            return this.formattedPrice(this.calculateTotalPrice())
         },
     },
 
-    watch: {
-        productNameFromRoute: {
-            handler(newVal, oldVal) {
-                if (newVal !== oldVal) {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-                this.isLoading = true;
-                this.loadProductData().finally(() => {
-                    this.isLoading = false;
-                });
-            },
-            immediate: true
+    created() {
+        if (this.ProductStore.getCurrentProductId) {
+            this.product_id = this.ProductStore.getCurrentProductId
+            this.loadProductData()
+        } else {
+            this.$router.push('/mainpage')
         }
     },
 
+    watch: {
+        '$route': {
+            immediate: true, // Đảm bảo watcher được gọi ngay khi component được tạo
+            handler() {
+                const productStore = useProductStore()
+                if (productStore.getCurrentProductId && productStore.hasProductIdChanged) {
+                    this.product_id = productStore.getCurrentProductId
+                    this.isLoading = true
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    })
+                    this.loadProductData()
+                }
+            }
+        }
+    },
+
+    // beforeUnmount() {
+    //     // Clear product id khi rời khỏi trang
+    //     const productStore = useProductStore()
+    //     productStore.clearProductId()
+    // },
+
     methods: {
-        formatPrice(price) {
-            return new Intl.NumberFormat('vi-VN').format(price)
+        formattedPrice(price) {
+            return formatPrice(price)
+        },
+
+        async loadProductData() {
+            try {
+                const response = await productAPI.getInfo({ product_id: this.product_id });
+                const data = response.data;
+                this.product = {
+                    ...data.product,
+                };
+                this.topping_items = data.product.toppings.map(topping => ({
+                    ...topping,
+                }));
+                this.product_relations = data.same_products.map(product => ({
+                    ...product,
+                }));
+            } catch (error) {
+                console.error("Failed to fetch product info:", error);
+                this.product = {
+                    id: this.id,
+                    name: this.name,
+                    description: this.description,
+                    price: this.price,
+                    image_url: this.image_url
+                };
+            } finally {
+                this.isLoading = false;
+            }
         },
 
         calculateTotalPrice() {
@@ -276,57 +267,19 @@ export default {
             const sizePrice = this.selectedSize === 'M' ? 6000 :
                 this.selectedSize === 'L' ? 10000 : 0
 
-            return (basePrice + toppingPrice + sizePrice) * this.count
-        },
-
-        async loadProductData() {
-            try {
-                const { data: { products } } = await productAPI.getAll()
-                this.products = products || []
-
-                const productId = this.findProductIdByName(this.productNameFromRoute)
-                if (!productId) {
-                    console.warn('Không tìm thấy sản phẩm')
-                    return
-                }
-
-                const { data } = await productAPI.getInfo(productId)
-                if (data) {
-                    this.product = data.product || this.product
-                    this.topping_items = data.toppings || []
-                    this.product_relations = data.same_products || []
-                }
-            } catch (error) {
-                console.error('Failed to load product data:', error)
-            }
-        },
-
-        findProductIdByName(nameInUrl) {
-            const product = this.products.find(p =>
-                this.formatProductName(p.name) === nameInUrl
-            )
-            return product?.id
-        },
-
-        formatProductName(name) {
-            return removeVietnameseTones(name)
-                .replaceAll(' ', '-')
-                .toLowerCase()
+            return (basePrice + toppingPrice + sizePrice) * this.quantity
         },
 
         increaseQuantity() {
-            if (this.count < 100) this.count++
+            if (this.quantity < 100) this.quantity++
             else alert("Số lượng sản phẩm tối đa là 100")
         },
 
         decreaseQuantity() {
-            if (this.count > 1) this.count--
+            if (this.quantity > 1) this.quantity--
         },
 
         handleAddCart() {
-            const notificationStore = useNotificationStore()
-            const cartStore = useCartStore()
-
             try {
                 const entry = {
                     product_item: {
@@ -334,27 +287,22 @@ export default {
                         id: this.product.id
                     },
                     size: this.selectedSize,
-                    count: this.count,
-                    total_amount: this.calculateTotalPrice(), 
-                    topping_items: this.topping_items.map(topping => ({
-                        ...topping,
-                        count: this.checked_topping.some(t => t.id === topping.id) ? 1 : 0
-                    })),
-                    note: ''
+                    quantity: this.quantity,
+                    total_amount: this.calculateTotalPrice(),
+                    topping_items: this.checked_topping,
+                    item_note: ''
                 }
 
-                cartStore.addItem(entry)
-
-                notificationStore.success(`Đã thêm "${this.product.name}" vào giỏ hàng`, 3000)
-                
+                this.CartStore.addItem(entry)
+                this.NotificationStore.success(`Đã thêm "${this.product.name}" vào giỏ hàng`, 3000)
                 this.resetForm()
             } catch (error) {
-                notificationStore.error('Không thể thêm vào giỏ hàng: ' + error.message)
+                this.NotificationStore.error('Không thể thêm vào giỏ hàng: ' + error.message, 1000)
             }
         },
 
         resetForm() {
-            this.count = 1
+            this.quantity = 1
             this.selectedSize = 'S'
             this.checked_topping = []
         },
@@ -411,16 +359,6 @@ export default {
     font-size: 14px;
 }
 
-/* .product-info {
-    .text-h4 {
-        color: rgb(var(--v-theme-text-primary));
-    }
-    
-    .primary-text {
-        color: rgb(var(--v-theme-primary)) !important;
-    }
-} */
-
 .product_des_title {
     color: rgb(var(--v-theme-text-primary));
     margin: 1rem 0;
@@ -436,43 +374,18 @@ hr {
     opacity: 0.12;
 }
 
-/* .product-carousel {
-    .product-image {
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .thumb {
-        border-radius: 4px;
-        border: 2px solid transparent;
-        cursor: pointer;
-        transition: border-color 0.2s ease;
-        
-        &:hover {
-            border-color: rgb(var(--v-theme-primary));
-        }
-    }
-} */
 
 @media (max-width: 600px) {
     .mobile-card-height :deep(.v-card) {
         max-height: 120px;
         display: flex;
     }
-    
+
     .mobile-card-height :deep(.v-img) {
         max-width: 120px;
         height: 100%;
     }
 }
-
-/* .v-btn.v-btn--variant-outlined {
-    border-color: rgb(var(--v-theme-border-color));
-    
-    &:hover {
-        border-color: rgb(var(--v-theme-primary));
-    }
-} */
 
 .v-btn.v-btn--variant-flat {
     background-color: rgb(var(--v-theme-primary));
@@ -493,4 +406,3 @@ hr {
     background-color: rgb(var(--v-theme-surface));
 }
 </style>
-

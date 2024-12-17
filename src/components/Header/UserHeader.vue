@@ -4,7 +4,7 @@
       <v-row align="center" justify="space-between" no-gutters style="height: 100%">
         <!-- Logo - Chỉ hiện trên desktop -->
         <v-col cols="auto" class="pl-0 d-none d-sm-flex">
-          <v-btn variant="text" href="/" class="pa-0">
+          <v-btn variant="text" to="/mainpage" class="pa-0">
             <v-img :src="logo" width="180" height="60" />
           </v-btn>
         </v-col>

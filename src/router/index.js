@@ -1,49 +1,27 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { ROUTES } from '@/constants/routes'
-
-const routes = [
-  {
-    path: "/",
-    redirect: ROUTES.MAIN_PAGE,
-    component: () => import("@/layouts/LayoutUser"),
-    children: [
-      {
-        name: "Mainpage",
-        path: ROUTES.MAIN_PAGE,
-        component: () => import("@/pages/user/MainPage/MainPage"),
-      },
-      {
-        name: "ProductDetail",
-        path: ROUTES.PRODUCT_DETAIL,
-        component: () => import("@/pages/user/ProductDetail/ProductDetail"),
-      },
-      // {
-      //   name: "userAcount",
-      //   path: ROUTES.USER_ACCOUNT,
-      //   component: () => import("@/components/userComponents/accountUser"),
-      // },
-      {
-        name: "UserInfo",
-        path: ROUTES.USER_PAGE,
-        component: () => import("@/pages/user/UserPage/UserInfo"),
-      },
-      // {
-      //   name: "menuMenu",
-      //   path: ROUTES.MENU,
-      //   component: () => import("@/components/productComponents/menuMenu"),
-      // },
-      {
-        name: "ThanhToan",
-        path: ROUTES.CHECKOUT,
-        component: () => import("@/pages/user/CheckOut/CheckOut"),
-      },
-    ],
-  },
-] 
+import { createRouter, createWebHistory } from "vue-router";
+import { userRoutes, adminRoutes, notFoundRoute } from "./routes";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-})
+  routes: [userRoutes, adminRoutes, notFoundRoute],
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 }
+  }
+});
 
-export default router
+// Thêm navigation guard
+router.beforeEach((to, from, next) => {
+  const isAdminLoggedIn = localStorage.getItem("AdminLoggedIn") === "true";
+  
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAdminLoggedIn) {
+      next({ name: 'Login' });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
+export default router;
