@@ -10,6 +10,7 @@ export const ROUTES = {
     PROFILE: "profile",
     ORDER_DETAIL: "order-detail/:order_code",
     ANALYZE: "analyze",
+    SHOPPING_BEHAVIOR: "shopping-behavior",
     MANAGE_PRODUCTS: "manage-products",
     MANAGE_VOUCHERS: "manage-vouchers",
     MANAGE_TOPPINGS: "manage-toppings",

@@ -59,6 +59,7 @@ export default {
                 { title: "Profile", icon: "mdi-account", to: "/admin/pages/profile" },
                 { title: "Dashboard", icon: "mdi-view-dashboard", to: "/admin/pages/dashboard" },
                 { title: "Analyze", icon: "mdi-chart-bar", to: "/admin/pages/analyze" },
+                { title: "Shopping Behavior", icon: "mdi-chart-line", to: "/admin/pages/shopping-behavior" },
                 { title: "Manage Products", icon: "mdi-package-variant", to: "/admin/pages/manage-products" },
                 { title: "Manage Toppings", icon: "mdi-pizza", to: "/admin/pages/manage-toppings" },
                 { title: "Manage Vouchers", icon: "mdi-ticket", to: "/admin/pages/manage-vouchers" },

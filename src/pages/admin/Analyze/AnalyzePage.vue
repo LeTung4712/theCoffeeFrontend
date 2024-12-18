@@ -119,6 +119,7 @@
                 </v-card>
             </v-col>
         </v-row>
+
     </v-container>
 </template>
 
@@ -141,20 +142,20 @@ export default {
                 { title: '365 ngày qua', value: 'year' },
             ],
             // Dữ liệu mẫu
-            totalRevenue: 15000000,
-            revenueGrowth: 12.5,
-            totalOrders: 150,
-            orderGrowth: 8.3,
-            newCustomers: 45,
-            customerGrowth: -2.1,
-            completionRate: 95,
+            totalRevenue: 0,
+            revenueGrowth: 0,
+            totalOrders: 0,
+            orderGrowth: 0,
+            newCustomers: 0,
+            customerGrowth: 0,
+            completionRate: 0,
             topProducts: [
                 {
                     id: 1,
-                    name: "Sữa tươi bánh flan",
-                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-                    soldCount: 50,
-                    revenue: 5000000
+                    name: "",
+                    image_url: "",
+                    soldCount: 0,
+                    revenue: 0
                 },
                 // Thêm các sản phẩm khác
             ],
@@ -249,6 +250,29 @@ export default {
                     }]
                 }
             });
+        },
+
+        async analyzeShoppingBehavior() {
+            this.isAnalyzing = true;
+            try {
+                const response = await axios.post('/api/analyze/shopping-behavior', {
+                    algorithm: this.selectedAlgorithm,
+                    minSupport: this.minSupport,
+                    minConfidence: this.minConfidence,
+                    timeRange: this.timeRange
+                });
+
+                this.associationRules = response.data.rules;
+                this.totalRules = response.data.totalRules;
+                this.executionTime = response.data.executionTime;
+
+                this.notificationStore.success('Phân tích hành vi mua sắm thành công');
+            } catch (error) {
+                console.error('Error analyzing shopping behavior:', error);
+                this.notificationStore.error('Có lỗi xảy ra khi phân tích hành vi mua sắm');
+            } finally {
+                this.isAnalyzing = false;
+            }
         }
     }
 }
