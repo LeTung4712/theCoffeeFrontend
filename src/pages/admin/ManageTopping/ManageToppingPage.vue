@@ -12,7 +12,7 @@
                             </v-col>
                             <v-col cols="6">
                                 <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Tìm kiếm"
-                                    single-line hide-details></v-text-field>
+                                    single-line hide-details variant="outlined" density="comfortable"></v-text-field>
                             </v-col>
                         </v-row>
                     </v-card-title>
@@ -51,14 +51,11 @@
                     <v-form ref="form" v-model="valid" @submit.prevent="saveTopping">
                         <v-row>
                             <v-col cols="12">
-                                <v-text-field 
-                                    v-model="toppingForm.name" 
-                                    label="Tên Topping" 
-                                    :rules="[v => !!v || 'Vui lòng nhập tên topping']" 
-                                    required
-                                ></v-text-field>
+                                <v-text-field v-model="toppingForm.name" label="Tên Topping"
+                                    :rules="[v => !!v || 'Vui lòng nhập tên topping']" required variant="outlined"
+                                    density="comfortable"></v-text-field>
 
-                            <!-- <div class="image-upload-container">
+                                <!-- <div class="image-upload-container">
                                 <v-text-field v-model="toppingForm.image" label="URL Hình ảnh"
                                     @input="previewImage"></v-text-field>
 
@@ -78,16 +75,11 @@
                                 </div>
                             </div> -->
 
-                            <v-text-field 
-                                v-model="toppingForm.price" 
-                                label="Giá" 
-                                type="number" 
-                                min="0"
-                                suffix="đ" 
-                                :rules="[v => !!v || 'Vui lòng nhập giá']"
-                            ></v-text-field>
-                            <v-switch v-model="toppingForm.active" label="Kích hoạt" color="success"
-                                hide-details></v-switch>
+                                <v-text-field class="mt-4" v-model="toppingForm.price" label="Giá" type="number" min="0"
+                                    suffix="đ" :rules="[v => !!v || 'Vui lòng nhập giá']" variant="outlined"
+                                    density="comfortable"></v-text-field>
+                                <v-switch v-model="toppingForm.active" label="Kích hoạt" color="success" hide-details
+                                    variant="outlined" density="comfortable"></v-switch>
                             </v-col>
                         </v-row>
                     </v-form>
@@ -188,7 +180,7 @@ export default {
         },
 
         editTopping(topping) {
-            this.toppingForm = { 
+            this.toppingForm = {
                 ...topping,
                 active: topping.active ? true : false
             };

@@ -12,7 +12,7 @@
                             </v-col>
                             <v-col cols="6">
                                 <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Tìm kiếm"
-                                    single-line hide-details ></v-text-field>
+                                    single-line hide-details variant="outlined" density="comfortable"></v-text-field>
                             </v-col>
                         </v-row>
                     </v-card-title>
@@ -54,61 +54,79 @@
                     <v-form ref="form" v-model="valid" @submit.prevent="saveVoucher">
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field 
-                                v-model="voucherForm.code" 
-                                label="Mã Voucher" 
-                                :rules="[v => !!v || 'Vui lòng nhập mã voucher']"
-                                required
-                                ></v-text-field>
+                                <v-text-field v-model="voucherForm.code" label="Mã Voucher"
+                                    :rules="[v => !!v || 'Vui lòng nhập mã voucher']" variant="outlined"
+                                    density="comfortable" required></v-text-field>
 
-                            <div class="image-upload-container">
-                                <v-text-field 
-                                    v-model="voucherForm.image_url" 
-                                    label="URL Hình ảnh"
-                                    :rules="[v => !!v || 'Vui lòng nhập URL hình ảnh']"
-                                    @input="previewImage"
-                                ></v-text-field>
+                                <div class="image-upload-container">
+                                    <v-text-field class="mt-4" v-model="voucherForm.image_url" label="URL Hình ảnh"
+                                        :rules="[v => !!v || 'Vui lòng nhập URL hình ảnh']" variant="outlined"
+                                        density="comfortable" @input="previewImage"></v-text-field>
 
-                                <div class="preview-container mt-2">
-                                    <v-img v-if="imagePreview" :src="imagePreview" width="120" height="120" contain
-                                        class="rounded-lg bg-grey-lighten-2">
-                                        <template v-slot:placeholder>
-                                            <v-row class="fill-height ma-0" align="center" justify="center">
-                                                <v-progress-circular indeterminate
-                                                    color="primary"></v-progress-circular>
-                                            </v-row>
-                                        </template>
-                                    </v-img>
-                                    <v-sheet v-else width="120" height="100"
-                                        class="d-flex align-center justify-center rounded-lg bg-grey-lighten-2">
-                                        <v-icon size="40" color="grey-darken-2">mdi-image</v-icon>
-                                    </v-sheet>
+                                    <div class="preview-container mt-2">
+                                        <v-img v-if="imagePreview" :src="imagePreview" width="120" height="120" contain
+                                            class="rounded-lg bg-grey-lighten-2">
+                                            <template v-slot:placeholder>
+                                                <v-row class="fill-height ma-0" align="center" justify="center">
+                                                    <v-progress-circular indeterminate
+                                                        color="primary"></v-progress-circular>
+                                                </v-row>
+                                            </template>
+                                        </v-img>
+                                        <v-sheet v-else width="120" height="100"
+                                            class="d-flex align-center justify-center rounded-lg bg-grey-lighten-2">
+                                            <v-icon size="40" color="grey-darken-2">mdi-image</v-icon>
+                                        </v-sheet>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <v-textarea v-model="voucherForm.description" label="Mô tả"
-                                :rules="[v => !!v || 'Vui lòng nhập mô tả']"></v-textarea>
-                            <v-select v-model="voucherForm.discount_type" :items="[
-                                { text: 'Giảm theo số tiền', value: 'amount' },
-                                { text: 'Giảm theo phần trăm', value: 'percent' }
-                            ]" item-title="text" item-value="value" label="Loại giảm giá"></v-select>
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-if="voucherForm.discount_type === 'percent'"
-                                v-model="voucherForm.discount_percent" label="Phần trăm giảm" type="number" min="0"
-                                max="100" suffix="%" :rules="[v => !!v || 'Vui lòng nhập phần trăm giảm']"></v-text-field>
-                            <v-text-field v-model="voucherForm.max_discount_amount" label="Số tiền giảm tối đa"
-                                type="number" min="0" suffix="đ" :rules="[v => !!v || 'Vui lòng nhập số tiền giảm tối đa']"></v-text-field>
-                            <v-text-field v-model="voucherForm.min_order_amount" label="Đơn hàng tối thiểu"
-                                type="number" min="0" suffix="đ" :rules="[v => !!v || 'Vui lòng nhập đơn hàng tối thiểu']"></v-text-field>
-                            <v-text-field v-model="voucherForm.total_quantity" label="Tổng số lượng" type="number"
-                                min="0" :rules="[v => !!v || 'Vui lòng nhập tổng số lượng']"></v-text-field>
-                            <v-text-field v-model="voucherForm.limit_per_user" label="Giới hạn mỗi người dùng"
-                                type="number" max="10" min="1" :rules="[v => !!v || 'Vui lòng nhập giới hạn mỗi người dùng']"></v-text-field>
-                            <v-text-field v-model="voucherForm.expire_at" label="Ngày hết hạn"
-                                type="date" :rules="[v => !!v || 'Vui lòng chọn ngày hết hạn']"></v-text-field>
-                            <v-switch v-model="voucherForm.active" label="Kích hoạt" color="success"
-                                hide-details></v-switch>
+                                <v-textarea v-model="voucherForm.description" label="Mô tả"
+                                    :rules="[v => !!v || 'Vui lòng nhập mô tả']" variant="outlined"
+                                    density="comfortable">
+                                </v-textarea>
+                                
+                                <v-select class="mt-4" v-model="voucherForm.discount_type" :items="discountTypes"
+                                    item-title="title" item-value="value" label="Loại giảm giá" variant="outlined"
+                                    density="comfortable">
+                                </v-select>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field v-if="voucherForm.discount_type === 'percent'"
+                                    v-model="voucherForm.discount_percent" label="Phần trăm giảm" type="number" min="0"
+                                    max="100" suffix="%" :rules="[v => !!v || 'Vui lòng nhập phần trăm giảm']"
+                                    variant="outlined" density="comfortable">
+                                </v-text-field>
+
+                                <v-text-field v-model="voucherForm.max_discount_amount"
+                                    label="Số tiền giảm tối đa" type="number" min="0" suffix="đ"
+                                    :rules="[v => !!v || 'Vui lòng nhập số tiền giảm tối đa']" variant="outlined"
+                                    density="comfortable">
+                                </v-text-field>
+
+                                <v-text-field class="mt-4" v-model="voucherForm.min_order_amount" label="Đơn hàng tối thiểu"
+                                    type="number" min="0" suffix="đ"
+                                    :rules="[v => !!v || 'Vui lòng nhập đơn hàng tối thiểu']" variant="outlined"
+                                    density="comfortable">
+                                </v-text-field>
+
+                                <v-text-field class="mt-4" v-model="voucherForm.total_quantity" label="Tổng số lượng"
+                                    type="number" min="0" :rules="[v => !!v || 'Vui lòng nhập tổng số lượng']"
+                                    variant="outlined" density="comfortable">
+                                </v-text-field>
+
+                                <v-text-field class="mt-4" v-model="voucherForm.limit_per_user"
+                                    label="Giới hạn mỗi người dùng" type="number" max="10" min="1"
+                                    :rules="[v => !!v || 'Vui lòng nhập giới hạn mỗi người dùng']" variant="outlined"
+                                    density="comfortable">
+                                </v-text-field>
+
+                                <v-text-field class="mt-4" v-model="voucherForm.expire_at" label="Ngày hết hạn" type="date"
+                                    :rules="[v => !!v || 'Vui lòng chọn ngày hết hạn']" variant="outlined"
+                                    density="comfortable">
+                                </v-text-field>
+
+                                <v-switch class="mt-4" v-model="voucherForm.active" label="Kích hoạt" color="success"
+                                    hide-details></v-switch>
                             </v-col>
                         </v-row>
                     </v-form>
@@ -151,6 +169,11 @@ export default {
             valid: false,
             dialog: false,
             isEdit: false,
+            discountType: 'amount',
+            discountTypes: [
+                { title: 'Giảm theo số tiền', value: 'amount' },
+                { title: 'Giảm theo phần trăm', value: 'percent' }
+            ],
             headers: [
                 { title: 'STT', key: 'index' },
                 { title: 'Mã', key: 'code' },

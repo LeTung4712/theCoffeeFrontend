@@ -9,7 +9,11 @@
         <v-row>
             <v-col cols="12" sm="6" md="3">
                 <v-select v-model="selectedAlgorithm" :items="algorithms" label="Thuật toán" density="comfortable"
-                    style="max-width: 250px"></v-select>
+                    variant="outlined"></v-select>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+                <v-select v-model="timeRange" :items="timeRanges" label="Khoảng thời gian" density="comfortable"
+                    variant="outlined"></v-select>
             </v-col>
             <v-col cols="12" sm="6" md="3">
                 <v-btn color="primary" class="ml-4" @click="analyzeShoppingBehavior" :loading="isAnalyzing">
@@ -28,15 +32,15 @@
                             <v-col cols="12">
                                 <div class="slider-container">
                                     <div class="slider-label">Ngưỡng support tối thiểu</div>
-                                    <v-slider v-model="minSupport" min="0" max="1" step="0.01"
-                                        thumb-label color="blue" class="slider-input" hide-details></v-slider>
+                                    <v-slider v-model="minSupport" min="0" max="1" step="0.01" thumb-label color="blue"
+                                        class="slider-input" hide-details></v-slider>
                                 </div>
                             </v-col>
                             <v-col cols="12">
                                 <div class="slider-container">
                                     <div class="slider-label">Ngưỡng confidence tối thiểu</div>
-                                    <v-slider v-model="minConfidence" min="0" max="1"
-                                        step="0.01" thumb-label color="green" class="slider-input" hide-details></v-slider>
+                                    <v-slider v-model="minConfidence" min="0" max="1" step="0.01" thumb-label
+                                        color="green" class="slider-input" hide-details></v-slider>
                                 </div>
                             </v-col>
                         </v-row>
@@ -57,7 +61,7 @@
         </v-row>
 
         <!-- Bảng kết quả -->
-        <v-data-table :headers="headers" :items="associationRules" class="elevation-1" >
+        <v-data-table :headers="headers" :items="associationRules" class="elevation-1">
             <template v-slot:item.index="{ item, index }">
                 {{ index + 1 }}
             </template>
@@ -91,10 +95,18 @@ export default {
 
     data() {
         return {
+            isLoading: false,
             selectedAlgorithm: 'apriori',
             algorithms: [
                 { title: 'Thuật toán Apriori', value: 'apriori' },
                 { title: 'Thuật toán FP-Growth', value: 'fp-growth' }
+            ],
+            timeRange: 'week',
+            timeRanges: [
+                { title: '7 ngày qua', value: 'week' },
+                { title: '30 ngày qua', value: 'month' },
+                { title: '90 ngày qua', value: 'quarter' },
+                { title: '365 ngày qua', value: 'year' },
             ],
             headers: [
                 { title: 'STT', key: 'index' },
@@ -106,7 +118,6 @@ export default {
             ],
             minSupport: 0.1,
             minConfidence: 0.5,
-            isAnalyzing: false,
             totalRules: 0,
             executionTime: 0,
             associationRules: [
@@ -115,7 +126,7 @@ export default {
                     consequent: ['C'],
                     support: 0.7,
                     confidence: 0.8,
-                    lift: 1.2 
+                    lift: 1.2
                 }
             ],
             search: '',
@@ -128,7 +139,7 @@ export default {
         },
 
         async analyzeShoppingBehavior() {
-            this.isAnalyzing = true;
+            this.isLoading = true;
             try {
                 const response = await recommendAPI.analyzeShoppingBehavior({
                     algorithm: this.selectedAlgorithm,
@@ -146,7 +157,7 @@ export default {
                 console.error('Error analyzing shopping behavior:', error);
                 this.notificationStore.error('Có lỗi xảy ra khi phân tích hành vi mua sắm');
             } finally {
-                this.isAnalyzing = false;
+                this.isLoading = false;
             }
         }
     }
