@@ -218,12 +218,26 @@ export default {
                 type: 'line',
                 data: {
                     labels: data.revenueByTimeRange.labels,
-                    datasets: [{
-                        label: 'Doanh thu',
-                        data: data.revenueByTimeRange.revenueData,
-                        borderColor: '#1976D2',
-                        tension: 0.1
-                    }]
+                    datasets: [
+                        {
+                            label: 'Chi phí',
+                            data: data.revenueByTimeRange.costData,
+                            borderColor: '#1976D2',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Doanh thu',
+                            data: data.revenueByTimeRange.revenueData,
+                            borderColor: '#4CAF50',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Lợi nhuận',
+                            data: data.revenueByTimeRange.profitData,
+                            borderColor: '#FF5722',
+                            tension: 0.1
+                        }
+                    ]
                 }
             });
 

@@ -66,6 +66,7 @@ export default {
                 { title: "New Orders", icon: "mdi-cart", to: "/admin/pages/new-orders" },
                 { title: "Delivery Orders", icon: "mdi-truck", to: "/admin/pages/delivery-orders" },
                 { title: "Payment History", icon: "mdi-history", to: "/admin/pages/payment-history" },
+                { title: "Settings", icon: "mdi-cog", to: "/admin/pages/settings" },
                 
             ],
         }
