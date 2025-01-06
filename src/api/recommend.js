@@ -11,11 +11,7 @@ export const recommendAPI = {
     return httpClient.get(`${PREFIX}/associationRules`, { params: data });
   },
 
-  analyzeApriori(data) {
-    return httpClient.post(`${PREFIX}/analyzeApriori`, data);
+  analyzeShoppingBehavior(data) {
+    return httpClient.post(`${PREFIX}/analyzeShoppingBehavior`, data);
   },
-
-  analyzeFpGrowth(data) {
-    return httpClient.post(`${PREFIX}/analyzeFpGrowth`, data);
-  }
 };

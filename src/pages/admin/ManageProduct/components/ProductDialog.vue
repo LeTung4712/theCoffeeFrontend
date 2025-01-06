@@ -8,63 +8,54 @@
             <v-card-text>
                 <v-form ref="form" v-model="valid">
                     <v-container>
-                        <v-row>
+                        <v-row class="mb-4">
                             <v-col cols="7">
-                                <v-text-field 
-                                    v-model="productData.image_url" 
-                                    label="URL hình ảnh" 
-                                    required
-                                    :rules="[v => !!v || 'Vui lòng nhập URL hình ảnh']"
-                                ></v-text-field>
+                                <v-text-field v-model="productData.image_url" label="URL hình ảnh" required
+                                    variant="outlined" density="comfortable"
+                                    :rules="[v => !!v || 'Vui lòng nhập URL hình ảnh']"></v-text-field>
                             </v-col>
                             <v-col cols="5" class="d-flex justify-center align-center">
                                 <div class="image-preview-container">
-                                    <v-img
-                                        v-if="productData.image_url"
-                                        :src="productData.image_url"
-                                        :width="200"
-                                        :height="200"
-                                        cover
-                                        class="rounded-lg"
-                                    >
+                                    <v-img v-if="productData.image_url" :src="productData.image_url" :width="200"
+                                        :height="200" cover class="rounded-lg">
                                         <template v-slot:placeholder>
                                             <v-row class="fill-height ma-0" align="center" justify="center">
-                                                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                                                <v-progress-circular indeterminate
+                                                    color="primary"></v-progress-circular>
                                             </v-row>
                                         </template>
                                     </v-img>
-                                    <v-sheet
-                                        v-else
-                                        :width="200"
-                                        :height="200"
-                                        class="d-flex align-center justify-center rounded-lg bg-grey-lighten-2"
-                                    >
+                                    <v-sheet v-else :width="200" :height="200"
+                                        class="d-flex align-center justify-center rounded-lg bg-grey-lighten-2">
                                         <v-icon size="80" color="grey-darken-2">mdi-image</v-icon>
                                     </v-sheet>
                                 </div>
                             </v-col>
                         </v-row>
 
-                        <v-text-field v-model="productData.name" label="Tên sản phẩm" required
-                            :rules="[v => !!v || 'Vui lòng nhập tên sản phẩm']"></v-text-field>
+                        <v-text-field v-model="productData.name" label="Tên sản phẩm" required variant="outlined"
+                            density="comfortable" :rules="[v => !!v || 'Vui lòng nhập tên sản phẩm']"></v-text-field>
 
-                        <v-select v-model="productData.category_id" :items="subCategories" item-title="name"
-                            item-value="id" label="Danh mục" required
-                            :rules="[v => !!v || 'Vui lòng chọn danh mục']"></v-select>
+                        <v-select class="mt-4" v-model="productData.category_id" :items="subCategories"
+                            item-title="name" item-value="id" label="Danh mục" required variant="outlined"
+                            density="comfortable" :rules="[v => !!v || 'Vui lòng chọn danh mục']"></v-select>
 
-                        <v-textarea v-model="productData.description" label="Mô tả" rows="3"></v-textarea>
+                        <v-textarea class="mt-4" v-model="productData.description" label="Mô tả" rows="3"
+                            variant="outlined" density="comfortable"></v-textarea>
 
-                        <v-text-field v-model.number="productData.price" label="Giá" type="number" required
+                        <v-text-field class="mt-4" v-model.number="productData.price" label="Giá" type="number" required
+                            variant="outlined" density="comfortable"
                             :rules="[v => !!v || 'Vui lòng nhập giá']"></v-text-field>
 
-                        <v-text-field v-model.number="productData.price_sale" label="Giá khuyến mãi"
-                            type="number"></v-text-field>
+                        <v-text-field class="mt-4" v-model.number="productData.price_sale" label="Giá khuyến mãi"
+                            type="number" variant="outlined" density="comfortable"></v-text-field>
 
-                        <v-switch v-model="productData.active" label="Kích hoạt" color="primary" :true-value="1"
-                            :false-value="0"></v-switch>
+                        <v-switch v-model="productData.active" label="Kích hoạt" color="primary"
+                            :true-value="1" :false-value="0" variant="outlined" density="comfortable"></v-switch>
 
-                        <v-select v-model="productData.toppings" :items="toppings" item-title="name" item-value="id"
-                            label="Toppings" multiple chips></v-select>
+                        <v-select v-model="productData.toppings" :items="toppings" item-title="name"
+                            item-value="id" label="Toppings" multiple chips variant="outlined"
+                            density="comfortable"></v-select>
                     </v-container>
                 </v-form>
             </v-card-text>

@@ -119,6 +119,7 @@
                 </v-card>
             </v-col>
         </v-row>
+
     </v-container>
 </template>
 
@@ -126,6 +127,7 @@
 import Chart from 'chart.js/auto'
 import { formatPrice } from "@/utils/format";
 import { useNotificationStore } from "@/stores/notification";
+import { orderAPI } from "@/api/order";
 
 export default {
     name: 'AnalyzePage',
@@ -140,23 +142,26 @@ export default {
                 { title: '365 ngày qua', value: 'year' },
             ],
             // Dữ liệu mẫu
-            totalRevenue: 15000000,
-            revenueGrowth: 12.5,
-            totalOrders: 150,
-            orderGrowth: 8.3,
-            newCustomers: 45,
-            customerGrowth: -2.1,
-            completionRate: 95,
+            totalRevenue: 0,
+            revenueGrowth: 0,
+            totalOrders: 0,
+            orderGrowth: 0,
+            newCustomers: 0,
+            customerGrowth: 0,
+            completionRate: 0,
             topProducts: [
                 {
                     id: 1,
-                    name: "Sữa tươi bánh flan",
-                    image_url: "https://product.hstatic.net/1000075078/product/1696220170_phin-sua-tuoi-banh-flan_0172beb85d08408b8912bf5f1dae7fd9_large.jpg",
-                    soldCount: 50,
-                    revenue: 5000000
+                    name: "",
+                    image_url: "",
+                    soldCount: 0,
+                    revenue: 0
                 },
                 // Thêm các sản phẩm khác
             ],
+            revenueChart: null,
+            orderStatusChart: null,
+            paymentMethodChart: null,
         }
     },
 
@@ -166,7 +171,7 @@ export default {
     },
 
     mounted() {
-        this.initCharts()
+        //this.initCharts()
     },
 
     methods: {
@@ -174,48 +179,114 @@ export default {
             return formatPrice(price);
         },
 
-        updateData() {
-            // Gọi API để cập nhật dữ liệu
+        async updateData() {
+            this.isLoading = true;
+            try {
+                const res = await orderAPI.getAnalyzeOrders({ timeRange: this.timeRange });
+                console.log(res);
+                this.totalRevenue = res.data.totalRevenue;
+                this.revenueGrowth = res.data.revenueGrowth;
+                this.totalOrders = res.data.totalOrders;
+                this.orderGrowth = res.data.orderGrowth;
+                this.newCustomers = res.data.newCustomers;
+                this.customerGrowth = res.data.customerGrowth;
+                this.completionRate = res.data.completionRate;
+                this.topProducts = res.data.topProducts;
+                this.initCharts(res.data);
+                this.notificationStore.success('Cập nhật dữ liệu thành công', 3000);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.isLoading = false;
+            }
         },
 
-        initCharts() {
-            // Biểu đồ doanh thu
-            new Chart(this.$refs.revenueChart, {
+        initCharts(data) {
+            // Hủy biểu đồ cũ nếu đã tồn tại
+            if (this.revenueChart) {
+                this.revenueChart.destroy();
+            }
+            if (this.orderStatusChart) {
+                this.orderStatusChart.destroy();
+            }
+            if (this.paymentMethodChart) {
+                this.paymentMethodChart.destroy();
+            }
+
+            // Tạo biểu đồ doanh thu
+            this.revenueChart = new Chart(this.$refs.revenueChart, {
                 type: 'line',
                 data: {
-                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-                    datasets: [{
-                        label: 'Doanh thu',
-                        data: [1200000, 1900000, 1500000, 2100000, 1800000, 2500000, 2000000],
-                        borderColor: '#1976D2',
-                        tension: 0.1
-                    }]
+                    labels: data.revenueByTimeRange.labels,
+                    datasets: [
+                        {
+                            label: 'Chi phí',
+                            data: data.revenueByTimeRange.costData,
+                            borderColor: '#1976D2',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Doanh thu',
+                            data: data.revenueByTimeRange.revenueData,
+                            borderColor: '#4CAF50',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Lợi nhuận',
+                            data: data.revenueByTimeRange.profitData,
+                            borderColor: '#FF5722',
+                            tension: 0.1
+                        }
+                    ]
                 }
-            })
+            });
 
-            // Biểu đồ trạng thái đơn hàng
-            new Chart(this.$refs.orderStatusChart, {
+            // Tạo biểu đồ trạng thái đơn hàng
+            this.orderStatusChart = new Chart(this.$refs.orderStatusChart, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Hoàn thành', 'Đang giao', 'Đã hủy'],
+                    labels: ['Hoàn thành', 'Đang xử lý', 'Đã hủy'],
                     datasets: [{
-                        data: [70, 25, 5],
+                        data: [data.orderStatusByTimeRange.completed, data.orderStatusByTimeRange.pending, data.orderStatusByTimeRange.canceled],
                         backgroundColor: ['#4CAF50', '#2196F3', '#F44336']
                     }]
                 }
-            })
+            });
 
-            // Biểu đồ phương thức thanh toán
-            new Chart(this.$refs.paymentMethodChart, {
+            // Tạo biểu đồ phương thức thanh toán
+            this.paymentMethodChart = new Chart(this.$refs.paymentMethodChart, {
                 type: 'pie',
                 data: {
-                    labels: ['Tiền mặt', 'Thẻ', 'Ví điện tử'],
+                    labels: ['COD', 'MoMo', 'Zalopay', 'VNPay'],
                     datasets: [{
-                        data: [45, 30, 25],
-                        backgroundColor: ['#FFC107', '#9C27B0', '#00BCD4']
+                        data: [data.paymentMethodByTimeRange.COD, data.paymentMethodByTimeRange.MoMo, data.paymentMethodByTimeRange.Zalopay, data.paymentMethodByTimeRange.VNPay],
+                        backgroundColor: ['#FFC107', '#9C27B0', '#00BCD4', '#FF5722']
                     }]
                 }
-            })
+            });
+        },
+
+        async analyzeShoppingBehavior() {
+            this.isAnalyzing = true;
+            try {
+                const response = await axios.post('/api/analyze/shopping-behavior', {
+                    algorithm: this.selectedAlgorithm,
+                    minSupport: this.minSupport,
+                    minConfidence: this.minConfidence,
+                    timeRange: this.timeRange
+                });
+
+                this.associationRules = response.data.rules;
+                this.totalRules = response.data.totalRules;
+                this.executionTime = response.data.executionTime;
+
+                this.notificationStore.success('Phân tích hành vi mua sắm thành công');
+            } catch (error) {
+                console.error('Error analyzing shopping behavior:', error);
+                this.notificationStore.error('Có lỗi xảy ra khi phân tích hành vi mua sắm');
+            } finally {
+                this.isAnalyzing = false;
+            }
         }
     }
 }

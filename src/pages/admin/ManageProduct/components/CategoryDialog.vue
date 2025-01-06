@@ -7,23 +7,14 @@
 
             <v-card-text class="pt-4">
                 <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit">
-                    <v-text-field
-                        v-model="formData.name"
-                        label="Tên danh mục"
-                        :rules="[v => !!v || 'Vui lòng nhập tên danh mục']"
-                        required
-                    ></v-text-field>
+                    <v-text-field v-model="formData.name" label="Tên danh mục"
+                        :rules="[v => !!v || 'Vui lòng nhập tên danh mục']" required variant="outlined"
+                        density="comfortable"></v-text-field>
 
-                    <v-select
-                        v-model="formData.parent_id"
-                        :items="categoryOptions"
-                        item-title="name"
-                        item-value="id"
-                        label="Danh mục cha"
-                        clearable
-                        :hint="!formData.parent_id ? 'Không chọn sẽ tạo danh mục gốc' : ''"
-                        persistent-hint
-                    >
+                    <v-select class="mt-4" v-model="formData.parent_id" :items="categoryOptions" item-title="name"
+                        item-value="id" label="Danh mục cha" clearable
+                        :hint="!formData.parent_id ? 'Không chọn sẽ tạo danh mục gốc' : ''" persistent-hint
+                        variant="outlined" density="comfortable">
                         <template v-slot:item="{ item, props }">
                             <v-list-item v-bind="props">
                                 <template v-slot:prepend>
@@ -35,22 +26,13 @@
                         </template>
                     </v-select>
 
-                    <v-text-field
-                        v-model="formData.image_url"
-                        label="URL hình ảnh"
-                        required
-                    ></v-text-field>
+                    <v-text-field class="mt-4" v-model="formData.image_url" label="URL hình ảnh" required
+                        variant="outlined" density="comfortable"></v-text-field>
 
                     <!-- Preview hình ảnh -->
-                    <v-img
-                        v-if="formData.image_url"
-                        :src="formData.image_url"
-                        height="120"
-                        width="120"
-                        class="mt-4 rounded-circle mx-auto border-primary"
-                        :class="{'elevation-2': formData.image_url}"
-                        style="border: 3px solid rgb(var(--v-theme-primary))"
-                    >
+                    <v-img v-if="formData.image_url" :src="formData.image_url" height="120" width="120"
+                        class="mt-4 rounded-circle mx-auto border-primary" :class="{ 'elevation-2': formData.image_url }"
+                        style="border: 3px solid rgb(var(--v-theme-primary))">
                         <template v-slot:placeholder>
                             <v-row class="fill-height ma-0" align="center" justify="center">
                                 <v-progress-circular indeterminate color="primary"></v-progress-circular>
@@ -62,19 +44,10 @@
 
             <v-card-actions class="pa-4">
                 <v-spacer></v-spacer>
-                <v-btn
-                    color="grey-darken-1"
-                    variant="text"
-                    @click="closeDialog"
-                >
+                <v-btn color="grey-darken-1" variant="text" @click="closeDialog">
                     Hủy
                 </v-btn>
-                <v-btn
-                    color="primary"
-                    :disabled="!valid"
-                    :loading="loading"
-                    @click="handleSubmit"
-                >
+                <v-btn color="primary" :disabled="!valid" :loading="loading" @click="handleSubmit">
                     Lưu
                 </v-btn>
             </v-card-actions>
@@ -90,7 +63,7 @@ import { storeToRefs } from 'pinia'
 
 export default {
     name: 'CategoryDialog',
-    
+
     props: {
         modelValue: {
             type: Boolean,
@@ -192,4 +165,4 @@ export default {
 .v-card-text {
     padding-top: 20px;
 }
-</style> 
+</style>
