@@ -1,17 +1,6 @@
 <template>
-  <v-bottom-navigation
-    class="mobile-nav d-sm-none"
-    fixed
-    grow
-    color="primary"
-    height="56"
-  >
-    <v-btn
-      v-for="item in navItems"
-      :key="item.title"
-      :to="item.to"
-      class="nav-btn"
-    >
+  <v-bottom-navigation class="mobile-nav d-sm-none" fixed grow color="primary" height="56">
+    <v-btn v-for="item in navItems" :key="item.title" :to="item.to" class="nav-btn">
       <v-icon size="24">{{ item.icon }}</v-icon>
       <span class="nav-text">{{ item.title }}</span>
     </v-btn>
@@ -26,7 +15,7 @@ export default {
       navItems: [
         { title: 'Trang chủ', icon: 'mdi-home', to: '/mainpage' },
         { title: 'Đặt hàng', icon: 'mdi-coffee', to: '/collections/menu' },
-        { title: 'Tin tức', icon: 'mdi-newspaper', to: '/blogs' },
+        { title: 'Tin tức', icon: 'mdi-newspaper', to: '/blog' },
         { title: 'Cửa hàng', icon: 'mdi-store', to: '/store' },
       ]
     }
@@ -62,4 +51,4 @@ export default {
 .v-icon {
   margin-bottom: 2px;
 }
-</style> 
+</style>
