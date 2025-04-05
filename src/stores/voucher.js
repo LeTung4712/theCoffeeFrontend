@@ -13,7 +13,7 @@ export const useVoucherStore = defineStore('voucher', {
     async fetchVouchers() {
       this.loading = true
       try {
-        const response = await voucherAPI.getAll()
+        const response = await voucherAPI.getVoucherActive()
         this.voucherList = response.data.vouchers
       } catch (error) {
         this.error = error.message

@@ -1,16 +1,65 @@
 <template>
   <div class="order-history-tab">
-    <v-text-field v-model="searchLocal" label="Tìm kiếm đơn hàng" prepend-inner-icon="mdi-magnify" outlined dense
-      clearable />
-    <v-list>
+    <!-- Tabs trạng thái đơn hàng - đã bỏ tab "Tất cả" -->
+    <v-tabs v-model="activeTab" color="primary" slider-color="primary" centered class="mb-4">
+      <v-tab value="pending">
+        Chờ xác nhận
+        <v-badge v-if="pendingOrdersCount > 0" :content="pendingOrdersCount" color="error" offset-x="-10"
+          offset-y="-5"></v-badge>
+      </v-tab>
+      <v-tab value="processing">
+        Đang xử lý
+        <v-badge v-if="processingOrdersCount > 0" :content="processingOrdersCount" color="error" offset-x="-10"
+          offset-y="-5"></v-badge>
+      </v-tab>
+      <v-tab value="shipping">
+        Đang giao
+        <v-badge v-if="shippingOrdersCount > 0" :content="shippingOrdersCount" color="error" offset-x="-10"
+          offset-y="-5"></v-badge>
+      </v-tab>
+      <v-tab value="completed">Hoàn thành</v-tab>
+      <v-tab value="cancelled">Đã hủy</v-tab>
+    </v-tabs>
+
+    <!-- Thanh tìm kiếm -->
+    <div class="d-flex align-center mb-4">
+      <v-text-field v-model="searchLocal" label="Tìm kiếm đơn hàng" prepend-inner-icon="mdi-magnify" outlined dense
+        clearable class="flex-grow-1" />
+
+      <v-menu offset-y>
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" class="ml-2" variant="outlined" prepend-icon="mdi-filter-variant">
+            Lọc
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-subheader>Trạng thái thanh toán</v-list-subheader>
+          <v-list-item>
+            <v-checkbox v-model="paymentFilters" label="Đã thanh toán" value="1" hide-details></v-checkbox>
+          </v-list-item>
+          <v-list-item>
+            <v-checkbox v-model="paymentFilters" label="Chưa thanh toán" value="0" hide-details></v-checkbox>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
+
+    <!-- Thông báo không có đơn hàng -->
+    <v-alert v-if="paginatedOrders.length === 0" type="info" variant="tonal"
+      text="Bạn chưa có đơn hàng nào trong mục này" class="mt-4"></v-alert>
+
+    <!-- Danh sách đơn hàng -->
+    <v-list v-else>
       <v-list-item v-for="order in paginatedOrders" :key="order.order_code" class="mb-4">
         <v-card width="100%" class="order-card" elevation="2" @click="toggleDetails(order.order_code)">
           <v-card-title class="d-flex justify-space-between py-2 px-4">
-            <span class="text-subtitle-1 font-weight-bold bg-secondary px-2 py-1 rounded">
-              Mã đơn: {{ order.order_code }}
-            </span>
-            <v-chip :color="getStatusColor(order.status)" text-color="white" small>
-              {{ getStatusText(order.status) }}
+            <div>
+              <span class="text-subtitle-1 font-weight-bold bg-secondary px-2 py-1 rounded">
+                Mã đơn: {{ order.order_code }}
+              </span>
+            </div>
+            <v-chip :color="order.payment_status == '1' ? 'success' : 'warning'" text-color="white" small>
+              {{ order.payment_status == '1' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
             </v-chip>
           </v-card-title>
 
@@ -18,7 +67,7 @@
             <v-row dense>
               <v-col cols="12" sm="12">
                 <v-icon small class="mr-2">mdi-clock-outline</v-icon>
-                {{ formatDateTime(order.order_time) }}
+                {{ formatDateTime(order.created_at) }}
               </v-col>
               <v-col cols="12" sm="12">
                 <v-icon small class="mr-2">mdi-map-marker</v-icon>
@@ -32,6 +81,8 @@
                   <div class="customer-info">
                     <div class="info-line"><strong>Khách hàng:</strong> {{ order.user_name }}</div>
                     <div class="info-line"><strong>Số điện thoại:</strong> {{ order.mobile_no }}</div>
+                    <div class="info-line"><strong>Phương thức thanh toán:</strong> {{
+                      getPaymentMethodText(order.payment_method) }}</div>
                     <div class="info-line"><strong>Ghi chú:</strong> {{ order.note || 'Không có' }}</div>
                   </div>
 
@@ -93,20 +144,18 @@
                   <!-- Thêm các nút hành động -->
                   <v-row v-if="isDetailsVisible(order.order_code) && canShowActionButtons(order.status)" class="mt-3">
                     <v-col cols="12" class="d-flex justify-end">
-                      <v-btn
-                        v-if="canReceiveOrder(order.status)"
-                        color="success"
-                        class="mr-2"
-                        @click.stop="confirmReceiveOrder(order.id)"
-                      >
+                      <v-btn v-if="canPaymentAgain(order)" color="primary" class="mr-2"
+                        @click.stop="handlePaymentAgain(order)">
+                        <v-icon left>mdi-cash-register</v-icon>
+                        Thanh toán lại
+                      </v-btn>
+                      <v-btn v-if="canReceiveOrder(order.status)" color="success" class="mr-2"
+                        @click.stop="confirmReceiveOrder(order.id)">
                         <v-icon left>mdi-check-circle</v-icon>
                         Đã nhận hàng
                       </v-btn>
-                      <v-btn
-                        v-if="canCancelOrder(order.status)"
-                        color="error"
-                        @click.stop="confirmCancelOrder(order.id)"
-                      >
+                      <v-btn v-if="canCancelOrder(order.status)" color="error"
+                        @click.stop="confirmCancelOrder(order.id)">
                         <v-icon left>mdi-close-circle</v-icon>
                         Hủy đơn
                       </v-btn>
@@ -127,6 +176,31 @@
     <div class="text-center pt-3">
       <v-pagination v-model="currentPage" :length="totalPages" :total-visible="7"></v-pagination>
     </div>
+
+    <!-- Thêm dialog xác nhận -->
+    <v-dialog v-model="showConfirmDialog" max-width="400" persistent>
+      <v-card>
+        <v-card-title class="text-h5"
+          :class="dialogType === 'cancel' ? 'bg-error text-white' : 'bg-success text-white'">
+          {{ dialogTitle }}
+        </v-card-title>
+        <v-card-text class="pt-4">
+          <p>{{ dialogMessage }}</p>
+          <p v-if="dialogType === 'cancel'" class="text-subtitle-2 text-error font-weight-medium mt-2">
+            Lưu ý: Bạn sẽ không thể hoàn tác hành động này sau khi xác nhận.
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey-darken-1" variant="text" @click="closeDialog">
+            Hủy bỏ
+          </v-btn>
+          <v-btn :color="dialogType === 'cancel' ? 'error' : 'success'" :loading="isProcessing" @click="processAction">
+            Xác nhận
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -159,36 +233,108 @@ export default {
       visibleDetails: {},
       currentPage: 1,
       itemsPerPage: 5,
+      activeTab: 'pending',
+      paymentFilters: [], // Lọc trạng thái thanh toán
+
+      // Thêm các trường dữ liệu cho dialog
+      showConfirmDialog: false,
+      dialogType: '',
+      dialogTitle: '',
+      dialogMessage: '',
+      selectedOrderId: null,
+      isProcessing: false
     }
   },
 
   computed: {
-    // Tính tổng số trang
-    totalPages() {
-      return Math.ceil(this.filteredOrders.length / this.itemsPerPage)
+    // Đếm số lượng đơn chờ xác nhận - điều chỉnh để chỉ đếm đơn không phải COD và chưa thanh toán
+    pendingOrdersCount() {
+      return this.orders.filter(order =>
+        order.status === '0' && order.payment_method !== 'cod' && order.payment_status === '0'
+      ).length;
     },
 
-    // Lọc đơn hàng theo mã đơn hàng
-    filteredOrders() {
-      if (!this.searchLocal) return this.orders;
+    // Đếm số lượng đơn đang xử lý - thêm cả những đơn đã thanh toán
+    processingOrdersCount() {
       return this.orders.filter(order =>
+        order.status === '1' || order.payment_status === '1'
+      ).length;
+    },
+
+    shippingOrdersCount() {
+      return this.orders.filter(order => order.status === '2').length;
+    },
+
+    // Lọc đơn hàng theo tab được chọn - điều chỉnh cả pending và processing
+    filteredByTabOrders() {
+      // Xử lý đặc biệt cho tab chờ xác nhận
+      if (this.activeTab === 'pending') {
+        return this.orders.filter(order =>
+          order.status === '0' && order.payment_method !== 'cod' && order.payment_status === '0'
+        );
+      }
+
+      // Xử lý đặc biệt cho tab đang xử lý
+      if (this.activeTab === 'processing') {
+        return this.orders.filter(order =>
+          order.status === '1' || order.payment_status === '1'
+        );
+      }
+
+      // Các tab khác xử lý như cũ
+      const statusMap = {
+        'shipping': ['2'],       // Đang giao
+        'completed': ['3'],      // Hoàn thành
+        'cancelled': ['-1']      // Đã hủy
+      };
+
+      return this.orders.filter(order =>
+        statusMap[this.activeTab]?.includes(order.status.toString())
+      );
+    },
+
+    // Lọc theo trạng thái thanh toán
+    filteredByPaymentOrders() {
+      if (this.paymentFilters.length === 0 || this.paymentFilters.length === 2) {
+        return this.filteredByTabOrders;
+      }
+
+      return this.filteredByTabOrders.filter(order =>
+        this.paymentFilters.includes(order.payment_status?.toString())
+      );
+    },
+
+    // Lọc đơn hàng theo từ khóa tìm kiếm
+    filteredOrders() {
+      if (!this.searchLocal) return this.filteredByPaymentOrders;
+
+      return this.filteredByPaymentOrders.filter(order =>
         order.order_code.toString().toLowerCase().includes(this.searchLocal.toLowerCase())
       );
     },
 
-    // Phân trang đơn hàng
-    paginatedOrders() {
-      const start = (this.currentPage - 1) * this.itemsPerPage
-      const end = start + this.itemsPerPage
-      return this.filteredOrders.slice(start, end)
+    // Tính tổng số trang
+    totalPages() {
+      return Math.ceil(this.filteredOrders.length / this.itemsPerPage);
     },
 
-    
+    // Phân trang đơn hàng
+    paginatedOrders() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredOrders.slice(start, end);
+    }
   },
 
   watch: {
     searchLocal() {
-      this.currentPage = 1
+      this.currentPage = 1;
+    },
+    activeTab() {
+      this.currentPage = 1;
+    },
+    paymentFilters() {
+      this.currentPage = 1;
     }
   },
 
@@ -226,6 +372,17 @@ export default {
       return colors[status] || 'grey'
     },
 
+    // Lấy text tương ứng với phương thức thanh toán
+    getPaymentMethodText(method) {
+      const methods = {
+        'cod': 'Thanh toán khi nhận hàng',
+        'momo': 'Ví điện tử MoMo',
+        'vnpay': 'Thanh toán qua VNPay',
+        'zalopay': 'Ví điện tử ZaloPay'
+      }
+      return methods[method] || method
+    },
+
     // Hiển thị hoặc ẩn chi tiết đơn hàng
     toggleDetails(orderCode) {
       this.visibleDetails = {
@@ -248,7 +405,7 @@ export default {
     },
 
     canShowActionButtons(status) {
-      return ['0', '1', '2'].includes(status.toString())
+      return ['0', '1', '2'].includes(status.toString()) // Chỉ cho phép hiển thị nút hành động khi đơn hàng chưa giao hàng hoặc đang giao hàng
     },
 
     canReceiveOrder(status) {
@@ -256,34 +413,66 @@ export default {
     },
 
     canCancelOrder(status) {
-      return ['0', '1', '2'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng
+      return ['0', '1'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng hoặc đang giao hàng
     },
 
-    async confirmReceiveOrder(orderId) {
-      if (confirm('Bạn xác nhận đã nhận được đơn hàng này?')) {
-        try {
-          await orderAPI.successOrder({ order_id: orderId });
+    canPaymentAgain(order) {
+      return order.payment_status === '0' && order.payment_method !== 'cod';
+    },
+
+    handlePaymentAgain(order) {
+      this.$router.push(`/payment/${order.order_code}`);
+    },
+
+    confirmReceiveOrder(orderId) {
+      this.selectedOrderId = orderId;
+      this.dialogType = 'receive';
+      this.dialogTitle = 'Xác nhận nhận hàng';
+      this.dialogMessage = 'Bạn xác nhận đã nhận được đơn hàng này?';
+      this.showConfirmDialog = true;
+    },
+
+    confirmCancelOrder(orderId) {
+      this.selectedOrderId = orderId;
+      this.dialogType = 'cancel';
+      this.dialogTitle = 'Xác nhận hủy đơn';
+      this.dialogMessage = 'Bạn có chắc chắn muốn hủy đơn hàng này?';
+      this.showConfirmDialog = true;
+    },
+
+    // Thêm các phương thức xử lý dialog
+
+    closeDialog() {
+      this.showConfirmDialog = false;
+      this.selectedOrderId = null;
+      this.isProcessing = false;
+    },
+
+    async processAction() {
+      if (!this.selectedOrderId) return;
+
+      this.isProcessing = true;
+
+      try {
+        if (this.dialogType === 'receive') {
+          await orderAPI.successOrder({ order_id: this.selectedOrderId });
           this.notificationStore.success("Xác nhận giao hàng thành công", 3000);
-          this.$emit('order-status-updated', { orderId, status: '3' })
-          this.$router.push('/user/lich-su');
-        } catch (error) {
-          console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error)
+          this.$emit('order-status-updated', { orderId: this.selectedOrderId, status: '3' });
+        } else if (this.dialogType === 'cancel') {
+          await orderAPI.cancelOrder({ order_id: this.selectedOrderId });
+          this.notificationStore.success("Hủy đơn hàng thành công", 3000);
+          this.$emit('order-status-updated', { orderId: this.selectedOrderId, status: '-1' });
         }
-      }
-    },
 
-    async confirmCancelOrder(orderId) {
-      if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
-        try {
-          await orderAPI.cancelOrder({ order_id: orderId });
-          this.notificationStore.success("Xác nhận hủy đơn hàng thành công", 3000);
-          this.$emit('order-status-updated', { orderId, status: '-1' })
-          this.$router.push('/user/lich-su');
-        } catch (error) {
-          console.error('Lỗi khi hủy đơn hàng:', error)
-        }
+        this.$router.push('/user/lich-su');
+      } catch (error) {
+        console.error(`Lỗi khi ${this.dialogType === 'cancel' ? 'hủy' : 'xác nhận'} đơn hàng:`, error);
+        this.notificationStore.error(`Có lỗi xảy ra, vui lòng thử lại sau`, 3000);
+      } finally {
+        this.isProcessing = false;
+        this.showConfirmDialog = false;
       }
-    },
+    }
   }
 }
 </script>
@@ -388,8 +577,34 @@ export default {
   color: rgba(0, 0, 0, 0.6);
   padding: 2px 0;
 }
+
 styleduct-price {
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+/* Thêm CSS cho tabs và filter */
+.v-tabs {
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+/* Thêm style cho badge trên tabs */
+:deep(.v-badge__badge) {
+  font-size: 12px;
+  height: 20px;
+  min-width: 20px;
+  padding: 0 4px;
+  top: -20px !important;
+  /* Dịch badge lên trên */
+  right: -8px !important;
+  /* Điều chỉnh vị trí ngang */
+}
+
+:deep(.v-tab) {
+  position: relative;
+  padding-right: 24px;
+  /* Để có chỗ hiển thị badge */
 }
 </style>

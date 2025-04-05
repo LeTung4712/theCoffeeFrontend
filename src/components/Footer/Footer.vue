@@ -77,7 +77,7 @@
           <div class="text-caption text-white">
             <p>Công ty cổ phần thương mại dịch vụ Trà Cà Phê VN</p>
             <p>Mã số DN: 0312867172 do sở kế hoạch và đầu tư tp. HCM cấp ngày 23/07/2014. Người đại diện: NGÔ NGUYÊN KHA</p>
-            <p>Địa chỉ: 86-88 Cao Thắng, phường 04, quận 3, tp Hồ Chí Minh - Điện thoại: (028) 7107 8079 - Email: hi@thecoffeehouse.vn</p>
+            <p>Địa chỉ: 86-88 Cao Thắng, phường 04, quận 3, tp Hồ Chí Minh - Điện thoại: (028) 7107 8079 - Email: hi@thecoffeeshop.vn</p>
             <p>© 2014-2022 Công ty cổ phần thương mại dịch vụ Trà Cà Phê VN mọi quyền bảo lưu</p>
           </div>
         </v-col>

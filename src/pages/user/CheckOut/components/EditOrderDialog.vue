@@ -188,11 +188,8 @@ export default {
       if (!this.order?.product_item?.id) return;
       this.isLoading = true;
       try {
-        const response = await productAPI.getInfo({
-          params: { product_id: this.order.product_item.id }
-        });
+        const response = await productAPI.getInfo({ product_id: this.order.product_item.id });
         const data = response.data;
-        console.log('data', data)
         this.product = data.product;
         this.topping_items = data.product.toppings.map(topping => ({
           ...topping,

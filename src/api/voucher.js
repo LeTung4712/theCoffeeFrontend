@@ -7,6 +7,10 @@ export const voucherAPI = {
     return httpClient.get(`${PREFIX}/index`);
   },
 
+  getVoucherActive() {
+    return httpClient.get(`${PREFIX}/indexActive`);
+  },
+
   createVoucher(data) {
     return httpClient.post(`${PREFIX}/create`, data);
   },

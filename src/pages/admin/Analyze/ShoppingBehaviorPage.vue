@@ -82,7 +82,7 @@
                             Kết quả phân tích
                         </v-card-title>
                         <v-card-subtitle class="text-black">
-                            Thống kê vào lúc {{ formatDate(time_analyze) }}
+                            Thống kê lúc {{ formatDate(time_analyze) }}
                         </v-card-subtitle>
                     </div>
                     <div class="d-flex align-center">

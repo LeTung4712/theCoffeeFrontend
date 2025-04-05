@@ -22,7 +22,7 @@
                 <v-row v-else>
                     <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="3">
                         <ProductCard :currentID="product.id" :dialog="dialog" :product="product" :isInProductListing="1"
-                      class="product-card-responsive" />
+                            class="product-card-responsive" />
                     </v-col>
                 </v-row>
             </v-col>
@@ -134,11 +134,11 @@ export default {
             console.log('handleActiveChange được gọi');
             console.log('items là:', items);
             console.log('kiểu dữ liệu của items:', typeof items, Array.isArray(items));
-            
+
             if (items.length > 0) {
                 const selectedId = items[items.length - 1];
                 this.fetchProducts(selectedId.toString());
-                
+
                 // Tìm category tương ứng để cập nhật URL
                 const selectedCategory = this.categories.find(cat => cat.id === selectedId);
                 if (selectedCategory) {
@@ -166,15 +166,16 @@ export default {
 <style scoped>
 /* Thêm styles mới cho responsive */
 .product-card-responsive {
-  height: auto !important;
+    height: auto !important;
 }
-@media (max-width: 600px) {
-  .product-card-responsive {
-    margin-bottom: 12px;
-  }
 
-  .v-col {
-    padding: 6px 12px !important;
-  }
+@media (max-width: 600px) {
+    .product-card-responsive {
+        margin-bottom: 12px;
+    }
+
+    .v-col {
+        padding: 6px 12px !important;
+    }
 }
 </style>

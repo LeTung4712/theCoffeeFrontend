@@ -38,13 +38,8 @@
 
               <!-- Nút xóa đơn hàng -->
               <v-card-actions class="pa-4 bg-grey-lighten-4">
-                <v-btn 
-                  color="error" 
-                  variant="outlined" 
-                  prepend-icon="mdi-delete" 
-                  @click="handleDeleteOrder"
-                  class="delete-order-btn"
-                >
+                <v-btn color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteOrder"
+                  class="delete-order-btn">
                   Xóa toàn bộ đơn hàng
                 </v-btn>
               </v-card-actions>
@@ -165,7 +160,7 @@ export default {
       deliveryInfo: null,
       paymentMethod: 'cod',
       finalPrice: 0,
-      agreedToTerms: false,
+      agreedToTerms: true,
       showConfirmDialog: false,
       isDeleting: false,
       redirectTimeout: null
@@ -240,13 +235,13 @@ export default {
             product_id: item.id,
             product_name: item.product_item.name,
             product_price: item.product_item.price,
-            product_quantity : item.quantity,
+            product_quantity: item.quantity,
             size: item.size,
             item_note: item.item_note,
             topping_items: item.topping_items
           }))
         }
-        
+
         const { data: { order_code } } = await orderAPI.createOrder(orderData)
 
         if (this.paymentMethod === 'cod') {
@@ -277,21 +272,24 @@ export default {
     async handleOnlinePayment(order_code) {
       try {
         const paymentData = {
-          order_id: order_code,
-          total_price: this.totalAmount,
+          order_code: order_code,
           return_url: `${window.location.origin}/user/lich-su`
         }
-        const { data: paymentUrl } = await paymentAPI.createMomoPayment(paymentData)
+        const response = await paymentAPI.createMomoPayment(paymentData)
+        const paymentUrl = response.data.payUrl
 
         if (!paymentUrl) {
           throw new Error('Không nhận được URL thanh toán')
         }
+
         // Xóa giỏ hàng và voucher
         this.cartStore.clearCart()
         this.voucherStore.clearVoucher()
+
+        // Chuyển hướng người dùng đến trang thanh toán MoMo
         window.location.href = paymentUrl
       } catch (error) {
-        this.notificationStore.error('Lỗi khi tạo thanh toán online',2000)
+        this.notificationStore.error('Lỗi khi tạo thanh toán online', 2000)
       }
     },
 
