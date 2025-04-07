@@ -2,7 +2,7 @@
     <v-container class="blog-page">
         <v-row>
             <v-col cols="12">
-                <h1 class="text-h4 font-weight-bold text-center my-5">Blog Coffee Shop</h1>
+                <h1 class="text-h4 font-weight-bold text-center my-5">Chuyện cà phê</h1>
             </v-col>
         </v-row>
 
@@ -34,7 +34,7 @@
         <!-- Danh sách bài viết -->
         <v-row v-else>
             <v-col v-for="post in paginatedPosts" :key="post.id" cols="12" md="6" lg="4">
-                <v-card class="blog-card h-100" :to="'/blogs/' + post.slug">
+                <v-card class="blog-card h-100" :to="'/blog/' + post.slug">
                     <v-img :src="post.thumbnail || '/images/blog/default.jpg'" height="200px" cover
                         class="blog-thumbnail"></v-img>
 

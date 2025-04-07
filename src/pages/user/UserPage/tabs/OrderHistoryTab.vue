@@ -1,7 +1,8 @@
 <template>
   <div class="order-history-tab">
-    <!-- Tabs trạng thái đơn hàng - đã bỏ tab "Tất cả" -->
-    <v-tabs v-model="activeTab" color="primary" slider-color="primary" centered class="mb-4">
+    <!-- Tabs trạng thái đơn hàng -->
+    <v-tabs v-model="activeTab" color="primary" slider-color="primary" centered class="mb-4"
+      @touchstart="handleTouchStart" @touchend="handleTouchEnd">
       <v-tab value="pending">
         Chờ xác nhận
         <v-badge v-if="pendingOrdersCount > 0" :content="pendingOrdersCount" color="error" offset-x="-10"
@@ -52,15 +53,19 @@
     <v-list v-else>
       <v-list-item v-for="order in paginatedOrders" :key="order.order_code" class="mb-4">
         <v-card width="100%" class="order-card" elevation="2" @click="toggleDetails(order.order_code)">
-          <v-card-title class="d-flex justify-space-between py-2 px-4">
-            <div>
-              <span class="text-subtitle-1 font-weight-bold bg-secondary px-2 py-1 rounded">
-                Mã đơn: {{ order.order_code }}
-              </span>
-            </div>
-            <v-chip :color="order.payment_status == '1' ? 'success' : 'warning'" text-color="white" small>
-              {{ order.payment_status == '1' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
-            </v-chip>
+          <v-card-title class="py-2 px-4">
+            <v-row no-gutters>
+              <v-col cols="12" class="mb-2">
+                <span class="text-subtitle-1 font-weight-bold bg-secondary px-2 py-1 rounded">
+                  Mã đơn: {{ order.order_code }}
+                </span>
+              </v-col>
+              <v-col cols="12">
+                <v-chip :color="order.payment_status == '1' ? 'success' : 'warning'" text-color="white" small>
+                  {{ order.payment_status == '1' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+                </v-chip>
+              </v-col>
+            </v-row>
           </v-card-title>
 
           <v-card-text class="pt-2">
@@ -235,6 +240,8 @@ export default {
       itemsPerPage: 5,
       activeTab: 'pending',
       paymentFilters: [], // Lọc trạng thái thanh toán
+      touchStartX: 0,
+      touchEndX: 0,
 
       // Thêm các trường dữ liệu cho dialog
       showConfirmDialog: false,
@@ -472,7 +479,17 @@ export default {
         this.isProcessing = false;
         this.showConfirmDialog = false;
       }
-    }
+    },
+
+    handleTouchStart(e) {
+      this.touchStartX = e.touches[0].clientX;
+      e.stopPropagation(); // Ngăn chặn sự kiện lan truyền
+    },
+
+    handleTouchEnd(e) {
+      this.touchEndX = e.changedTouches[0].clientX;
+      e.stopPropagation(); // Ngăn chặn sự kiện lan truyền
+    },
   }
 }
 </script>

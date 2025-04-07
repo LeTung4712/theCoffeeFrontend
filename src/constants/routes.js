@@ -2,10 +2,10 @@ export const ROUTES = {
   MAIN_PAGE: "mainpage",
   PRODUCT_DETAIL: "products/:product_name_convert",
   USER_PAGE: "user/:name",
-  BLOG_PAGE: "blogs",
+  BLOG_PAGE: "blog",
   MENU: "collections/:category_name",
   CHECKOUT: "thanh-toan",
-  BLOG_DETAIL: "blogs/:blog_name_convert",
+  BLOG_DETAIL: "blog/:blog_name_convert",
   // routes cho admin
   ADMIN: {
     PROFILE: "profile",

@@ -65,11 +65,11 @@ export default {
         async getRecommendProducts() {
             this.loadingProducts = true
             try {
-                //console.log(this.cartItems)
+                console.log(this.cartItems)
                 const response = await recommendAPI.getRecommendation({
                     cartItems: this.cartItems
                 })
-                //console.log(response)
+                console.log(response)
                 this.recommendProducts = response.data.recommend_products
             } catch (error) {
                 console.error('Error fetching recommend products:', error)

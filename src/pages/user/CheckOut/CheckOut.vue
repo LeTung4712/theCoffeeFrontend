@@ -49,7 +49,7 @@
             <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 2 : 1">
               <v-card elevation="4" rounded="lg" class="pa-0">
                 <OrderSummary ref="orderSummary" @order-loaded="handleOrderLoaded"
-                  @add-more="$router.push('/mainpage')" />
+                  @add-more="$router.push('/collections/menu')" />
 
                 <!-- Desktop footer giữ nguyên -->
                 <v-card-actions class="bg-primary pa-4 desktop-footer">
