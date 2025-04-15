@@ -48,8 +48,9 @@
         </v-row>
 
         <!-- Note -->
-        <v-text-field v-model="item_note" placeholder="Ghi chú thêm cho món này" variant="outlined" density="comfortable"
-          prepend-inner-icon="mdi-note-text" class="mt-6" hide-details bg-color="grey-lighten-4" />
+        <v-text-field v-model="item_note" placeholder="Ghi chú thêm cho món này" variant="outlined"
+          density="comfortable" prepend-inner-icon="mdi-note-text" class="mt-6" hide-details
+          bg-color="grey-lighten-4" />
 
         <!-- Size Selection -->
         <template v-if="hasToppings">
@@ -112,6 +113,7 @@ import { formatPrice } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import { useCartStore } from '@/stores/cart'
 import { useNotificationStore } from '@/stores/notification'
+import { useVoucherStore } from '@/stores/voucher'
 export default {
   name: 'EditOrderDialog',
 
@@ -204,7 +206,7 @@ export default {
     },
 
     calculateTotalPrice() {
-      const basePrice = parseInt(this.product.price) || 0  
+      const basePrice = parseInt(this.product.price) || 0
       const toppingPrice = this.checked_topping.reduce((sum, topping) =>
         sum + parseInt(topping.price), 0)
       const sizePrice = this.sizeOptions.find(opt => opt.value === this.size)?.price || 0
@@ -216,6 +218,7 @@ export default {
       this.isLoading = true
       const cartStore = useCartStore()
       const notificationStore = useNotificationStore()
+      const voucherStore = useVoucherStore()
 
       try {
         const updatedOrder = {
@@ -229,6 +232,19 @@ export default {
         }
 
         cartStore.updateItem(updatedOrder)
+
+        // Tính toán lại tổng giá trị đơn hàng
+        const totalPrice = cartStore.items.reduce((sum, order) => sum + order.total_amount, 0)
+
+        // Kiểm tra tính hợp lệ của voucher
+        if (voucherStore.selectedVoucher && totalPrice < voucherStore.selectedVoucher.min_order_amount) {
+          notificationStore.warning(
+            `Voucher không còn phù hợp. Đơn hàng cần tối thiểu ${formatPrice(voucherStore.selectedVoucher.min_order_amount)}đ`,
+            5000
+          )
+          voucherStore.removeSelectedVoucher()
+        }
+
         notificationStore.success('Cập nhật thành công!', 3000)
         this.closeDialog()
       } catch (error) {

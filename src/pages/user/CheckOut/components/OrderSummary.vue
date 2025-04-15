@@ -3,62 +3,39 @@
     <!-- Header -->
     <div class="d-flex justify-space-between align-center mb-4">
       <v-card-title class="px-0">Các món đã chọn</v-card-title>
-      <v-btn
-        variant="text"
-        color="black"
-        @click="$emit('add-more')"
-      >
+      <v-btn variant="text" color="black" @click="$emit('add-more')">
         Thêm món
       </v-btn>
     </div>
 
     <!-- Order List -->
     <v-list>
-      <v-list-item
-        v-for="(order, index) in safeOrders"
-        :key="index"
-        class="px-0"
-      >
+      <v-list-item v-for="(order, index) in safeOrders" :key="index" class="px-0">
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-start">
             <!-- Thêm nút edit -->
-            <v-btn
-              icon="mdi-pencil"
-              size="small"
-              variant="text"
-              density="compact"
-              class="me-2 mt-1"
-              @click="openEditDialog(order)"
-            ></v-btn>
-            
+            <v-btn icon="mdi-pencil" size="small" variant="text" density="compact" class="me-2 mt-1"
+              @click="openEditDialog(order)"></v-btn>
+
             <div>
               <!-- Tên sản phẩm -->
               <div class="text-body-1 font-weight-medium" v-if="getProductName(order)">
                 {{ order.quantity || 1 }} x {{ getProductName(order) }}
               </div>
-              
+
               <!-- Size -->
               <div class="text-subtitle-2" v-if="order.size">
                 Size: {{ order.size }}
               </div>
-              
+
               <!-- Toppings -->
-              <div 
-                v-for="(topping, tIndex) in order.topping_items"
-                :key="`${order.id}-${tIndex}`"
-                class="text-subtitle-2"
-              >
+              <div v-for="(topping, tIndex) in order.topping_items" :key="`${order.id}-${tIndex}`"
+                class="text-subtitle-2">
                 + {{ topping.name }} x 1
               </div>
 
-              <v-btn
-                size="small"
-                color="error"
-                variant="text"
-                density="compact"
-                class="mt-1"
-                @click="handleDeleteItem(order)"
-              >
+              <v-btn size="small" color="error" variant="text" density="compact" class="mt-1"
+                @click="handleDeleteItem(order)">
                 Xóa
               </v-btn>
             </div>
@@ -68,13 +45,13 @@
             <span class="text-body-1">{{ formattedPrice(order.total_amount) }}đ</span>
           </div>
         </div>
-        <v-divider class="my-2" ></v-divider>
+        <v-divider class="my-2"></v-divider>
       </v-list-item>
     </v-list>
 
     <!-- Summary -->
     <v-card-title class="px-0 pt-6">Tổng cộng</v-card-title>
-    
+
     <v-list class="pa-0">
       <v-list-item class="px-0">
         <template v-slot:default>
@@ -99,25 +76,22 @@
       <v-list-item class="px-0">
         <template v-slot:default>
           <div class="d-flex justify-space-between w-100">
-            <EditVoucherDialog
-              v-model="selectedVoucher"
-              :total-price="totalPrice"
-              @voucher-selected="handleVoucherSelected"
-            />
-            <span v-if="selectedVoucher" class="text-orange">
-              -{{ formattedPrice(voucherDiscount) }}đ
-            </span>
-            <span v-else>0đ</span>
+            <EditVoucherDialog v-model="selectedVoucher" :total-price="totalPrice"
+              @voucher-selected="handleVoucherSelected" />
+            <div class="d-flex align-center">
+              <span v-if="selectedVoucher" class="text-orange">
+                -{{ formattedPrice(voucherDiscount) }}đ
+              </span>
+              <span v-else>0đ</span>
+              <v-btn v-if="selectedVoucher" icon="mdi-close" size="small" color="error" variant="text" density="compact"
+                class="ml-1" @click="removeVoucher" title="Xóa voucher"></v-btn>
+            </div>
           </div>
         </template>
       </v-list-item>
     </v-list>
     <!-- Thêm EditOrderDialog -->
-  <EditOrderDialog
-    v-model="showEditDialog"
-    :order="selectedOrder"
-    @save="handleEditComplete"
-  />
+    <EditOrderDialog v-model="showEditDialog" :order="selectedOrder" @save="handleEditComplete" />
   </v-card-text>
 </template>
 
@@ -132,7 +106,7 @@ import EditVoucherDialog from './EditVoucherDialog.vue'
 
 export default {
   name: 'OrderSummary',
-  
+
   components: {
     EditOrderDialog,
     EditVoucherDialog
@@ -160,7 +134,7 @@ export default {
 
   watch: {
     voucherDiscount: {
-      handler( newValue ) {
+      handler(newValue) {
         this.emitOrderData();
       }
     },
@@ -191,12 +165,12 @@ export default {
     },
     voucherDiscount() {
       if (!this.selectedVoucher || !this.totalPrice) return 0
-      
+
       if (this.selectedVoucher.discount_type === 'percent') {
         const discountAmount = (this.totalPrice * this.selectedVoucher.discount_percent) / 100
         return Math.min(discountAmount, this.selectedVoucher.max_discount_amount)
       }
-      return Math.min(this.totalPrice,this.selectedVoucher.max_discount_amount)
+      return Math.min(this.totalPrice, this.selectedVoucher.max_discount_amount)
     },
     finalTotal() {
       return Math.max(0, this.totalPrice + this.shippingFee - (this.voucherDiscount || 0))
@@ -207,7 +181,7 @@ export default {
     formattedPrice(price) {
       return formatPrice(price)
     },
-    
+
     getProductName(order) {
       if (!order?.product_item?.name) {
         console.warn('Không tìm thấy tên sản phẩm:', order)
@@ -235,6 +209,8 @@ export default {
         cartStore.updateItem(updatedOrder)
         this.$nextTick(() => {
           this.calculateTotalPrice()
+          // Kiểm tra lại tính hợp lệ của voucher sau khi cập nhật sản phẩm
+          this.validateVoucherAfterDelete()
         })
       }
       this.showEditDialog = false
@@ -242,11 +218,11 @@ export default {
 
     async handleDeleteItem(item) {
       if (this.isProcessingDelete) return
-      
+
       const notificationStore = useNotificationStore()
       const cartStore = useCartStore()
       this.isProcessingDelete = true
-      
+
       try {
         if (!item?.id) {
           throw new Error('Item không hợp lệ')
@@ -254,6 +230,9 @@ export default {
 
         await cartStore.removeItem(item.id)
         this.calculateTotalPrice()
+
+        // Kiểm tra lại tính hợp lệ của voucher sau khi xóa sản phẩm
+        this.validateVoucherAfterDelete()
 
         if (cartStore.itemCount === 0) {
           await notificationStore.warning(
@@ -275,8 +254,28 @@ export default {
       }
     },
 
+    // Thêm phương thức mới để kiểm tra tính hợp lệ của voucher
+    validateVoucherAfterDelete() {
+      if (!this.selectedVoucher) return;
+
+      // Kiểm tra điều kiện tối thiểu của voucher
+      if (this.totalPrice < this.selectedVoucher.min_order_amount) {
+        // Xóa voucher không hợp lệ
+        this.voucherStore.removeSelectedVoucher()
+      }
+    },
+
     handleVoucherSelected(voucher) {
       this.voucherStore.setSelectedVoucher(voucher)
+      this.$nextTick(() => {
+        this.calculateTotalPrice()
+      })
+    },
+
+    removeVoucher() {
+      const notificationStore = useNotificationStore()
+      this.voucherStore.removeSelectedVoucher()
+      notificationStore.success('Đã xóa voucher', 3000)
       this.$nextTick(() => {
         this.calculateTotalPrice()
       })
@@ -292,6 +291,6 @@ export default {
     }
   },
 
-  
+
 }
-</script> 
+</script>

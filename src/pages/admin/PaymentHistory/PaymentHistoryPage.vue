@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-row >
+        <v-row>
             <v-col cols="12">
                 <v-card>
                     <!-- Header section -->
@@ -49,32 +49,16 @@
                     <v-card-text>
                         <v-row>
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field 
-                                    v-model="search" 
-                                    prepend-inner-icon="mdi-magnify" 
-                                    label="Nhập mã đơn hàng"
-                                    single-line 
-                                    density="compact" 
-                                    variant="outlined" 
-                                    hide-details 
-                                    class="mb-4" 
-                                />
+                                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Nhập mã đơn hàng"
+                                    single-line density="compact" variant="outlined" hide-details class="mb-4" />
                             </v-col>
                         </v-row>
 
-                        <v-data-table 
-                            :headers="headers" 
-                            :items="filteredOrders" 
-                            :search="search" 
-                            :items-per-page="10"
-                            density="comfortable" 
-                        >
+                        <v-data-table :headers="headers" :items="filteredOrders" :search="search" :items-per-page="10"
+                            density="comfortable">
                             <template v-slot:item.order_code="{ item }">
-                                <span 
-                                    class="text-primary cursor-pointer"
-                                    style="cursor: pointer;"
-                                    @click="openOrderDetail(item)"
-                                >
+                                <span class="text-primary cursor-pointer" style="cursor: pointer;"
+                                    @click="openOrderDetail(item)">
                                     {{ item.order_code }}
                                 </span>
                             </template>
@@ -92,10 +76,7 @@
             </v-col>
         </v-row>
 
-        <PaymentDetailDialog 
-            v-model="showDialog"
-            :order-detail="selectedOrder"
-        />
+        <PaymentDetailDialog v-model="showDialog" :order-detail="selectedOrder" />
     </v-container>
 </template>
 
@@ -116,7 +97,7 @@ export default {
             mydate: new Date().toISOString().slice(0, 10),
             search: '',
             headers: [
-                { title: 'THỜI GIAN', key: 'order_time', width: '15%' },
+                { title: 'THỜI GIAN', key: 'formatted_time', width: '15%' },
                 { title: 'Mã ĐƠN', key: 'order_code', width: '15%' },
                 { title: 'SỐ TIỀN', key: 'final_price', width: '10%' },
                 { title: 'TÊN KHÁCH HÀNG', key: 'user_name', width: '20%' },
@@ -130,9 +111,10 @@ export default {
     },
     computed: {
         filteredOrders() {
-            return this.contents.filter(item => item.order_time.slice(0, 10) === this.mydate)
+            return this.contents.filter(item => item.created_at.slice(0, 10) === this.mydate)
                 .map(item => ({
                     ...item,
+                    formatted_time: this.formatTime(item.created_at)
                 }));
         },
 
@@ -180,6 +162,29 @@ export default {
 
         getStatusText(status) {
             return status === '3' ? 'Thành công' : 'Đã Hủy';
+        },
+
+        formatTime(timeString) {
+            if (!timeString) return '';
+
+            try {
+                // Xử lý chuỗi thời gian ISO
+                const date = new Date(timeString);
+
+                // Lấy giờ và phút
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+
+                // Định dạng ngày
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+                // Trả về định dạng "DD/MM HH:MM"
+                return `${day}/${month} ${hours}:${minutes}`;
+            } catch (error) {
+                console.error('Lỗi định dạng thời gian:', error);
+                return timeString;
+            }
         },
     }
 };
