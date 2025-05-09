@@ -3,23 +3,10 @@
     <v-row no-gutters>
       <v-col cols="12">
         <!-- Phần Slide -->
-        <v-carousel
-          cycle
-          hide-delimiter-background
-          show-arrows="hover"
-          :height="carouselHeight"
-          class="carousel-container"
-        >
-          <v-carousel-item
-            v-for="(url_header, i) in urls_header"
-            :key="i"
-            cover
-          >
-            <v-img
-              :src="url_header"
-              :height="carouselHeight"
-              class="align-center"
-            />
+        <v-carousel cycle hide-delimiter-background :show-arrows="$vuetify.display.mdAndUp" :height="carouselHeight"
+          class="carousel-container">
+          <v-carousel-item v-for="(url_header, i) in urls_header" :key="i" cover>
+            <v-img :src="url_header" :height="carouselHeight" class="align-center" />
           </v-carousel-item>
         </v-carousel>
       </v-col>

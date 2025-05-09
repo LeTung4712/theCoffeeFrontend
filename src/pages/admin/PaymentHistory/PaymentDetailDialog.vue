@@ -13,20 +13,22 @@
                 <template v-if="orderDetail">
                     <v-row>
                         <v-col cols="6">
-                            <p><strong>Thời gian:</strong> {{ orderDetail.order_time }}</p>
+                            <p><strong>Thời gian:</strong> {{ formatTime(orderDetail.created_at) }}</p>
                             <p><strong>Khách hàng:</strong> {{ orderDetail.user_name }}</p>
                             <p><strong>Địa chỉ:</strong> {{ orderDetail.address }}</p>
                         </v-col>
                         <v-col cols="6">
                             <p><strong>Tổng tiền:</strong>{{ formatPrice(orderDetail.final_price) }}VNĐ</p>
-                            <p><strong>Trạng thái:</strong> {{ orderDetail.status === '3' ? 'Thành công' : 'Đã Hủy' }}</p>
+                            <p><strong>Trạng thái:</strong> {{ orderDetail.status === '3' ? 'Thành công' : 'Đã Hủy' }}
+                            </p>
                         </v-col>
                     </v-row>
 
                     <v-divider class="my-4"></v-divider>
 
                     <h3 class="text-h6 mb-3">Chi tiết sản phẩm </h3>
-                    <h4 class="text-subtitle-1 text-medium-emphasis">Thành tiền = (Đơn giá + Tổng giá trị Topping + Giá size) * Số lượng</h4>
+                    <h4 class="text-subtitle-1 text-medium-emphasis">Thành tiền = (Đơn giá + Tổng giá trị Topping + Giá
+                        size) * Số lượng</h4>
                     <v-table density="comfortable">
                         <thead>
                             <tr>
@@ -44,7 +46,7 @@
                                         <div v-for="topping in item.topping_items" :key="topping.id"
                                             class="text-caption text-grey ml-3">
                                             + {{ topping ? topping.name : '' }} ({{ topping ? formatPrice(topping.price)
-                                            : 0 }}VNĐ)
+                                                : 0 }}VNĐ)
                                         </div>
                                     </template>
                                 </td>
@@ -73,7 +75,8 @@
                             <v-divider class="my-2"></v-divider>
                             <div class="d-flex justify-space-between">
                                 <strong>Tổng thanh toán:</strong>
-                                <span class="text-primary font-weight-bold">{{ formatPrice(orderDetail.final_price) }}VNĐ</span>
+                                <span class="text-primary font-weight-bold">{{ formatPrice(orderDetail.final_price)
+                                }}VNĐ</span>
                             </div>
                         </v-col>
                     </v-row>
@@ -105,13 +108,36 @@ export default {
         },
 
         calculateItemTotal(item) {
-            const toppingTotal = (item.topping_items || []).reduce((sum, topping) => 
+            const toppingTotal = (item.topping_items || []).reduce((sum, topping) =>
                 sum + (topping ? parseInt(topping.price) : 0), 0)
-            const sizePrice = item.size === 'M' ? 6000 : 
-                             item.size === 'L' ? 10000 : 0
+            const sizePrice = item.size === 'M' ? 6000 :
+                item.size === 'L' ? 10000 : 0
             const total = (parseInt(item.product_price) + toppingTotal + sizePrice) * item.product_quantity
             return total
-        }
+        },
+
+        formatTime(timeString) {
+            if (!timeString) return '';
+
+            try {
+                // Xử lý chuỗi thời gian ISO
+                const date = new Date(timeString);
+
+                // Lấy giờ và phút
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+
+                // Định dạng ngày
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+                // Trả về định dạng "DD/MM HH:MM"
+                return `${day}/${month} ${hours}:${minutes}`;
+            } catch (error) {
+                console.error('Lỗi định dạng thời gian:', error);
+                return timeString;
+            }
+        },
     }
 }
 </script>
@@ -122,15 +148,15 @@ export default {
         display: block;
         overflow-x: auto;
     }
-    
+
     .text-h6 {
         font-size: 1rem !important;
     }
-    
+
     :deep(.v-table) {
         font-size: 0.875rem;
     }
-    
+
     :deep(.v-card-text) {
         padding: 12px;
     }

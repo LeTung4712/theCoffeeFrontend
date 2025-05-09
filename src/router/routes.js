@@ -37,6 +37,16 @@ export const userRoutes = {
       path: ROUTES.CHECKOUT,
       component: () => import("@/pages/user/CheckOut/CheckOut"),
     },
+    {
+      name: "Blog",
+      path: ROUTES.BLOG_PAGE,
+      component: () => import("@/pages/user/BlogPage/BlogPage"),
+    },
+    {
+      name: "BlogDetail",
+      path: ROUTES.BLOG_DETAIL,
+      component: () => import("@/pages/user/BlogPage/BlogDetail"),
+    },
   ],
 };
 

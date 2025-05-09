@@ -8,11 +8,11 @@
         <!-- Thời gian filter -->
         <v-row>
             <v-col cols="12" sm="6" md="3">
-                <v-select v-model="timeRange" :items="timeRanges" label="Khoảng thời gian" variant="outlined"
-                    density="comfortable"></v-select>
+                <v-select v-model="analyzeStore.timeRange" :items="analyzeStore.timeRanges" label="Khoảng thời gian"
+                    variant="outlined" density="comfortable"></v-select>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-                <v-btn color="primary" @click="updateData" prepend-icon="mdi-refresh" :loading="isLoading">
+                <v-btn color="primary" @click="updateData" prepend-icon="mdi-refresh" :loading="analyzeStore.isLoading">
                     Cập nhật dữ liệu
                 </v-btn>
             </v-col>
@@ -24,9 +24,12 @@
                 <v-card>
                     <v-card-text>
                         <div class="text-subtitle-1 mb-2">Tổng doanh thu</div>
-                        <div class="text-h5 primary--text">{{ formattedPrice(totalRevenue) }}</div>
-                        <v-chip :color="revenueGrowth >= 0 ? 'success' : 'error'" size="small" class="mt-2">
-                            {{ revenueGrowth >= 0 ? '+' : '' }}{{ revenueGrowth }}%
+                        <div class="text-h5 primary--text">{{ formattedPrice(analyzeStore.statistics.totalRevenue) }}
+                        </div>
+                        <v-chip :color="analyzeStore.statistics.revenueGrowth >= 0 ? 'success' : 'error'" size="small"
+                            class="mt-2">
+                            {{ analyzeStore.statistics.revenueGrowth >= 0 ? '+' : '' }}{{
+                                analyzeStore.statistics.revenueGrowth }}%
                         </v-chip>
                     </v-card-text>
                 </v-card>
@@ -36,9 +39,11 @@
                 <v-card>
                     <v-card-text>
                         <div class="text-subtitle-1 mb-2">Tổng đơn hàng</div>
-                        <div class="text-h5">{{ totalOrders }}</div>
-                        <v-chip :color="orderGrowth >= 0 ? 'success' : 'error'" size="small" class="mt-2">
-                            {{ orderGrowth >= 0 ? '+' : '' }}{{ orderGrowth }}%
+                        <div class="text-h5">{{ analyzeStore.statistics.totalOrders }}</div>
+                        <v-chip :color="analyzeStore.statistics.orderGrowth >= 0 ? 'success' : 'error'" size="small"
+                            class="mt-2">
+                            {{ analyzeStore.statistics.orderGrowth >= 0 ? '+' : '' }}{{
+                                analyzeStore.statistics.orderGrowth }}%
                         </v-chip>
                     </v-card-text>
                 </v-card>
@@ -48,9 +53,11 @@
                 <v-card>
                     <v-card-text>
                         <div class="text-subtitle-1 mb-2">Khách hàng mới</div>
-                        <div class="text-h5">{{ newCustomers }}</div>
-                        <v-chip :color="customerGrowth >= 0 ? 'success' : 'error'" size="small" class="mt-2">
-                            {{ customerGrowth >= 0 ? '+' : '' }}{{ customerGrowth }}%
+                        <div class="text-h5">{{ analyzeStore.statistics.newCustomers }}</div>
+                        <v-chip :color="analyzeStore.statistics.customerGrowth >= 0 ? 'success' : 'error'" size="small"
+                            class="mt-2">
+                            {{ analyzeStore.statistics.customerGrowth >= 0 ? '+' : '' }}{{
+                                analyzeStore.statistics.customerGrowth }}%
                         </v-chip>
                     </v-card-text>
                 </v-card>
@@ -60,9 +67,9 @@
                 <v-card>
                     <v-card-text>
                         <div class="text-subtitle-1 mb-2">Tỷ lệ hoàn thành</div>
-                        <div class="text-h5">{{ completionRate }}%</div>
-                        <v-progress-linear :model-value="completionRate" color="success" height="8"
-                            class="mt-2"></v-progress-linear>
+                        <div class="text-h5">{{ analyzeStore.statistics.completionRate }}%</div>
+                        <v-progress-linear :model-value="analyzeStore.statistics.completionRate" color="success"
+                            height="8" class="mt-2"></v-progress-linear>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -83,7 +90,7 @@
                 <v-card>
                     <v-card-title>Top sản phẩm bán chạy</v-card-title>
                     <v-list>
-                        <v-list-item v-for="product in topProducts" :key="product.id">
+                        <v-list-item v-for="product in analyzeStore.topProducts" :key="product.id">
                             <template v-slot:prepend>
                                 <v-avatar size="40">
                                     <v-img :src="product.image_url"></v-img>
@@ -126,167 +133,99 @@
 <script>
 import Chart from 'chart.js/auto'
 import { formatPrice } from "@/utils/format";
-import { useNotificationStore } from "@/stores/notification";
-import { orderAPI } from "@/api/order";
+import { useAnalyzeStore } from '@/stores/analyze'
+import { orderAPI } from "@/api/order"
 
 export default {
     name: 'AnalyzePage',
+
+    setup() {
+        const analyzeStore = useAnalyzeStore()
+        return { analyzeStore }
+    },
+
     data() {
         return {
-            isLoading: false,
-            timeRange: 'week',
-            timeRanges: [
-                { title: '7 ngày qua', value: 'week' },
-                { title: '30 ngày qua', value: 'month' },
-                { title: '90 ngày qua', value: 'quarter' },
-                { title: '365 ngày qua', value: 'year' },
-            ],
-            // Dữ liệu mẫu
-            totalRevenue: 0,
-            revenueGrowth: 0,
-            totalOrders: 0,
-            orderGrowth: 0,
-            newCustomers: 0,
-            customerGrowth: 0,
-            completionRate: 0,
-            topProducts: [
-                {
-                    id: 1,
-                    name: "",
-                    image_url: "",
-                    soldCount: 0,
-                    revenue: 0
-                },
-                // Thêm các sản phẩm khác
-            ],
             revenueChart: null,
             orderStatusChart: null,
             paymentMethodChart: null,
         }
     },
 
-    setup() {
-        const notificationStore = useNotificationStore();
-        return { notificationStore }
-    },
-
     mounted() {
-        //this.initCharts()
+        this.updateData()
     },
 
     methods: {
         formattedPrice(price) {
-            return formatPrice(price);
+            return formatPrice(price)
         },
 
         async updateData() {
-            this.isLoading = true;
+            this.analyzeStore.isLoading = true
             try {
-                const res = await orderAPI.getAnalyzeOrders({ timeRange: this.timeRange });
-                console.log(res);
-                this.totalRevenue = res.data.totalRevenue;
-                this.revenueGrowth = res.data.revenueGrowth;
-                this.totalOrders = res.data.totalOrders;
-                this.orderGrowth = res.data.orderGrowth;
-                this.newCustomers = res.data.newCustomers;
-                this.customerGrowth = res.data.customerGrowth;
-                this.completionRate = res.data.completionRate;
-                this.topProducts = res.data.topProducts;
-                this.initCharts(res.data);
-                this.notificationStore.success('Cập nhật dữ liệu thành công', 3000);
+                const res = await orderAPI.getAnalyzeOrders({ timeRange: this.analyzeStore.timeRange })
+                this.analyzeStore.setStatistics(res.data)
+                this.analyzeStore.setTopProducts(res.data.topProducts)
+                this.analyzeStore.setChartData(res.data)
+                this.initCharts()
             } catch (error) {
-                console.log(error);
+                console.error('Error fetching analytics:', error)
             } finally {
-                this.isLoading = false;
+                this.analyzeStore.isLoading = false
             }
         },
 
-        initCharts(data) {
+        initCharts() {
             // Hủy biểu đồ cũ nếu đã tồn tại
-            if (this.revenueChart) {
-                this.revenueChart.destroy();
+            if (this.revenueChart) this.revenueChart.destroy()
+            if (this.orderStatusChart) this.orderStatusChart.destroy()
+            if (this.paymentMethodChart) this.paymentMethodChart.destroy()
+
+            // Khởi tạo biểu đồ doanh thu
+            const revenueCtx = this.$refs.revenueChart?.getContext('2d')
+            if (revenueCtx) {
+                this.revenueChart = new Chart(revenueCtx, {
+                    type: 'line',
+                    data: this.analyzeStore.getRevenueChartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                })
             }
-            if (this.orderStatusChart) {
-                this.orderStatusChart.destroy();
+
+            // Khởi tạo biểu đồ trạng thái đơn hàng
+            const orderStatusCtx = this.$refs.orderStatusChart?.getContext('2d')
+            if (orderStatusCtx) {
+                this.orderStatusChart = new Chart(orderStatusCtx, {
+                    type: 'doughnut',
+                    data: this.analyzeStore.getOrderStatusData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                })
             }
-            if (this.paymentMethodChart) {
-                this.paymentMethodChart.destroy();
+
+            // Khởi tạo biểu đồ phương thức thanh toán
+            const paymentMethodCtx = this.$refs.paymentMethodChart?.getContext('2d')
+            if (paymentMethodCtx) {
+                this.paymentMethodChart = new Chart(paymentMethodCtx, {
+                    type: 'pie',
+                    data: this.analyzeStore.getPaymentMethodData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                })
             }
+        }
+    },
 
-            // Tạo biểu đồ doanh thu
-            this.revenueChart = new Chart(this.$refs.revenueChart, {
-                type: 'line',
-                data: {
-                    labels: data.revenueByTimeRange.labels,
-                    datasets: [
-                        {
-                            label: 'Chi phí',
-                            data: data.revenueByTimeRange.costData,
-                            borderColor: '#1976D2',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Doanh thu',
-                            data: data.revenueByTimeRange.revenueData,
-                            borderColor: '#4CAF50',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Lợi nhuận',
-                            data: data.revenueByTimeRange.profitData,
-                            borderColor: '#FF5722',
-                            tension: 0.1
-                        }
-                    ]
-                }
-            });
-
-            // Tạo biểu đồ trạng thái đơn hàng
-            this.orderStatusChart = new Chart(this.$refs.orderStatusChart, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Hoàn thành', 'Đang xử lý', 'Đã hủy'],
-                    datasets: [{
-                        data: [data.orderStatusByTimeRange.completed, data.orderStatusByTimeRange.pending, data.orderStatusByTimeRange.canceled],
-                        backgroundColor: ['#4CAF50', '#2196F3', '#F44336']
-                    }]
-                }
-            });
-
-            // Tạo biểu đồ phương thức thanh toán
-            this.paymentMethodChart = new Chart(this.$refs.paymentMethodChart, {
-                type: 'pie',
-                data: {
-                    labels: ['COD', 'MoMo', 'Zalopay', 'VNPay'],
-                    datasets: [{
-                        data: [data.paymentMethodByTimeRange.COD, data.paymentMethodByTimeRange.MoMo, data.paymentMethodByTimeRange.Zalopay, data.paymentMethodByTimeRange.VNPay],
-                        backgroundColor: ['#FFC107', '#9C27B0', '#00BCD4', '#FF5722']
-                    }]
-                }
-            });
-        },
-
-        async analyzeShoppingBehavior() {
-            this.isAnalyzing = true;
-            try {
-                const response = await axios.post('/api/analyze/shopping-behavior', {
-                    algorithm: this.selectedAlgorithm,
-                    minSupport: this.minSupport,
-                    minConfidence: this.minConfidence,
-                    timeRange: this.timeRange
-                });
-
-                this.associationRules = response.data.rules;
-                this.totalRules = response.data.totalRules;
-                this.executionTime = response.data.executionTime;
-
-                this.notificationStore.success('Phân tích hành vi mua sắm thành công');
-            } catch (error) {
-                console.error('Error analyzing shopping behavior:', error);
-                this.notificationStore.error('Có lỗi xảy ra khi phân tích hành vi mua sắm');
-            } finally {
-                this.isAnalyzing = false;
-            }
+    watch: {
+        'analyzeStore.timeRange'() {
+            this.updateData()
         }
     }
 }

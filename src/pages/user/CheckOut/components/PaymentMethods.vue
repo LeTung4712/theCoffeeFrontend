@@ -57,13 +57,13 @@ export default {
         {
           value: 'vnpay',
           label: 'VNPAY',
-          image: 'https://minio.thecoffeehouse.com/image/tchmobileapp/1120_1119_ShopeePay-Horizontal2_O.png',
+          image: 'https://minio.thecoffeehouse.com/image/admin/1690094645_362961302-6516710751684191-4996740142959914656-n.png',
           enabled: true
         },
         {
-          value: 'atm',
-          label: 'Thẻ ngân hàng',
-          image: 'https://minio.thecoffeehouse.com/image/tchmobileapp/385_ic_atm@3x.png',
+          value: 'ZaloPay',
+          label: 'ZaloPay',
+          image: 'https://minio.thecoffeehouse.com/image/tchmobileapp/388_ic_zalo@3x.png',
           enabled: true
         }
       ].filter(method => method.enabled)

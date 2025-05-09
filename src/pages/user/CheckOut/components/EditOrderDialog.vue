@@ -48,8 +48,9 @@
         </v-row>
 
         <!-- Note -->
-        <v-text-field v-model="item_note" placeholder="Ghi chú thêm cho món này" variant="outlined" density="comfortable"
-          prepend-inner-icon="mdi-note-text" class="mt-6" hide-details bg-color="grey-lighten-4" />
+        <v-text-field v-model="item_note" placeholder="Ghi chú thêm cho món này" variant="outlined"
+          density="comfortable" prepend-inner-icon="mdi-note-text" class="mt-6" hide-details
+          bg-color="grey-lighten-4" />
 
         <!-- Size Selection -->
         <template v-if="hasToppings">
@@ -112,6 +113,7 @@ import { formatPrice } from "@/utils/format";
 import { productAPI } from "@/api/product";
 import { useCartStore } from '@/stores/cart'
 import { useNotificationStore } from '@/stores/notification'
+import { useVoucherStore } from '@/stores/voucher'
 export default {
   name: 'EditOrderDialog',
 
@@ -188,11 +190,8 @@ export default {
       if (!this.order?.product_item?.id) return;
       this.isLoading = true;
       try {
-        const response = await productAPI.getInfo({
-          params: { product_id: this.order.product_item.id }
-        });
+        const response = await productAPI.getInfo({ product_id: this.order.product_item.id });
         const data = response.data;
-        console.log('data', data)
         this.product = data.product;
         this.topping_items = data.product.toppings.map(topping => ({
           ...topping,
@@ -207,7 +206,7 @@ export default {
     },
 
     calculateTotalPrice() {
-      const basePrice = parseInt(this.product.price) || 0  
+      const basePrice = parseInt(this.product.price) || 0
       const toppingPrice = this.checked_topping.reduce((sum, topping) =>
         sum + parseInt(topping.price), 0)
       const sizePrice = this.sizeOptions.find(opt => opt.value === this.size)?.price || 0
@@ -219,6 +218,7 @@ export default {
       this.isLoading = true
       const cartStore = useCartStore()
       const notificationStore = useNotificationStore()
+      const voucherStore = useVoucherStore()
 
       try {
         const updatedOrder = {
@@ -232,6 +232,15 @@ export default {
         }
 
         cartStore.updateItem(updatedOrder)
+
+        // Tính toán lại tổng giá trị đơn hàng
+        const totalPrice = cartStore.items.reduce((sum, order) => sum + order.total_amount, 0)
+
+        // Kiểm tra tính hợp lệ của voucher
+        if (voucherStore.selectedVoucher && totalPrice < voucherStore.selectedVoucher.min_order_amount) {
+          voucherStore.removeSelectedVoucher()
+        }
+
         notificationStore.success('Cập nhật thành công!', 3000)
         this.closeDialog()
       } catch (error) {

@@ -53,7 +53,7 @@
                             @click="handleMenuClick(i + 1)" :color="select === i + 1 ? 'primary' : undefined"
                             class="py-3">
                             <template v-slot:prepend>
-                                <v-img :src="item.icon" :opacity="select === i + 1 ? 1 : 0.7" width="20" class="me-2"/>
+                                <v-img :src="item.icon" :opacity="select === i + 1 ? 1 : 0.7" width="20" class="me-2" />
                             </template>
                             <v-list-item-title :class="{
                                 'text-primary': select === i + 1,
@@ -205,13 +205,13 @@ export default {
                     return
                 }
                 this.userInfomation = userData
-                
+
                 await Promise.all([
                     this.getAddresses(userData.id),
                     this.getOrders(userData.id)
                 ])
             } catch (error) {
-                this.notificationStore.error('Không thể t�i thông tin người dùng', 3000)
+                this.notificationStore.error('Không thể tải thông tin người dùng', 3000)
                 console.error('Lỗi khi khởi tạo dữ liệu:', error)
             }
         },
@@ -222,7 +222,6 @@ export default {
                 const response = await userAPI.getAddressNote({ user_id: userId })
                 this.addressStore.setAddressNote(response.data.address_note)
                 this.listAddresses = this.addressStore.addressNote
-                
                 const defaultAddress = this.listAddresses.find(address => address.is_default)
                 if (defaultAddress) {
                     this.addressStore.updateAddress(defaultAddress.address)
@@ -239,7 +238,12 @@ export default {
                 const response = await userAPI.getOrdersUser({ user_id: userId })
                 this.listOrders = response.data.orders
             } catch (error) {
-                this.notificationStore.error('Không thể tải lịch sử đơn hàng', 3000)
+                if (error.response && error.response.status === 404) {
+                    this.notificationStore.info('Bạn chưa có lịch sử mua hàng', 3000)
+                    this.listOrders = [] // Đảm bảo mảng rỗng khi không có đơn hàng
+                } else {
+                    this.notificationStore.error('Không thể tải lịch sử đơn hàng', 3000)
+                }
                 console.error('Lỗi khi lấy đơn hàng:', error)
             }
         },
@@ -326,6 +330,4 @@ export default {
 }
 </script>
 
-<style scope>
-
-</style>
+<style scope></style>

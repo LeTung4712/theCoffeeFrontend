@@ -18,7 +18,6 @@ export const userAPI = {
   },
 
   getAddressNote(data) {
-    console.log('call address')
     return httpClient.get(`${PREFIX}/info/getAddressNote`, { params: data });
   },
 

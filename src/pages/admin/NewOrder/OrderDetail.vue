@@ -237,7 +237,7 @@ export default {
                 order_total_price: orderInfo.total_price,
                 order_discount_amount: orderInfo.discount_amount,
                 order_shipping_fee: orderInfo.shipping_fee,
-                order_time: new Date(orderInfo.order_time).toLocaleString(),
+                order_time: new Date(orderInfo.created_at).toLocaleString(),
                 order_status: orderInfo.status,
             };
         },

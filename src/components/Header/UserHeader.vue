@@ -18,13 +18,8 @@
         <v-col class="d-none d-sm-flex">
           <v-row justify="center" align="center" class="fill-height">
             <v-col cols="auto" v-for="item in menuItems" :key="item.title">
-              <v-btn 
-                variant="text"
-                :to="item.to"
-                class="text-none font-weight-medium px-2"
-                color="text-primary"
-                height="48"
-              >
+              <v-btn variant="text" :to="item.to" class="text-none font-weight-medium px-2" color="text-primary"
+                height="48">
                 {{ item.title }}
               </v-btn>
             </v-col>
@@ -34,7 +29,7 @@
         <!-- User Menu & Cart -->
         <v-col cols="auto" class="pr-4">
           <v-row no-gutters align="center">
-            
+
             <!-- User Menu -->
             <v-col cols="auto">
               <template v-if="logged">
@@ -51,19 +46,10 @@
                   </template>
 
                   <v-list>
-                    <v-list-item
-                      v-for="(item, index) in userMenuItems"
-                      :key="index"
-                      :prepend-icon="item.icon"
-                      :title="item.title"
-                      @click="handleClickInfo(item.route)"
-                    />
+                    <v-list-item v-for="(item, index) in userMenuItems" :key="index" :prepend-icon="item.icon"
+                      :title="item.title" @click="handleClickInfo(item.route)" />
                     <v-divider />
-                    <v-list-item
-                      prepend-icon="mdi-logout"
-                      title="Thoát"
-                      @click="logout"
-                    />
+                    <v-list-item prepend-icon="mdi-logout" title="Thoát" @click="logout" />
                   </v-list>
                 </v-menu>
               </template>
@@ -75,25 +61,15 @@
                   </v-avatar>
                 </v-btn>
                 <!-- Login Popup -->
-                <login-popup 
-                  ref="loginPopup"
-                  @login-success="handleLoginSuccess"
-                />
+                <login-popup ref="loginPopup" @login-success="handleLoginSuccess" />
               </template>
             </v-col>
 
             <!-- Cart Button -->
             <v-col cols="auto" class="ml-2 ml-sm-6">
               <v-btn icon variant="text" @click="handelClickCart" height="48">
-                <v-badge
-                  :content="cartStore.itemCount"
-                  color="error"
-                  location="bottom start"
-                  :dot="false"
-                  offset-x="0"
-                  offset-y="0"
-                  v-if="cartStore.itemCount > 0"
-                >
+                <v-badge :content="cartStore.itemCount" color="error" location="bottom start" :dot="false" offset-x="0"
+                  offset-y="0" v-if="cartStore.itemCount > 0">
                   <v-icon size="32" color="background">mdi-cart</v-icon>
                 </v-badge>
                 <v-icon v-else size="32" color="white">mdi-cart</v-icon>
@@ -116,7 +92,7 @@ import { useNotificationStore } from '@/stores/notification'
 
 export default {
   name: "UserHeader",
-  
+
   components: {
     DeliveryAddressButton,
     LoginPopup
@@ -136,8 +112,8 @@ export default {
       group: null,
       displayClick: false,
       menuItems: [
-        { title: 'Menu', to: '/collections/menu' },
-        { title: 'Tin tức', to: '/blogs' },
+        { title: 'Menu', to: '/collections/menu/0' },
+        { title: 'Tin tức', to: '/blog' },
         { title: 'Cửa hàng', to: '/store' },
         { title: 'Khuyến mãi', to: '/promotion' },
         { title: 'Tuyển dụng', to: '/job' },
@@ -226,7 +202,7 @@ export default {
 
   beforeUnmount() {
     window.removeEventListener("order-localstorage-changed", this.handleOrderChange)
-    window.removeEventListener("scroll", this.handleScroll) 
+    window.removeEventListener("scroll", this.handleScroll)
   }
 }
 </script>
@@ -272,7 +248,8 @@ export default {
   padding: 4px;
 }
 
-.v-avatar, .v-icon {
+.v-avatar,
+.v-icon {
   margin: auto 0;
 }
 </style>
