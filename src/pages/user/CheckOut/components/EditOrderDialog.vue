@@ -238,10 +238,6 @@ export default {
 
         // Kiểm tra tính hợp lệ của voucher
         if (voucherStore.selectedVoucher && totalPrice < voucherStore.selectedVoucher.min_order_amount) {
-          notificationStore.warning(
-            `Voucher không còn phù hợp. Đơn hàng cần tối thiểu ${formatPrice(voucherStore.selectedVoucher.min_order_amount)}đ`,
-            5000
-          )
           voucherStore.removeSelectedVoucher()
         }
 

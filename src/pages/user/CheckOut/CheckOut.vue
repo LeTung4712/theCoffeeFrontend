@@ -15,87 +15,148 @@
           </v-card-title>
         </v-card>
 
-        <!-- Main Content -->
-        <div class="checkout-content">
-          <v-row>
-            <!-- Left Column -->
-            <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 1 : 2">
-              <DeliverySection @delivery-info-loaded="handleDeliveryInfoLoaded" />
-              <PaymentMethods @payment-method-changed="handlePaymentMethodChanged" />
+        <!-- Stepper -->
+        <v-stepper v-model="currentStep" class="mb-6">
+          <v-stepper-header>
+            <v-stepper-item value="1">
+              <span :class="{ 'd-none d-sm-flex': true }">Giỏ hàng</span>
+              <span class="d-flex d-sm-none">1</span>
+            </v-stepper-item>
+            <v-divider></v-divider>
+            <v-stepper-item value="2">
+              <span :class="{ 'd-none d-sm-flex': true }">Giao hàng</span>
+              <span class="d-flex d-sm-none">2</span>
+            </v-stepper-item>
+            <v-divider></v-divider>
+            <v-stepper-item value="3">
+              <span :class="{ 'd-none d-sm-flex': true }">Thanh toán</span>
+              <span class="d-flex d-sm-none">3</span>
+            </v-stepper-item>
+          </v-stepper-header>
 
-              <!-- Thêm checkbox điều khoản -->
-              <v-card flat class="pa-4 bg-grey-lighten-4">
-                <v-checkbox v-model="agreedToTerms" color="primary">
-                  <template #label>
-                    <span>
-                      Đồng ý với các
-                      <a href="#" class="text-primary text-decoration-underline">điều khoản và điều kiện</a>
-                      mua hàng của The Coffee House
-                    </span>
-                  </template>
-                </v-checkbox>
-              </v-card>
-
-              <!-- Nút xóa đơn hàng -->
-              <v-card-actions class="pa-4 bg-grey-lighten-4">
-                <v-btn color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteOrder"
-                  class="delete-order-btn">
-                  Xóa toàn bộ đơn hàng
-                </v-btn>
-              </v-card-actions>
-            </v-col>
-
-            <!-- Right Column -->
-            <v-col cols="12" md="6" :order="$vuetify.display.mdAndUp ? 2 : 1">
-              <v-card elevation="4" rounded="lg" class="pa-0">
+          <v-stepper-window>
+            <!-- Bước 1: Giỏ hàng & Gợi ý -->
+            <v-stepper-window-item value="1">
+              <v-card elevation="4" rounded="lg" class="pa-0 mb-6">
                 <OrderSummary ref="orderSummary" @order-loaded="handleOrderLoaded"
                   @add-more="$router.push('/collections/menu')" />
-
-                <!-- Desktop footer giữ nguyên -->
-                <v-card-actions class="bg-primary pa-4 desktop-footer">
-                  <v-row no-gutters align="center">
-                    <v-col>
-                      <div class="text-white">
-                        <div class="text-body-2">Thành tiền</div>
-                        <div class="text-h6 font-weight-bold">
-                          {{ formattedPrice(finalPrice) }}đ
-                        </div>
-                      </div>
-                    </v-col>
-
-                    <v-col class="text-right">
-                      <v-btn color="white" size="x-large" rounded variant="elevated" :loading="isLoading" :elevation="3"
-                        prepend-icon="mdi-cart-check" class="order-button" @click="validateAndCheckout">
-                        Đặt hàng
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-card-actions>
               </v-card>
-            </v-col>
-          </v-row>
-        </div>
 
-        <!-- Footer cho mobile -->
-        <div class="mobile-footer">
-          <v-row no-gutters align="center">
-            <v-col>
-              <div class="text-white">
-                <div class="text-body-2">Thành tiền</div>
-                <div class="text-h6 font-weight-bold">
-                  {{ formattedPrice(finalPrice) }}đ
-                </div>
+              <!-- Component Gợi ý -->
+              <RecommendCheckout @product-added="handleProductAdded" />
+
+              <div class="d-flex justify-end mt-6">
+                <v-btn color="primary" prepend-icon="mdi-arrow-right" @click="goToStep(2)" :disabled="!hasItems">
+                  Tiếp tục
+                </v-btn>
               </div>
-            </v-col>
+            </v-stepper-window-item>
 
-            <v-col class="text-right">
-              <v-btn color="white" size="x-large" rounded variant="elevated" :loading="isLoading" :elevation="3"
-                prepend-icon="mdi-cart-check" class="order-button" @click="validateAndCheckout">
-                Đặt hàng
-              </v-btn>
-            </v-col>
-          </v-row>
-        </div>
+            <!-- Bước 2: Thông tin giao hàng -->
+            <v-stepper-window-item value="2">
+              <v-row>
+                <v-col cols="12">
+                  <DeliverySection @delivery-info-loaded="handleDeliveryInfoLoaded" />
+
+                  <div class="d-flex justify-space-between mt-6">
+                    <v-btn color="grey" variant="outlined" prepend-icon="mdi-arrow-left" @click="goToStep(1)">
+                      Quay lại
+                    </v-btn>
+                    <v-btn color="primary" prepend-icon="mdi-arrow-right" @click="goToStep(3)"
+                      :disabled="!deliveryInfo || !deliveryInfo.address || deliveryInfo.address === 'Chưa có địa chỉ giao hàng'">
+                      Tiếp tục
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-stepper-window-item>
+
+            <!-- Bước 3: Phương thức thanh toán và Xác nhận -->
+            <v-stepper-window-item value="3">
+              <v-row>
+                <v-col cols="12" md="6">
+                  <PaymentMethods @payment-method-changed="handlePaymentMethodChanged" />
+
+                  <!-- Thêm checkbox điều khoản -->
+                  <v-card flat class="pa-4 bg-grey-lighten-4 mt-4">
+                    <v-checkbox v-model="agreedToTerms" color="primary">
+                      <template #label>
+                        <span>
+                          Đồng ý với các
+                          <a href="#" class="text-primary text-decoration-underline">điều khoản và điều kiện</a>
+                          mua hàng của The Coffee House
+                        </span>
+                      </template>
+                    </v-checkbox>
+                  </v-card>
+
+                  <!-- Nút xóa đơn hàng -->
+                  <v-card-actions class="pa-4 bg-grey-lighten-4">
+                    <v-btn color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteOrder"
+                      class="delete-order-btn">
+                      Xóa toàn bộ đơn hàng
+                    </v-btn>
+                  </v-card-actions>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                  <v-card elevation="4" rounded="lg" class="pa-4">
+                    <v-card-title>Tóm tắt đơn hàng</v-card-title>
+                    <v-list>
+                      <v-list-item>
+                        <div class="d-flex justify-space-between w-100">
+                          <span>Tổng tiền hàng:</span>
+                          <span>{{ formattedPrice((orderData && orderData.totalPrice) || 0) }}đ</span>
+                        </div>
+                      </v-list-item>
+
+                      <v-list-item>
+                        <div class="d-flex justify-space-between w-100">
+                          <span>Giảm giá:</span>
+                          <span>{{ formattedPrice((orderData && orderData.voucherDiscount) || 0) }}đ</span>
+                        </div>
+                      </v-list-item>
+
+                      <v-list-item>
+                        <div class="d-flex justify-space-between w-100">
+                          <span>Phí giao hàng:</span>
+                          <span>15,000đ</span>
+                        </div>
+                      </v-list-item>
+
+                      <v-divider class="my-2"></v-divider>
+
+                      <v-list-item>
+                        <div class="d-flex justify-space-between w-100">
+                          <span class="text-subtitle-1 font-weight-bold">Tổng thanh toán:</span>
+                          <span class="text-subtitle-1 font-weight-bold">{{ formattedPrice(finalPrice) }}đ</span>
+                        </div>
+                      </v-list-item>
+                    </v-list>
+
+                    <v-card-actions class="pt-4">
+                      <v-row>
+                        <v-col cols="6">
+                          <v-btn color="grey" variant="outlined" prepend-icon="mdi-arrow-left" block
+                            @click="goToStep(2)">
+                            Quay lại
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="6">
+                          <v-btn color="primary" variant="elevated" prepend-icon="mdi-cart-check" block
+                            :loading="isLoading" :disabled="!isValidCheckout || !agreedToTerms"
+                            @click="validateAndCheckout">
+                            Đặt hàng
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-stepper-window-item>
+          </v-stepper-window>
+        </v-stepper>
 
         <!-- Thêm confirm dialog -->
         <v-dialog v-model="showConfirmDialog" max-width="400">
@@ -130,6 +191,7 @@ import { paymentAPI } from '@/api/payment'
 import DeliverySection from './components/DeliverySection.vue'
 import PaymentMethods from './components/PaymentMethods.vue'
 import OrderSummary from './components/OrderSummary.vue'
+import RecommendCheckout from './components/RecommendCheckout.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
@@ -142,7 +204,8 @@ export default {
   components: {
     DeliverySection,
     PaymentMethods,
-    OrderSummary
+    OrderSummary,
+    RecommendCheckout
   },
 
   setup() {
@@ -155,6 +218,7 @@ export default {
 
   data() {
     return {
+      currentStep: '1',
       isLoading: false,
       orderData: null,
       deliveryInfo: null,
@@ -179,6 +243,10 @@ export default {
   },
 
   computed: {
+    hasItems() {
+      return this.orderData?.items?.length > 0
+    },
+
     isValidCheckout() {
       return (
         this.orderData?.items?.length > 0 &&
@@ -192,6 +260,15 @@ export default {
   methods: {
     formattedPrice(price) {
       return formatPrice(price)
+    },
+
+    goToStep(step) {
+      this.currentStep = step.toString()
+    },
+
+    handleProductAdded(product) {
+      // Cập nhật lại thông tin đơn hàng sau khi thêm sản phẩm
+      this.$refs.orderSummary.calculateTotalPrice()
     },
 
     handleOrderLoaded(data) {
@@ -312,10 +389,6 @@ export default {
       } finally {
         this.isDeleting = false
       }
-    },
-
-    formatPrice(price) {
-      return new Intl.NumberFormat('vi-VN').format(price)
     },
 
     validateAndCheckout() {
