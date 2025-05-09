@@ -112,7 +112,7 @@ export default {
       group: null,
       displayClick: false,
       menuItems: [
-        { title: 'Menu', to: '/collections/menu' },
+        { title: 'Menu', to: '/collections/menu/0' },
         { title: 'Tin tức', to: '/blog' },
         { title: 'Cửa hàng', to: '/store' },
         { title: 'Khuyến mãi', to: '/promotion' },

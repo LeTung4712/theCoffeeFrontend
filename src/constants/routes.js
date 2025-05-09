@@ -3,7 +3,7 @@ export const ROUTES = {
   PRODUCT_DETAIL: "products/:product_name_convert",
   USER_PAGE: "user/:name",
   BLOG_PAGE: "blog",
-  MENU: "collections/:category_name",
+  MENU: "collections/:category_name/:category_id",
   CHECKOUT: "thanh-toan",
   BLOG_DETAIL: "blog/:blog_name_convert",
   // routes cho admin
