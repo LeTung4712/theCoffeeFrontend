@@ -13,8 +13,8 @@
         </v-row>
 
         <v-row>
-            <!-- Menu Tree Column -->
-            <v-col cols="12" md="3">
+            <!-- Menu Tree Column - Chỉ hiển thị trên desktop -->
+            <v-col cols="12" md="3" class="d-none d-md-block">
                 <v-card flat>
                     <v-card-title class="d-flex align-center">
                         <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
@@ -69,53 +69,53 @@
                         </v-list>
                     </v-card-text>
                 </v-card>
-
-                <!-- Mobile menu -->
-                <v-bottom-sheet v-model="mobileMenuOpen" class="d-md-none">
-                    <v-card>
-                        <v-card-title class="d-flex justify-space-between">
-                            <span>Danh mục</span>
-                            <v-btn icon @click="mobileMenuOpen = false">
-                                <v-icon>mdi-close</v-icon>
-                            </v-btn>
-                        </v-card-title>
-
-                        <v-card-text>
-                            <v-list density="compact" nav>
-                                <!-- Tất cả sản phẩm -->
-                                <v-list-item :active="!currentCategoryId"
-                                    @click="selectCategory(null); mobileMenuOpen = false" prepend-icon="mdi-view-grid">
-                                    <v-list-item-title>Tất cả sản phẩm</v-list-item-title>
-                                </v-list-item>
-
-                                <!-- Danh mục cha -->
-                                <v-list-group v-for="category in rootCategories" :key="category.id"
-                                    :opened="category.isOpen" :open-on-click="false">
-                                    <template v-slot:activator="{ props }">
-                                        <v-list-item v-bind="props" :active="currentCategoryId === category.id"
-                                            @click="selectCategory(category); mobileMenuOpen = false">
-                                            <template v-slot:prepend>
-                                                <v-icon>mdi-folder-outline</v-icon>
-                                            </template>
-                                            <v-list-item-title>{{ category.name }}</v-list-item-title>
-                                        </v-list-item>
-                                    </template>
-
-                                    <!-- Danh mục con -->
-                                    <v-list-item v-for="child in getChildCategories(category.id)" :key="child.id"
-                                        :active="currentCategoryId === child.id"
-                                        @click="selectCategory(child); mobileMenuOpen = false" class="pl-4">
-                                        <template v-slot:prepend>
-                                            <v-icon>mdi-coffee-to-go-outline</v-icon>
-                                        </template>
-                                        <v-list-item-title>{{ child.name }}</v-list-item-title>
-                                    </v-list-item>
-                                </v-list-group>
-                            </v-list>
-                        </v-card-text>
-                    </v-card>
-                </v-bottom-sheet>
             </v-col>
+
+            <!-- Mobile menu -->
+            <v-bottom-sheet v-model="mobileMenuOpen" class="d-md-none">
+                <v-card>
+                    <v-card-title class="d-flex justify-space-between">
+                        <span>Danh mục</span>
+                        <v-btn icon @click="mobileMenuOpen = false">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                    </v-card-title>
+
+                    <v-card-text>
+                        <v-list density="compact" nav>
+                            <!-- Tất cả sản phẩm -->
+                            <v-list-item :active="!currentCategoryId"
+                                @click="selectCategory(null); mobileMenuOpen = false" prepend-icon="mdi-view-grid">
+                                <v-list-item-title>Tất cả sản phẩm</v-list-item-title>
+                            </v-list-item>
+
+                            <!-- Danh mục cha -->
+                            <v-list-group v-for="category in rootCategories" :key="category.id"
+                                :opened="category.isOpen" open-on-click>
+                                <template v-slot:activator="{ props }">
+                                    <v-list-item v-bind="props" :active="currentCategoryId === category.id"
+                                        @click.stop="handleMobileParentClick(category, $event)">
+                                        <template v-slot:prepend>
+                                            <v-icon>mdi-folder-outline</v-icon>
+                                        </template>
+                                        <v-list-item-title>{{ category.name }}</v-list-item-title>
+                                    </v-list-item>
+                                </template>
+
+                                <!-- Danh mục con -->
+                                <v-list-item v-for="child in getChildCategories(category.id)" :key="child.id"
+                                    :active="currentCategoryId === child.id"
+                                    @click="selectCategory(child); mobileMenuOpen = false" class="pl-4">
+                                    <template v-slot:prepend>
+                                        <v-icon>mdi-coffee-to-go-outline</v-icon>
+                                    </template>
+                                    <v-list-item-title>{{ child.name }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list-group>
+                        </v-list>
+                    </v-card-text>
+                </v-card>
+            </v-bottom-sheet>
 
             <!-- Products Column -->
             <v-col cols="12" md="9">
@@ -440,6 +440,22 @@ export default {
             if (item.disabled) return;
             if (item.href) {
                 this.$router.push(item.href);
+            }
+        },
+
+        handleMobileParentClick(category, event) {
+            // Ngăn chặn sự kiện mặc định để không đóng menu
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Nếu danh mục không có danh mục con, chọn danh mục và đóng menu
+            if (this.getChildCategories(category.id).length === 0) {
+                this.selectCategory(category);
+                this.mobileMenuOpen = false;
+            } else {
+                // Nếu có danh mục con, chỉ chọn danh mục nhưng không đóng menu
+                this.selectCategory(category);
+                // Menu sẽ không đóng để người dùng có thể chọn danh mục con
             }
         },
     },
