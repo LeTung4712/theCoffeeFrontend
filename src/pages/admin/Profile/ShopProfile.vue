@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import logoImage from '@/assets/logo.jpg'
+import logoImage from '@/assets/logo-admin.png'
 export default {
     name: "ShopProfile",
     
