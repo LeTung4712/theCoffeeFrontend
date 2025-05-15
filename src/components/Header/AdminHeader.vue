@@ -1,12 +1,6 @@
 <template>
     <div>
-        <v-app-bar 
-            app 
-            color="primary" 
-            dark
-            elevation="4"
-            class="fixed-header"
-        >
+        <v-app-bar app color="primary" dark elevation="4" class="fixed-header">
             <v-app-bar-nav-icon @click="toggleDrawer" />
             <v-toolbar-title>Admin Dashboard</v-toolbar-title>
             <v-spacer></v-spacer>
@@ -18,11 +12,7 @@
             </v-btn>
         </v-app-bar>
 
-        <v-navigation-drawer 
-            :model-value="drawer" 
-            app
-            class="navigation-drawer"
-        >
+        <v-navigation-drawer :model-value="drawer" app class="navigation-drawer">
             <div class="drawer-content">
                 <v-list>
                     <v-list-item v-for="item in menuItems" :key="item.title" :to="item.to" link>
@@ -33,14 +23,8 @@
                     </v-list-item>
                 </v-list>
             </div>
-            
-            <v-btn
-                block
-                color="error"
-                class="logout-btn"
-                @click="logout"
-                prepend-icon="mdi-logout"
-            >
+
+            <v-btn block color="error" class="logout-btn" @click="logout" prepend-icon="mdi-logout">
                 Logout
             </v-btn>
         </v-navigation-drawer>
@@ -67,13 +51,19 @@ export default {
                 { title: "Delivery Orders", icon: "mdi-truck", to: "/admin/pages/delivery-orders" },
                 { title: "Payment History", icon: "mdi-history", to: "/admin/pages/payment-history" },
                 { title: "Settings", icon: "mdi-cog", to: "/admin/pages/settings" },
-                
+
             ],
         }
+    },
+    mounted() {
+        // Emit initial drawer state
+        this.$emit('update:drawer', this.drawer);
     },
     methods: {
         toggleDrawer() {
             this.drawer = !this.drawer;
+            // Emit event to parent when drawer changes
+            this.$emit('update:drawer', this.drawer);
         },
         async logout() {
             //const response = await adminAPI.logout();
