@@ -13,11 +13,12 @@ export const ROUTES = {
     ANALYZE: "analyze",
     SHOPPING_BEHAVIOR: "shopping-behavior",
     MANAGE_PRODUCTS: "manage-products",
+    MANAGE_PRODUCTS_CATEGORY: "manage-products/:category_name/:category_id",
     MANAGE_VOUCHERS: "manage-vouchers",
     MANAGE_TOPPINGS: "manage-toppings",
-    NEW_ORDERS: "new-orders", 
+    NEW_ORDERS: "new-orders",
     PAYMENT_HISTORY: "payment-history",
     DELIVERY_ORDERS: "delivery-orders",
-    LOGIN: "login"
-  }
+    LOGIN: "login",
+  },
 };

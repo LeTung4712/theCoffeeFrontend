@@ -116,7 +116,6 @@ export default {
         { title: 'Tin tức', to: '/blog' },
         { title: 'Cửa hàng', to: '/store' },
         { title: 'Khuyến mãi', to: '/promotion' },
-        { title: 'Tuyển dụng', to: '/job' },
       ],
       userMenuItems: [
         { title: 'Thông tin tài khoản', icon: 'mdi-account', route: 'user-info' },

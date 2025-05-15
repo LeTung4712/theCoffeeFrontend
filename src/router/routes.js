@@ -84,19 +84,29 @@ export const adminRoutes = {
         {
           name: "ManageProducts",
           path: ROUTES.ADMIN.MANAGE_PRODUCTS,
-          component: () => import("@/pages/admin/ManageProduct/ManageProductPage"),
+          component: () =>
+            import("@/pages/admin/ManageProduct/ManageProductPage"),
+          meta: { requiresAuth: true },
+        },
+        {
+          name: "ManageProductsCategory",
+          path: ROUTES.ADMIN.MANAGE_PRODUCTS_CATEGORY,
+          component: () =>
+            import("@/pages/admin/ManageProduct/ManageProductPage"),
           meta: { requiresAuth: true },
         },
         {
           name: "ManageToppings",
           path: ROUTES.ADMIN.MANAGE_TOPPINGS,
-          component: () => import("@/pages/admin/ManageTopping/ManageToppingPage"),
+          component: () =>
+            import("@/pages/admin/ManageTopping/ManageToppingPage"),
           meta: { requiresAuth: true },
         },
         {
           name: "ManageVouchers",
           path: ROUTES.ADMIN.MANAGE_VOUCHERS,
-          component: () => import("@/pages/admin/ManageVoucher/ManageVoucherPage"),
+          component: () =>
+            import("@/pages/admin/ManageVoucher/ManageVoucherPage"),
           meta: { requiresAuth: true },
         },
         {
@@ -114,16 +124,18 @@ export const adminRoutes = {
         {
           name: "PaymentHistory",
           path: ROUTES.ADMIN.PAYMENT_HISTORY,
-          component: () => import("@/pages/admin/PaymentHistory/PaymentHistoryPage"),
+          component: () =>
+            import("@/pages/admin/PaymentHistory/PaymentHistoryPage"),
           meta: { requiresAuth: true },
         },
         {
           name: "DeliveryOrders",
           path: ROUTES.ADMIN.DELIVERY_ORDERS,
-          component: () => import("@/pages/admin/DeliveryOrder/DeliveryOrderPage"),
+          component: () =>
+            import("@/pages/admin/DeliveryOrder/DeliveryOrderPage"),
           meta: { requiresAuth: true },
         },
-      ]
-    }
+      ],
+    },
   ],
 };
