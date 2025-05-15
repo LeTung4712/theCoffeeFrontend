@@ -96,7 +96,33 @@
             <v-divider></v-divider>
 
             <v-card-text>
-                <v-data-table :headers="headers" :items="formattedRules" class="elevation-0">
+                <v-row class="mb-2">
+                    <v-col cols="12" sm="4" md="3">
+                        <v-text-field v-model="search" prepend-icon="mdi-magnify" label="Tìm kiếm" density="compact"
+                            variant="outlined" hide-details></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="4" md="3">
+                        <v-select v-model="sortBy" :items="sortOptions" label="Sắp xếp theo" density="compact"
+                            variant="outlined" hide-details></v-select>
+                    </v-col>
+                    <v-col cols="12" sm="4" md="3">
+                        <v-select v-model="sortDirection" :items="sortDirections" label="Thứ tự" density="compact"
+                            variant="outlined" hide-details></v-select>
+                    </v-col>
+                    <v-spacer></v-spacer>
+                    <v-col cols="auto">
+                        <v-btn prepend-icon="mdi-microsoft-excel" color="success" variant="tonal"
+                            @click="exportToExcel">
+                            Xuất Excel
+                        </v-btn>
+                    </v-col>
+                </v-row>
+
+                <v-data-table :headers="headers" :items="filteredAndSortedRules" :search="search" class="elevation-0"
+                    :items-per-page="10" :footer-props="{
+                        'items-per-page-options': [5, 10, 20, 50],
+                        showFirstLastPage: true,
+                    }">
                     <template v-slot:item.index="{ item, index }">
                         {{ index + 1 }}
                     </template>
@@ -112,8 +138,14 @@
                             {{ product.name }}
                         </v-chip>
                     </template>
+                    <template v-slot:item.support="{ item }">
+                        {{ (Number(item.support) * 100).toFixed(1) }}%
+                    </template>
                     <template v-slot:item.confidence="{ item }">
                         {{ (Number(item.confidence) * 100).toFixed(1) }}%
+                    </template>
+                    <template v-slot:item.lift="{ item }">
+                        {{ Number(item.lift).toFixed(2) }}
                     </template>
                 </v-data-table>
             </v-card-text>
@@ -153,7 +185,9 @@ export default {
                 { title: 'STT', key: 'index', align: 'center', width: '80px' },
                 { title: 'Sản phẩm gốc', key: 'antecedent', align: 'start' },
                 { title: 'Sản phẩm gợi ý', key: 'consequent', align: 'start' },
-                { title: 'Độ tin cậy', key: 'confidence', align: 'center', width: '120px' }
+                { title: 'Support', key: 'support', align: 'center', width: '120px' },
+                { title: 'Confidence', key: 'confidence', align: 'center', width: '120px' },
+                { title: 'Lift', key: 'lift', align: 'center', width: '120px' },
             ],
             minSupport: 0.1,
             minConfidence: 0.5,
@@ -166,9 +200,23 @@ export default {
                 {
                     antecedent: ['A', 'B'],
                     consequent: ['C'],
-                    confidence: 0.8
+                    confidence: 0.8,
+                    support: 0.4,
+                    lift: 1.2
                 }
-            ]
+            ],
+            search: '',
+            sortBy: 'confidence',
+            sortDirection: 'desc',
+            sortOptions: [
+                { title: 'Confidence', value: 'confidence' },
+                { title: 'Support', value: 'support' },
+                { title: 'Lift', value: 'lift' },
+            ],
+            sortDirections: [
+                { title: 'Giảm dần', value: 'desc' },
+                { title: 'Tăng dần', value: 'asc' },
+            ],
         }
     },
 
@@ -177,8 +225,30 @@ export default {
             return this.associationRules.map(rule => ({
                 antecedent_products: rule.antecedent_products || [],
                 consequent_products: rule.consequent_products || [],
-                confidence: rule.confidence
+                confidence: rule.confidence,
+                support: rule.support || 0,
+                lift: rule.lift || 0
             }));
+        },
+
+        filteredAndSortedRules() {
+            let result = [...this.formattedRules];
+
+            // Sắp xếp kết quả
+            if (this.sortBy && this.sortDirection) {
+                result.sort((a, b) => {
+                    let aValue = Number(a[this.sortBy]);
+                    let bValue = Number(b[this.sortBy]);
+
+                    if (this.sortDirection === 'asc') {
+                        return aValue - bValue;
+                    } else {
+                        return bValue - aValue;
+                    }
+                });
+            }
+
+            return result;
         }
     },
 
@@ -242,7 +312,12 @@ export default {
                 hour: '2-digit',
                 minute: '2-digit'
             }).format(date);
-        }
+        },
+
+        exportToExcel() {
+            // Placeholder for Excel export functionality
+            this.notificationStore.info('Tính năng xuất Excel đang được phát triển', 3000);
+        },
     }
 }
 </script>
