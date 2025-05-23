@@ -113,9 +113,9 @@ export default {
       displayClick: false,
       menuItems: [
         { title: 'Menu', to: '/collections/menu/0' },
-        { title: 'Tin tức', to: '/blog' },
-        { title: 'Cửa hàng', to: '/store' },
-        { title: 'Khuyến mãi', to: '/promotion' },
+        { title: 'Tin tức', to: '/tin-tuc' },
+        { title: 'Cửa hàng', to: '/cua-hang' },
+        { title: 'Về chúng tôi', to: '/ve-chung-toi' },
       ],
       userMenuItems: [
         { title: 'Thông tin tài khoản', icon: 'mdi-account', route: 'user-info' },

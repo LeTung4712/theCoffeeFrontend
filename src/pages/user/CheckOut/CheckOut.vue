@@ -39,7 +39,7 @@
             <v-stepper-window-item value="1">
               <v-card elevation="4" rounded="lg" class="pa-0 mb-6">
                 <OrderSummary ref="orderSummary" @order-loaded="handleOrderLoaded"
-                  @add-more="$router.push('/collections/menu')" />
+                  @add-more="$router.push('/collections/menu/0')" />
               </v-card>
 
               <!-- Component Gợi ý -->

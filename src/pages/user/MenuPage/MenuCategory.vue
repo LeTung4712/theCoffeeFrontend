@@ -16,10 +16,7 @@
             <!-- Menu Tree Column - Chỉ hiển thị trên desktop -->
             <v-col cols="12" md="3" class="d-none d-md-block">
                 <v-card flat>
-                    <v-card-title class="d-flex align-center">
-                        <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
-                        Danh mục
-                    </v-card-title>
+                    
 
                     <v-card-text>
                         <!-- Loading state -->
