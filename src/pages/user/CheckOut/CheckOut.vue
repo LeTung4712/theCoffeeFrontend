@@ -18,18 +18,29 @@
         <!-- Stepper -->
         <v-stepper v-model="currentStep" class="mb-6">
           <v-stepper-header>
-            <v-stepper-item value="1">
-              <span :class="{ 'd-none d-sm-flex': true }">Giỏ hàng</span>
+            <v-stepper-item value="1" :complete="currentStep > 1">
+              <template #icon>
+                <v-icon :color="currentStep > 1 ? 'success' : (currentStep >= 1 ? 'primary' : 'grey')"
+                  :icon="currentStep > 1 ? 'mdi-check' : 'mdi-cart'"></v-icon>
+              </template>
+              <span :class="{ 'd-none d-sm-flex': true, 'text-primary': currentStep >= 1 }">Giỏ hàng</span>
               <span class="d-flex d-sm-none">1</span>
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item value="2">
-              <span :class="{ 'd-none d-sm-flex': true }">Giao hàng</span>
+            <v-stepper-item value="2" :complete="currentStep > 2">
+              <template #icon>
+                <v-icon :color="currentStep > 2 ? 'success' : (currentStep >= 2 ? 'primary' : 'grey')"
+                  :icon="currentStep > 2 ? 'mdi-check' : 'mdi-truck-delivery'"></v-icon>
+              </template>
+              <span :class="{ 'd-none d-sm-flex': true, 'text-primary': currentStep >= 2 }">Giao hàng</span>
               <span class="d-flex d-sm-none">2</span>
             </v-stepper-item>
             <v-divider></v-divider>
             <v-stepper-item value="3">
-              <span :class="{ 'd-none d-sm-flex': true }">Thanh toán</span>
+              <template #icon>
+                <v-icon :color="currentStep >= 3 ? 'primary' : 'grey'" icon="mdi-credit-card-check"></v-icon>
+              </template>
+              <span :class="{ 'd-none d-sm-flex': true, 'text-primary': currentStep >= 3 }">Thanh toán</span>
               <span class="d-flex d-sm-none">3</span>
             </v-stepper-item>
           </v-stepper-header>
@@ -457,7 +468,7 @@ export default {
   }
 
   .v-container {
-    padding-bottom: 0 !important;
+    padding-bottom: 320px !important;
     min-height: calc(100vh - 56px - env(safe-area-inset-bottom));
     max-width: 100vw;
     overflow-x: hidden;
@@ -470,6 +481,10 @@ export default {
 
   .v-col {
     padding: 0;
+  }
+
+  .v-stepper-window-item {
+    margin-bottom: 100px;
   }
 }
 
@@ -536,6 +551,62 @@ export default {
   .delete-order-btn {
     font-size: 0.875rem;
     padding: 0 16px;
+  }
+}
+
+/* Thêm style cho stepper */
+.v-stepper {
+  background: transparent !important;
+}
+
+.v-stepper-header {
+  box-shadow: none !important;
+  border-radius: 8px;
+  background: rgba(var(--v-theme-surface), 0.8);
+  backdrop-filter: blur(10px);
+  margin-bottom: 24px;
+}
+
+.v-stepper-item {
+  transition: all 0.3s ease;
+}
+
+.v-stepper-item:hover {
+  transform: translateY(-2px);
+}
+
+.v-stepper-item .v-icon {
+  transition: all 0.3s ease;
+}
+
+.v-stepper-item:hover .v-icon {
+  transform: scale(1.1);
+}
+
+.v-stepper-item span {
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.v-stepper-item:hover span {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.v-divider {
+  border-color: rgba(var(--v-theme-primary), 0.2) !important;
+}
+
+@media (max-width: 600px) {
+  .v-stepper-header {
+    margin: 0 16px 16px 16px;
+  }
+
+  .v-stepper-item {
+    padding: 8px !important;
+  }
+
+  .v-stepper-item .v-icon {
+    font-size: 20px !important;
   }
 }
 </style>
