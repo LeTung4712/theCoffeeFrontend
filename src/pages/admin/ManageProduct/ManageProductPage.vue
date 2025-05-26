@@ -206,7 +206,8 @@
         </v-bottom-sheet>
 
         <!-- Add dialogs -->
-        <ProductDialog v-model="dialogs.product" @refresh="fetchProducts" :edit-product="selectedProduct" />
+        <ProductDialog v-model="dialogs.product" @refresh="fetchProducts" :edit-product="selectedProduct"
+            @close="resetSelectedProduct" />
         <CategoryDialog v-model="dialogs.category" @refresh="initializeMenu" />
 
         <!-- Xác nhận xóa -->
@@ -516,6 +517,11 @@ export default {
         handleMobileParentClick(category, event) {
             event.stopPropagation();
             this.selectCategory(category);
+        },
+
+        // Reset selected product when dialog is closed
+        resetSelectedProduct() {
+            this.selectedProduct = null;
         },
 
         // Chức năng chỉnh sửa sản phẩm

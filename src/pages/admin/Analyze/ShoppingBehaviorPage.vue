@@ -110,12 +110,7 @@
                             variant="outlined" hide-details></v-select>
                     </v-col>
                     <v-spacer></v-spacer>
-                    <v-col cols="auto">
-                        <v-btn prepend-icon="mdi-microsoft-excel" color="success" variant="tonal"
-                            @click="exportToExcel">
-                            Xuất Excel
-                        </v-btn>
-                    </v-col>
+                    
                 </v-row>
 
                 <v-data-table :headers="headers" :items="filteredAndSortedRules" :search="search" class="elevation-0"
@@ -376,10 +371,6 @@ export default {
             }).format(date);
         },
 
-        exportToExcel() {
-            // Placeholder for Excel export functionality
-            this.notificationStore.info('Tính năng xuất Excel đang được phát triển', 3000);
-        },
     }
 }
 </script>

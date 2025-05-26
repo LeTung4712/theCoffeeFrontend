@@ -135,7 +135,7 @@ export default {
     },
     userAvatar() {
       return this.logged
-        ? 'https://th.bing.com/th/id/OIP.4bP4PqQqYnMYbub5PNgXeQHaEK?w=311&h=180&c=7&r=0&o=5&pid=1.7'
+        ? 'https://th.bing.com/th/id/OIP.TqNTqcNAcekKylput9ydiwHaHa?w=198&h=198&c=7&r=0&o=5&pid=1.7'
         : 'https://order.thecoffeehouse.com/_nuxt/img/Login.70dc3d8.png'
     }
   },

@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import logoImage from '@/assets/logo.jpg'
+import logoImage from '@/assets/logo-admin.png'
 import { formatPrice } from '@/utils/format';
 import { orderAPI } from "@/api/order";
 import PaymentDetailDialog from './PaymentDetailDialog.vue'
