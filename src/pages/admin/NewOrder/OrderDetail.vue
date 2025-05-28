@@ -70,7 +70,8 @@
                     <v-row align="center" class="mb-2">
                         <v-col cols="8" class="text-subtitle-1">Tổng tiền hàng:</v-col>
                         <v-col cols="4" class="text-right">
-                            <span class="text-subtitle-1">{{ formattedPrice(userOrderInfor.order_total_price) }} đ</span>
+                            <span class="text-subtitle-1">{{ formattedPrice(userOrderInfor.order_total_price) }}
+                                đ</span>
                         </v-col>
                     </v-row>
 
@@ -78,7 +79,8 @@
                     <v-row align="center" class="mb-2">
                         <v-col cols="8" class="text-subtitle-1">Phí giao hàng:</v-col>
                         <v-col cols="4" class="text-right">
-                            <span class="text-subtitle-1">{{ formattedPrice(userOrderInfor.order_shipping_fee) }} đ</span>
+                            <span class="text-subtitle-1">{{ formattedPrice(userOrderInfor.order_shipping_fee) }}
+                                đ</span>
                         </v-col>
                     </v-row>
 
@@ -101,8 +103,9 @@
                             <div class="text-h6 font-weight-bold">THÀNH TIỀN:</div>
                         </v-col>
                         <v-col cols="4" class="text-right">
-                            <span class="text-h6 font-weight-bold primary--text">{{ formattedPrice(payment_infor[0].total)
-                                }} đ</span>
+                            <span class="text-h6 font-weight-bold primary--text">{{
+                                formattedPrice(payment_infor[0].total)
+                            }} đ</span>
                         </v-col>
                     </v-row>
 
@@ -152,7 +155,7 @@ export default {
     data() {
         return {
             loading: true,
-            currentCODE: this.$route.params.order_code,
+            currentCODE: '',
             customerFields: [
                 { label: 'Tên khách hàng', key: 'order_username' },
                 { label: 'Số điện thoại', key: 'order_userphone' },
@@ -198,8 +201,21 @@ export default {
         }
     },
 
+    watch: {
+        '$route': {
+            immediate: true,
+            handler(to) {
+                const orderCode = to.params.order_code;
+                if (orderCode && orderCode !== this.currentCODE) {
+                    this.currentCODE = orderCode;
+                    this.getOrderInfo();
+                }
+            }
+        }
+    },
+
     created() {
-        this.getOrderInfo();
+        // Không cần gọi getOrderInfo ở đây nữa vì watch với immediate: true sẽ tự động gọi
     },
 
     methods: {
