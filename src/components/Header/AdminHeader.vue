@@ -58,12 +58,12 @@
                                 <v-list-item-title class="notification-title">
                                     {{ notification.message }}
                                 </v-list-item-title>
+                                <span class="text-caption text-medium-emphasis notification-time">
+                                    {{ formatTime(notification.timestamp) }}
+                                </span>
 
                                 <template v-slot:append>
                                     <div class="d-flex flex-column align-end">
-                                        <span class="text-caption text-medium-emphasis notification-time">
-                                            {{ formatTime(notification.timestamp) }}
-                                        </span>
                                         <v-btn icon="mdi-close" size="x-small" variant="text"
                                             class="notification-close-btn"
                                             @click.stop="removeNotification(notification.id)"></v-btn>
@@ -123,7 +123,6 @@ export default {
             drawer: true,
             menuItems: [
                 { title: "Profile", icon: "mdi-account", to: "/admin/pages/profile" },
-                { title: "Dashboard", icon: "mdi-view-dashboard", to: "/admin/pages/dashboard" },
                 { title: "Analyze", icon: "mdi-chart-bar", to: "/admin/pages/analyze" },
                 { title: "Shopping Behavior", icon: "mdi-chart-line", to: "/admin/pages/shopping-behavior" },
                 { title: "Manage Products", icon: "mdi-package-variant", to: "/admin/pages/manage-products" },
@@ -154,10 +153,11 @@ export default {
             this.$router.push({ name: 'Login' });
         },
         formatTime(timestamp) {
-            return formatDistanceToNow(new Date(timestamp), {
+            const result = formatDistanceToNow(new Date(timestamp), {
                 addSuffix: true,
                 locale: vi
             });
+            return result.replace('khoảng ', '');
         },
         handleNotificationClick(notification) {
             if (!notification.read) {

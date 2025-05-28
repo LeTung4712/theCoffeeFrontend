@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="bg-black" app>
+  <v-footer class="footer bg-black">
     <v-container>
       <v-row>
         <!-- Cột thông tin liên hệ -->
@@ -49,10 +49,10 @@ export default {
   data() {
     return {
       quickLinks: [
-        { title: 'Về Chúng Tôi', to: '/about' },
-        { title: 'Sản phẩm', to: '/collections/menu' },
-        { title: 'Khuyến mại', to: '/promotion' },
-        { title: 'Cửa Hàng', to: '/store' },
+        { title: 'Về Chúng Tôi', to: '/ve-chung-toi' },
+        { title: 'Sản phẩm', to: '/collections/menu/0' },
+        { title: 'Tin tức', to: '/tin-tuc' },
+        { title: 'Cửa Hàng', to: '/cua-hang' },
       ]
     }
   }
@@ -60,7 +60,20 @@ export default {
 </script>
 
 <style scoped>
+.footer {
+  position: relative;
+  width: 100%;
+  margin-top: auto;
+}
+
 .v-list-item {
   min-height: 32px !important;
+}
+
+@media (max-width: 599px) {
+  .footer {
+    padding-bottom: 56px;
+    /* Thêm padding bottom bằng chiều cao của mobile nav */
+  }
 }
 </style>

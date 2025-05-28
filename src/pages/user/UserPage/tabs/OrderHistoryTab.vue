@@ -178,8 +178,9 @@
       </v-list-item>
     </v-list>
 
-    <div class="text-center pt-3">
-      <v-pagination v-model="currentPage" :length="totalPages" :total-visible="7"></v-pagination>
+    <div class="text-center pt-2 pb-2">
+      <v-pagination v-model="currentPage" :length="totalPages" :total-visible="totalVisiblePages" rounded="circle"
+        density="comfortable" class="order-pagination"></v-pagination>
     </div>
 
     <!-- Thêm dialog xác nhận -->
@@ -330,6 +331,11 @@ export default {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
       return this.filteredOrders.slice(start, end);
+    },
+
+    totalVisiblePages() {
+      // Trên mobile hiển thị ít nút hơn
+      return window.innerWidth < 600 ? 5 : 7;
     }
   },
 
@@ -343,6 +349,16 @@ export default {
     paymentFilters() {
       this.currentPage = 1;
     }
+  },
+
+  mounted() {
+    // Thêm event listener để cập nhật số lượng nút khi resize
+    window.addEventListener('resize', this.handleResize);
+  },
+
+  beforeUnmount() {
+    // Cleanup event listener
+    window.removeEventListener('resize', this.handleResize);
   },
 
   methods: {
@@ -490,6 +506,11 @@ export default {
       this.touchEndX = e.changedTouches[0].clientX;
       e.stopPropagation(); // Ngăn chặn sự kiện lan truyền
     },
+
+    handleResize() {
+      // Force update computed property
+      this.$forceUpdate();
+    }
   }
 }
 </script>
@@ -623,5 +644,28 @@ styleduct-price {
   position: relative;
   padding-right: 24px;
   /* Để có chỗ hiển thị badge */
+}
+
+.order-pagination {
+  /* Đảm bảo phân trang không bị tràn trên mobile */
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 0;
+  /* Bỏ margin bottom */
+}
+
+/* Tùy chỉnh kích thước nút trên mobile */
+@media (max-width: 599px) {
+  :deep(.v-pagination__item) {
+    min-width: 32px !important;
+    height: 32px !important;
+  }
+
+  :deep(.v-pagination__prev),
+  :deep(.v-pagination__next) {
+    min-width: 32px !important;
+    height: 32px !important;
+  }
 }
 </style>

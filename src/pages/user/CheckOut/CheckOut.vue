@@ -48,7 +48,7 @@
           <v-stepper-window>
             <!-- Bước 1: Giỏ hàng & Gợi ý -->
             <v-stepper-window-item value="1">
-              <v-card elevation="4" rounded="lg" class="pa-0 mb-6">
+              <v-card elevation="4" rounded="lg" class="pa-0 mb-2">
                 <OrderSummary ref="orderSummary" @order-loaded="handleOrderLoaded"
                   @add-more="$router.push('/collections/menu/0')" />
               </v-card>
@@ -468,7 +468,6 @@ export default {
   }
 
   .v-container {
-    padding-bottom: 320px !important;
     min-height: calc(100vh - 56px - env(safe-area-inset-bottom));
     max-width: 100vw;
     overflow-x: hidden;
