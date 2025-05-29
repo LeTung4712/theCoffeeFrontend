@@ -120,15 +120,15 @@ export const adminRoutes = {
           meta: { requiresAuth: true },
         },
         {
-          name: "NewOrders",
-          path: ROUTES.ADMIN.NEW_ORDERS,
-          component: () => import("@/pages/admin/NewOrder/NewOrderPage"),
+          name: "ManageOrders",
+          path: ROUTES.ADMIN.MANAGE_ORDERS,
+          component: () => import("@/pages/admin/ManageOrder/ManageOrderPage"),
           meta: { requiresAuth: true },
         },
         {
           name: "OrderDetails",
           path: ROUTES.ADMIN.ORDER_DETAIL,
-          component: () => import("@/pages/admin/NewOrder/OrderDetail"),
+          component: () => import("@/pages/admin/ManageOrder/OrderDetail"),
           meta: { requiresAuth: true },
         },
         {
@@ -136,13 +136,6 @@ export const adminRoutes = {
           path: ROUTES.ADMIN.PAYMENT_HISTORY,
           component: () =>
             import("@/pages/admin/PaymentHistory/PaymentHistoryPage"),
-          meta: { requiresAuth: true },
-        },
-        {
-          name: "DeliveryOrders",
-          path: ROUTES.ADMIN.DELIVERY_ORDERS,
-          component: () =>
-            import("@/pages/admin/DeliveryOrder/DeliveryOrderPage"),
           meta: { requiresAuth: true },
         },
       ],

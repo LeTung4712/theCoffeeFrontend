@@ -199,11 +199,11 @@ export default {
         },
 
         getStatusColor(status) {
-            return status === '3' ? 'success' : 'error';
+            return status === '2' ? 'success' : 'error';
         },
 
         getStatusText(status) {
-            return status === '3' ? 'Thành công' : 'Đã Hủy';
+            return status === '2' ? 'Thành công' : 'Đã Hủy';
         },
 
         formatTime(timeString) {

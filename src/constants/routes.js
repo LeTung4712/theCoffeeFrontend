@@ -18,9 +18,8 @@ export const ROUTES = {
     MANAGE_PRODUCTS_CATEGORY: "manage-products/:category_name/:category_id",
     MANAGE_VOUCHERS: "manage-vouchers",
     MANAGE_TOPPINGS: "manage-toppings",
-    NEW_ORDERS: "new-orders",
+    MANAGE_ORDERS: "manage-orders",
     PAYMENT_HISTORY: "payment-history",
-    DELIVERY_ORDERS: "delivery-orders",
     LOGIN: "login",
   },
 };

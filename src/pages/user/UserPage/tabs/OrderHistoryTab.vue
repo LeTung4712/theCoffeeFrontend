@@ -259,61 +259,63 @@ export default {
   },
 
   computed: {
-    // Đếm số lượng đơn chờ xác nhận - điều chỉnh để chỉ đếm đơn không phải COD và chưa thanh toán
+    // Đếm số lượng đơn chờ xác nhận - chỉ đếm đơn online chưa thanh toán
     pendingOrdersCount() {
       return this.orders.filter(order =>
-        order.status === '0' && order.payment_method !== 'cod' && order.payment_status === '0'
+        order.payment_status === '0' && order.payment_method !== 'cod'
       ).length;
     },
 
-    // Đếm số lượng đơn đang xử lý (đã thanh toán hoặc cod)
+    // Đếm số lượng đơn đang xử lý - gồm đơn COD chưa thanh toán và đơn online đã thanh toán, status = 0
     processingOrdersCount() {
       return this.orders.filter(order =>
-        // Chỉ lấy đơn hàng có status = '1' (đang xử lý) và chưa hoàn thành (status != '3')
-        (order.status === '1' && order.status !== '3') ||
-        // Hoặc đơn hàng đã thanh toán (payment_status = '1') nhưng chưa hoàn thành
-        (order.payment_status === '1' && order.status !== '3') ||
-        // Hoặc đơn hàng thanh toán COD nhưng chưa hoàn thành
-        (order.payment_method === 'cod' && order.status !== '3')
+        order.status === '0' && (
+          (order.payment_method === 'cod' && order.payment_status === '0') ||
+          (order.payment_method !== 'cod' && order.payment_status === '1')
+        )
       ).length;
     },
 
-    // Đếm số lượng đơn đang giao
+    // Đếm số lượng đơn đang giao - status = 1
     shippingOrdersCount() {
-      return this.orders.filter(order => order.status === '2').length;
+      return this.orders.filter(order => order.status === '1').length;
     },
 
-    // Lọc đơn hàng theo tab được chọn - điều chỉnh cả pending và processing
+    // Lọc đơn hàng theo tab được chọn
     filteredByTabOrders() {
-      // Xử lý đặc biệt cho tab chờ xác nhận
-      if (this.activeTab === 'pending') {
-        return this.orders.filter(order =>
-          order.status === '0' && order.payment_status === '0' && order.payment_method !== 'cod'
-        );
+      switch (this.activeTab) {
+        case 'pending':
+          // Tab chờ xác nhận: chỉ lấy đơn online chưa thanh toán
+          return this.orders.filter(order =>
+            order.payment_status === '0' && order.payment_method !== 'cod'
+          );
+
+        case 'processing':
+          // Tab đang xử lý: lấy đơn COD chưa thanh toán hoặc đơn online đã thanh toán, status = 0
+          return this.orders.filter(order =>
+            order.status === '0' && (
+              (order.payment_method === 'cod' && order.payment_status === '0') ||
+              (order.payment_method !== 'cod' && order.payment_status === '1')
+            )
+          );
+
+        case 'shipping':
+          // Tab đang giao: lấy đơn có status = 1
+          return this.orders.filter(order => order.status === '1');
+
+        case 'completed':
+          // Tab hoàn thành: status = 3
+          return this.orders.filter(order => order.status === '2');
+
+        case 'cancelled':
+          // Tab đã hủy: status = -1
+          return this.orders.filter(order => order.status === '-1');
+
+        default:
+          return this.orders.filter(order =>
+            order.payment_status === '0' && order.payment_method !== 'cod'
+          );
       }
-
-      // Xử lý đặc biệt cho tab đang xử lý
-      if (this.activeTab === 'processing') {
-        return this.orders.filter(order =>
-          // Chỉ lấy đơn hàng có status = '1' (đang xử lý) và chưa hoàn thành (status != '3')
-          (order.status === '1' && order.status !== '3') ||
-          // Hoặc đơn hàng đã thanh toán (payment_status = '1') nhưng chưa hoàn thành
-          (order.payment_status === '1' && order.status !== '3') ||
-          // Hoặc đơn hàng thanh toán COD nhưng chưa hoàn thành
-          (order.payment_method === 'cod' && order.status !== '3')
-        );
-      }
-
-      // Các tab khác xử lý như cũ
-      const statusMap = {
-        'shipping': ['2'],       // Đang giao
-        'completed': ['3'],      // Hoàn thành
-        'cancelled': ['-1']      // Đã hủy
-      };
-
-      return this.orders.filter(order =>
-        statusMap[this.activeTab]?.includes(order.status.toString())
-      );
     },
 
     // Lọc theo trạng thái thanh toán
@@ -392,9 +394,8 @@ export default {
     getStatusText(status) {
       const statuses = {
         '0': 'Chờ giao hàng',
-        '1': 'Đã thanh toán - chờ giao hàng ',
-        '2': 'Đang giao hàng',
-        '3': 'Thành công',
+        '1': 'Đang giao hàng',
+        '2': 'Đã giao hàng',
         '-1': 'Đã hủy'
       }
       return statuses[status] || 'Không xác định'
@@ -405,8 +406,7 @@ export default {
       const colors = {
         '0': 'warning',
         '1': 'info',
-        '2': 'purple',
-        '3': 'success',
+        '2': 'success',
         '-1': 'error'
       }
       return colors[status] || 'grey'
@@ -445,15 +445,15 @@ export default {
     },
 
     canShowActionButtons(status) {
-      return ['0', '1', '2'].includes(status.toString()) // Chỉ cho phép hiển thị nút hành động khi đơn hàng chưa giao hàng hoặc đang giao hàng
+      return ['0', '1'].includes(status.toString()) // Chỉ cho phép hiển thị nút hành động khi đơn hàng chưa giao hàng hoặc đang giao hàng
     },
 
     canReceiveOrder(status) {
-      return status.toString() === '2' // Chỉ cho phép nhận đơn khi đang giao hàng
+      return status.toString() === '1' // Chỉ cho phép nhận đơn khi đang giao hàng
     },
 
     canCancelOrder(status) {
-      return ['0', '1'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng hoặc đang giao hàng
+      return ['0'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng hoặc đang giao hàng
     },
 
     canPaymentAgain(order) {

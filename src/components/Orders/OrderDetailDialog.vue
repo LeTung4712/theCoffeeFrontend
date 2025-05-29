@@ -24,7 +24,7 @@
                             <p><strong>Trạng thái:</strong> {{ getStatusText(orderDetail.status) }}</p>
                             <p v-if="orderDetail.status === '-1'"><strong>Thời gian hủy:</strong>{{
                                 formatDateTime(orderDetail.updated_at) }}</p>
-                            <p v-if="orderDetail.status === '3'"><strong>Thời gian hoàn thành:</strong>{{
+                            <p v-if="orderDetail.status === '2'"><strong>Thời gian hoàn thành:</strong>{{
                                 formatDateTime(orderDetail.updated_at) }}</p>
                         </v-col>
                     </v-row>
@@ -83,7 +83,7 @@
                             <div class="d-flex justify-space-between">
                                 <strong>Tổng thanh toán:</strong>
                                 <span class="text-primary font-weight-bold">{{ formatPrice(orderDetail.final_price)
-                                    }}VNĐ</span>
+                                }}VNĐ</span>
                             </div>
                             <v-divider class="my-2"></v-divider>
                             <div class="d-flex justify-space-between">
@@ -134,10 +134,8 @@ export default {
             const statusTexts = {
                 '-1': 'Đã hủy',
                 '0': 'Chờ xác nhận',
-                '1': 'Đã thanh toán',
-                '2': 'Đang giao hàng',
-                '3': 'Hoàn thành',
-                '4': 'Giao thất bại'
+                '1': 'Đang giao hàng',
+                '2': 'Đã giao hàng',
             };
             return statusTexts[status] || 'Không xác định';
         },
@@ -145,7 +143,7 @@ export default {
         getPaymentMethodText(method) {
             const methods = {
                 'cod': 'Thanh toán khi nhận hàng',
-                'online': 'Chuyển khoản online',
+                'vnpay': 'Thanh toán qua VNPay',
                 'momo': 'Ví MoMo',
                 'zalopay': 'Ví ZaloPay'
             };
