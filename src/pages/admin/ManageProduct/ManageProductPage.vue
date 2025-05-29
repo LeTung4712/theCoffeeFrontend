@@ -12,7 +12,7 @@
             <v-col cols="12">
                 <v-card flat>
                     <v-card-text class="d-flex flex-wrap gap-2">
-                        <v-btn color="primary" prepend-icon="mdi-plus" @click="dialogs.product = true">
+                        <v-btn color="primary" prepend-icon="mdi-plus" @click="openAddProductDialog">
                             Thêm sản phẩm
                         </v-btn>
                         <v-btn color="success" prepend-icon="mdi-folder-plus" @click="dialogs.category = true">
@@ -138,7 +138,7 @@
                                         </span>
                                         <div class="action-wrapper d-flex">
                                             <v-btn icon="mdi-pencil" color="primary" variant="text" size="small"
-                                                @click="editProduct(product)" title="Chỉnh sửa sản phẩm"
+                                                @click="handleEditProduct(product)" title="Chỉnh sửa sản phẩm"
                                                 class="scale-button" density="compact" />
                                             <v-btn icon="mdi-delete" color="error" variant="text" size="small"
                                                 @click="confirmDelete(product)" title="Xóa sản phẩm"
@@ -206,8 +206,8 @@
         </v-bottom-sheet>
 
         <!-- Add dialogs -->
-        <ProductDialog v-model="dialogs.product" @refresh="fetchProducts" :edit-product="selectedProduct"
-            @close="resetSelectedProduct" />
+        <ProductDialog v-model="dialogs.product" :edit-product="editProduct" @update:edit-product="editProduct = $event"
+            @refresh="fetchProducts" @close="closeProductDialog" />
         <CategoryDialog v-model="dialogs.category" @refresh="initializeMenu" />
 
         <!-- Xác nhận xóa -->
@@ -304,7 +304,8 @@ export default {
             selectedProduct: null,
             confirmDeleteDialog: false,
             deletingProduct: false,
-            deleteConfirmation: ''
+            deleteConfirmation: '',
+            editProduct: null
         }
     },
 
@@ -524,10 +525,22 @@ export default {
             this.selectedProduct = null;
         },
 
-        // Chức năng chỉnh sửa sản phẩm
-        editProduct(product) {
-            this.selectedProduct = { ...product };
-            this.dialogs.product = true;
+        // Thêm mới sản phẩm
+        openAddProductDialog() {
+            this.editProduct = null; // Reset editProduct về null
+            this.dialogs.product = true; // Mở dialog
+        },
+
+        // Sửa sản phẩm
+        handleEditProduct(product) {
+            this.editProduct = product; // Set sản phẩm cần edit
+            this.dialogs.product = true; // Mở dialog
+        },
+
+        // Đóng dialog
+        closeProductDialog() {
+            this.dialogs.product = false;
+            this.editProduct = null; // Reset editProduct khi đóng dialog
         },
 
         // Hiển thị dialog xác nhận xóa

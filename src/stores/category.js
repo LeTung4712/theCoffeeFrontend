@@ -62,7 +62,7 @@ export const useCategoryStore = defineStore("category", {
     buildMenuItems() {
       if (!this.categories.length) return;
 
-      console.log("Building menu items from categories:", this.categories);
+      //console.log("Building menu items from categories:", this.categories);
 
       // Item "Tất cả sản phẩm"
       const allProducts = {
@@ -87,7 +87,7 @@ export const useCategoryStore = defineStore("category", {
         .filter((category) => category.children.length > 0);
 
       this.menuItems = [allProducts, ...parentCategories];
-      console.log("Menu items built:", JSON.stringify(this.menuItems, null, 2));
+      //console.log("Menu items built:", JSON.stringify(this.menuItems, null, 2));
     },
 
     getMenuChildCategories(parentId) {
@@ -101,7 +101,7 @@ export const useCategoryStore = defineStore("category", {
           selectable: true,
         }));
 
-      console.log(`Child categories for parent ${parentId}:`, childCategories);
+      //console.log(`Child categories for parent ${parentId}:`, childCategories);
       return childCategories;
     },
   },

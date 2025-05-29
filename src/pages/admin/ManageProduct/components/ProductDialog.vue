@@ -88,6 +88,8 @@ export default {
         }
     },
 
+    emits: ['update:modelValue', 'update:editProduct', 'refresh', 'close'],
+
     data() {
         return {
             dialog: false,
@@ -124,18 +126,25 @@ export default {
     },
 
     watch: {
-        modelValue(val) {
-            this.dialog = val
-            if (val && this.editProduct) {
-                this.initEditMode()
+        modelValue: {
+            immediate: true,
+            handler(val) {
+                this.dialog = val;
+                if (val) {
+                    if (this.editProduct) {
+                        this.initEditMode();
+                    } else {
+                        this.resetForm();
+                    }
+                }
             }
         },
         dialog(val) {
-            if (!val) this.$emit('update:modelValue', val)
-        },
-        editProduct(val) {
-            if (val && this.dialog) {
-                this.initEditMode()
+            if (!val) {
+                this.$emit('update:modelValue', false);
+                this.$emit('update:editProduct', null);
+                this.$emit('close');
+                this.resetForm();
             }
         }
     },
@@ -156,7 +165,7 @@ export default {
 
         initEditMode() {
             if (this.editProduct) {
-                // Clone đối tượng sản phẩm để tránh thay đổi trực tiếp
+                //console.log(this.editProduct)
                 this.productData = {
                     id: this.editProduct.id,
                     name: this.editProduct.name,
@@ -165,48 +174,12 @@ export default {
                     image_url: this.editProduct.image_url,
                     price: this.editProduct.price,
                     price_sale: this.editProduct.price_sale || 0,
-                    active: this.editProduct.active || 1,
+                    active: this.editProduct.active === true ? 1 : 0,
                     toppings: Array.isArray(this.editProduct.toppings)
                         ? this.editProduct.toppings.map(t => typeof t === 'object' ? t.id : t)
                         : []
                 }
             }
-        },
-
-        async saveProduct() {
-            if (!this.$refs.form.validate()) return
-            this.loading = true
-
-            try {
-                if (this.isEditing) {
-                    // Cập nhật sản phẩm hiện có
-                    await productAPI.update(this.productData)
-                    this.$emit('refresh')
-                    this.closeDialog()
-                    this.notificationStore.success('Cập nhật sản phẩm thành công!', 3000);
-                } else {
-                    // Tạo mới sản phẩm
-                    await productAPI.create(this.productData)
-                    this.$emit('refresh')
-                    this.closeDialog()
-                    this.notificationStore.success('Thêm sản phẩm thành công!', 3000);
-                }
-            } catch (error) {
-                if (error.response && error.response.status === 409) {
-                    this.notificationStore.error('Đã có sản phẩm này!', 3000);
-                } else {
-                    console.error('Error creating/updating product:', error)
-                    this.notificationStore.error('Có lỗi xảy ra khi lưu sản phẩm', 3000);
-                }
-            } finally {
-                this.loading = false
-            }
-        },
-
-        closeDialog() {
-            this.dialog = false
-            this.resetForm()
-            this.$emit('update:modelValue', false)
         },
 
         resetForm() {
@@ -219,6 +192,43 @@ export default {
                 price_sale: null,
                 active: 1,
                 toppings: []
+            };
+            if (this.$refs.form) {
+                this.$refs.form.reset();
+            }
+        },
+
+        closeDialog() {
+            this.dialog = false;
+            this.$emit('update:modelValue', false);
+            this.$emit('update:editProduct', null);
+            this.$emit('close');
+            this.resetForm();
+        },
+
+        async saveProduct() {
+            if (!this.$refs.form.validate()) return;
+            this.loading = true;
+
+            try {
+                if (this.editProduct) {
+                    await productAPI.update(this.productData);
+                    this.notificationStore.success('Cập nhật sản phẩm thành công!', 3000);
+                } else {
+                    await productAPI.create(this.productData);
+                    this.notificationStore.success('Thêm sản phẩm thành công!', 3000);
+                }
+                this.$emit('refresh');
+                this.closeDialog();
+            } catch (error) {
+                if (error.response && error.response.status === 409) {
+                    this.notificationStore.error('Đã có sản phẩm này!', 3000);
+                } else {
+                    console.error('Error creating/updating product:', error);
+                    this.notificationStore.error('Có lỗi xảy ra khi lưu sản phẩm', 3000);
+                }
+            } finally {
+                this.loading = false;
             }
         }
     }
