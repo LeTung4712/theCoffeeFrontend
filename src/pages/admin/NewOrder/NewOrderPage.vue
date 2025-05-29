@@ -51,6 +51,9 @@
               {{ getStatusText(item.status) }}
             </v-chip>
           </template>
+          <template v-slot:item.created_at="{ item }">
+            {{ formatDateTime(item.created_at) }}
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
@@ -59,6 +62,7 @@
 
 <script>
 import { orderAPI } from "@/api/order";
+import { formatDateTime } from "@/utils/format";
 
 export default {
   name: "NewOrderPage",
@@ -70,7 +74,7 @@ export default {
       headers: [
         { title: 'STT', key: 'number', align: 'center', width: '10%' },
         { title: 'MÃ ĐƠN', key: 'order_code', align: 'center', width: '15%' },
-        { title: 'Thời gian', key: 'order_time', align: 'center', width: '20%' },
+        { title: 'Thời gian', key: 'created_at', align: 'center', width: '20%' },
         { title: 'SỐ ĐIỆN THOẠI', key: 'mobile_no', align: 'center', width: '15%' },
         { title: 'ĐỊA CHỈ', key: 'address', align: 'center', width: '40%' },
         { title: 'TRẠNG THÁI', key: 'status', align: 'center', width: '15%' },
@@ -104,6 +108,8 @@ export default {
         this.loading = false;
       }
     },
+
+    formatDateTime,
 
     getStatusColor(status) {
       const statusColors = {

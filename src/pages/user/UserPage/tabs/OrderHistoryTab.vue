@@ -269,7 +269,12 @@ export default {
     // Đếm số lượng đơn đang xử lý (đã thanh toán hoặc cod)
     processingOrdersCount() {
       return this.orders.filter(order =>
-        order.status === '1' || order.payment_status === '1' || order.payment_method === 'cod'
+        // Chỉ lấy đơn hàng có status = '1' (đang xử lý) và chưa hoàn thành (status != '3')
+        (order.status === '1' && order.status !== '3') ||
+        // Hoặc đơn hàng đã thanh toán (payment_status = '1') nhưng chưa hoàn thành
+        (order.payment_status === '1' && order.status !== '3') ||
+        // Hoặc đơn hàng thanh toán COD nhưng chưa hoàn thành
+        (order.payment_method === 'cod' && order.status !== '3')
       ).length;
     },
 
@@ -290,7 +295,12 @@ export default {
       // Xử lý đặc biệt cho tab đang xử lý
       if (this.activeTab === 'processing') {
         return this.orders.filter(order =>
-          order.status === '1' || order.payment_status === '1' || order.payment_method === 'cod'
+          // Chỉ lấy đơn hàng có status = '1' (đang xử lý) và chưa hoàn thành (status != '3')
+          (order.status === '1' && order.status !== '3') ||
+          // Hoặc đơn hàng đã thanh toán (payment_status = '1') nhưng chưa hoàn thành
+          (order.payment_status === '1' && order.status !== '3') ||
+          // Hoặc đơn hàng thanh toán COD nhưng chưa hoàn thành
+          (order.payment_method === 'cod' && order.status !== '3')
         );
       }
 
