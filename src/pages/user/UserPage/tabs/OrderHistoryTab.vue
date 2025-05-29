@@ -61,8 +61,12 @@
                 </span>
               </v-col>
               <v-col cols="12">
-                <v-chip :color="order.payment_status == '1' ? 'success' : 'warning'" text-color="white" small>
-                  {{ order.payment_status == '1' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+                <v-chip v-if="order.payment_status == '1'" color="success" text-color="white" small>
+                  Đã thanh toán
+                </v-chip>
+                <v-chip v-if="canPaymentAgain(order) && order.status !== '-1'" color="error" text-color="white" small
+                  class="ml-2">
+                  {{ getRemainingPaymentTime(order) }}
                 </v-chip>
               </v-col>
             </v-row>
@@ -152,7 +156,7 @@
                       <v-btn v-if="canPaymentAgain(order)" color="primary" class="mr-2"
                         @click.stop="handlePaymentAgain(order)">
                         <v-icon left>mdi-cash-register</v-icon>
-                        Thanh toán lại
+                        Thanh toán
                       </v-btn>
                       <v-btn v-if="canReceiveOrder(order.status)" color="success" class="mr-2"
                         @click.stop="confirmReceiveOrder(order.id)">
@@ -213,6 +217,7 @@
 <script>
 import { formatPrice } from '@/utils/format'
 import { orderAPI } from '@/api/order'
+import { paymentAPI } from '@/api/payment'
 import { useNotificationStore } from '@/stores/notification'
 export default {
   name: 'OrderHistoryTab',
@@ -240,17 +245,16 @@ export default {
       currentPage: 1,
       itemsPerPage: 5,
       activeTab: 'pending',
-      paymentFilters: [], // Lọc trạng thái thanh toán
+      paymentFilters: [],
       touchStartX: 0,
       touchEndX: 0,
-
-      // Thêm các trường dữ liệu cho dialog
       showConfirmDialog: false,
       dialogType: '',
       dialogTitle: '',
       dialogMessage: '',
       selectedOrderId: null,
-      isProcessing: false
+      isProcessing: false,
+      paymentTimers: {},
     }
   },
 
@@ -262,13 +266,14 @@ export default {
       ).length;
     },
 
-    // Đếm số lượng đơn đang xử lý - thêm cả những đơn đã thanh toán
+    // Đếm số lượng đơn đang xử lý (đã thanh toán hoặc cod)
     processingOrdersCount() {
       return this.orders.filter(order =>
-        order.status === '1' || order.payment_status === '1'
+        order.status === '1' || order.payment_status === '1' || order.payment_method === 'cod'
       ).length;
     },
 
+    // Đếm số lượng đơn đang giao
     shippingOrdersCount() {
       return this.orders.filter(order => order.status === '2').length;
     },
@@ -278,14 +283,14 @@ export default {
       // Xử lý đặc biệt cho tab chờ xác nhận
       if (this.activeTab === 'pending') {
         return this.orders.filter(order =>
-          order.status === '0' && order.payment_method !== 'cod' && order.payment_status === '0'
+          order.status === '0' && order.payment_status === '0' && order.payment_method !== 'cod'
         );
       }
 
       // Xử lý đặc biệt cho tab đang xử lý
       if (this.activeTab === 'processing') {
         return this.orders.filter(order =>
-          order.status === '1' || order.payment_status === '1'
+          order.status === '1' || order.payment_status === '1' || order.payment_method === 'cod'
         );
       }
 
@@ -354,11 +359,13 @@ export default {
   mounted() {
     // Thêm event listener để cập nhật số lượng nút khi resize
     window.addEventListener('resize', this.handleResize);
+    this.updatePaymentTimers();
   },
 
   beforeUnmount() {
     // Cleanup event listener
     window.removeEventListener('resize', this.handleResize);
+    Object.values(this.paymentTimers).forEach(timer => clearInterval(timer));
   },
 
   methods: {
@@ -440,11 +447,80 @@ export default {
     },
 
     canPaymentAgain(order) {
-      return order.payment_status === '0' && order.payment_method !== 'cod';
+      if (order.payment_status === '1' || order.payment_method === 'cod') {
+        return false;
+      }
+
+      const orderTime = new Date(order.created_at);
+      const now = new Date();
+      const hoursDiff = (now - orderTime) / (1000 * 60 * 60);
+
+      return hoursDiff <= 24;
     },
 
-    handlePaymentAgain(order) {
-      this.$router.push(`/payment/${order.order_code}`);
+    getRemainingPaymentTime(order) {
+      const orderTime = new Date(order.created_at);
+      const now = new Date();
+      const hoursDiff = (now - orderTime) / (1000 * 60 * 60);
+      const remainingHours = 24 - hoursDiff;
+
+      if (remainingHours <= 0) {
+        return 'Đã hết thời gian thanh toán';
+      }
+
+      const hours = Math.floor(remainingHours);
+      const minutes = Math.floor((remainingHours - hours) * 60);
+      return `Còn ${hours} giờ ${minutes} phút để thanh toán`;
+    },
+
+    async checkAndAutoCancelOrder(order) {
+      if (order.payment_status === '1' || order.payment_method === 'cod') {
+        return;
+      }
+
+      const orderTime = new Date(order.created_at);
+      const now = new Date();
+      const hoursDiff = (now - orderTime) / (1000 * 60 * 60);
+
+      if (hoursDiff > 24) {
+        try {
+          await orderAPI.cancelOrder({ order_id: order.id });
+          this.notificationStore.warning(`Đơn hàng ${order.order_code} đã bị hủy do quá thời gian thanh toán`, 5000);
+          this.$emit('order-status-updated', { orderId: order.id, status: '-1' });
+        } catch (error) {
+          console.error('Lỗi khi tự động hủy đơn:', error);
+        }
+      }
+    },
+
+    updatePaymentTimers() {
+      this.paginatedOrders.forEach(order => {
+        if (this.canPaymentAgain(order)) {
+          this.paymentTimers[order.order_code] = setInterval(() => {
+            this.checkAndAutoCancelOrder(order);
+            this.$forceUpdate(); // Cập nhật UI
+          }, 60000); // Kiểm tra mỗi phút
+        }
+      });
+    },
+
+    async handlePaymentAgain(order) {
+      try {
+        const paymentData = {
+          order_code: order.order_code,
+          return_url: `${window.location.origin}/user/lich-su`
+        }
+        const response = await paymentAPI.createMomoPayment(paymentData)
+        const paymentUrl = response.data.payUrl
+
+        if (!paymentUrl) {
+          throw new Error('Không nhận được URL thanh toán')
+        }
+        // Chuyển hướng người dùng đến trang thanh toán MoMo
+        window.location.href = paymentUrl
+      } catch (error) {
+        this.notificationStore.error('Lỗi khi tạo thanh toán online', 2000)
+      }
     },
 
     confirmReceiveOrder(orderId) {

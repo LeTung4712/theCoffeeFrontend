@@ -5,26 +5,14 @@
     </v-card-title>
 
     <v-radio-group v-model="selectedPayment" class="payment-methods-group">
-      <div
-        v-for="method in paymentMethods"
-        :key="method.value"
-        :class="['payment-method', {'selected': selectedPayment === method.value}]"
-        @click="selectedPayment = method.value"
-      >
-        <v-radio
-          :value="method.value"
-          hide-details
-          class="pa-0 payment-radio"
-        >
+      <div v-for="method in paymentMethods" :key="method.value"
+        :class="['payment-method', { 'selected': selectedPayment === method.value }]"
+        @click="selectedPayment = method.value">
+        <v-radio :value="method.value" hide-details class="pa-0 payment-radio">
           <template #label>
             <div class="d-flex align-center py-3 px-4">
-              <v-img 
-                :src="method.image" 
-                width="32" 
-                height="32" 
-                class="mr-4 payment-icon"
-                :class="{'selected-icon': selectedPayment === method.value}"
-              />
+              <v-img :src="method.image" width="32" height="32" class="mr-4 payment-icon"
+                :class="{ 'selected-icon': selectedPayment === method.value }" />
               <span class="font-weight-medium payment-label">{{ method.label }}</span>
             </div>
           </template>
@@ -90,15 +78,19 @@ export default {
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
 }
 
 .payment-method:hover {
   transform: translateY(-2px);
-  background-color: rgb(var(--v-theme-surface-variant));
+  background-color: #f5f5f5;
+  border-color: #bdbdbd;
 }
 
 .payment-method.selected {
-  background-color: rgb(var(--v-theme-secondary));
+  background-color: #e3f2fd;
+  border-color: #1976d2;
 }
 
 .payment-radio {
@@ -109,23 +101,29 @@ export default {
   opacity: 1;
   object-fit: contain;
   display: block;
+  background-color: #fff;
+  padding: 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .payment-method:not(.selected) .payment-icon {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .selected-icon {
   opacity: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .payment-label {
-  color: rgb(var(--v-theme-text-primary));
+  color: #1a1a1a;
   font-weight: 500;
 }
 
 .payment-method.selected .payment-label {
-  color: rgb(var(--v-theme-primary));
+  color: #1976d2;
+  font-weight: 600;
 }
 
 :deep(.v-radio) {
@@ -135,4 +133,4 @@ export default {
 :deep(.v-radio__label) {
   opacity: 1 !important;
 }
-</style> 
+</style>

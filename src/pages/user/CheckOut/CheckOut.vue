@@ -155,8 +155,7 @@
                         </v-col>
                         <v-col cols="6">
                           <v-btn color="primary" variant="elevated" prepend-icon="mdi-cart-check" block
-                            :loading="isLoading" :disabled="!isValidCheckout || !agreedToTerms"
-                            @click="validateAndCheckout">
+                            :loading="isLoading" :disabled="!agreedToTerms" @click="validateAndCheckout">
                             Đặt hàng
                           </v-btn>
                         </v-col>
