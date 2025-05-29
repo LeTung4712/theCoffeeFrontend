@@ -68,7 +68,7 @@
                                         <div class="text-subtitle-2 text-medium-emphasis mb-1">TRUNG BÌNH/ĐƠN</div>
                                         <div class="text-h4 font-weight-bold text-info">
                                             {{ countOrders ? formatPrice(Math.round(parseInt(saleTotal.replace(/\./g,
-                                            '')) / countOrders)) : '0' }} VNĐ
+                                                '')) / countOrders)) : '0' }} VNĐ
                                         </div>
                                         <div class="text-caption text-medium-emphasis">Giá trị trung bình mỗi đơn</div>
                                     </v-card-text>
@@ -95,7 +95,7 @@
                                 </template>
                                 <template v-slot:item.order_code="{ item }">
                                     <span class="text-primary font-weight-medium cursor-pointer"
-                                        @click="openOrderDetail(item)">
+                                        @click="showOrderDetail(item)">
                                         {{ item.order_code }}
                                     </span>
                                 </template>
@@ -119,7 +119,7 @@
             </v-col>
         </v-row>
 
-        <PaymentDetailDialog v-model="showDialog" :order-detail="selectedOrder" />
+        <OrderDetailDialog v-model="showDetailDialog" :order-detail="selectedOrder" />
     </v-container>
 </template>
 
@@ -128,12 +128,12 @@ import { formatDateTime } from '@/utils/format';
 import logoImage from '@/assets/logo-admin.png'
 import { formatPrice } from '@/utils/format';
 import { orderAPI } from "@/api/order";
-import PaymentDetailDialog from './PaymentDetailDialog.vue'
+import OrderDetailDialog from '@/components/Orders/OrderDetailDialog.vue'
 
 export default {
     name: "PaymentHistoryPage",
     components: {
-        PaymentDetailDialog
+        OrderDetailDialog
     },
     data() {
         return {
@@ -149,7 +149,7 @@ export default {
                 { title: 'TRẠNG THÁI', key: 'status', width: '30%' },
             ],
             contents: [],
-            showDialog: false,
+            showDetailDialog: false,
             selectedOrder: null
         }
     },
@@ -193,9 +193,9 @@ export default {
             }
         },
 
-        openOrderDetail(item) {
-            this.selectedOrder = item;
-            this.showDialog = true;
+        showOrderDetail(order) {
+            this.selectedOrder = order;
+            this.showDetailDialog = true;
         },
 
         getStatusColor(status) {
