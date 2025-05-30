@@ -49,7 +49,7 @@ export default {
           enabled: true
         },
         {
-          value: 'ZaloPay',
+          value: 'zalopay',
           label: 'ZaloPay',
           image: 'https://minio.thecoffeehouse.com/image/tchmobileapp/388_ic_zalo@3x.png',
           enabled: true

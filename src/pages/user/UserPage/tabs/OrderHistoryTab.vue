@@ -88,7 +88,7 @@
               <v-row v-if="isDetailsVisible(order.order_code)" class="order-details">
                 <v-col cols="12">
                   <div class="customer-info">
-                    <div class="info-line"><strong>Khách hàng:</strong> {{ order.user_name }}</div>
+                    <div class="info-line"><strong>Tên người nhận:</strong> {{ order.user_name }}</div>
                     <div class="info-line"><strong>Số điện thoại:</strong> {{ order.mobile_no }}</div>
                     <div class="info-line"><strong>Phương thức thanh toán:</strong> {{
                       getPaymentMethodText(order.payment_method) }}</div>

@@ -1,25 +1,15 @@
 <template>
   <v-dialog v-model="showDialog" max-width="750">
     <template v-slot:activator="{ props }">
-      <v-btn
-        v-bind="props"
-        variant="text"
-        class="delivery-btn rounded-pill px-2 px-sm-4"
-        color="secondary"
-      >
+      <v-btn v-bind="props" variant="text" class="delivery-btn rounded-pill px-2 px-sm-4" color="secondary">
         <v-row no-gutters align="center" style="height: 100%; width: 100%">
           <v-col cols="auto">
-            <v-img
-              src="@/assets/Delivery2.png"
-              width="36"
-              height="36"
-              class="mr-2 rounded-circle"
-            />
+            <v-img src="@/assets/Delivery2.png" width="36" height="36" class="mr-2 rounded-circle" />
           </v-col>
           <v-col class="address-container">
             <div class="ml-2">
               <div class="text-subtitle-1 font-weight-bold text-black">Giao hàng</div>
-              <div class="text-caption text-truncate text-black">{{ address }}</div>
+              <div class="text-caption text-truncate text-black">{{ addressDisplay }}</div>
             </div>
           </v-col>
           <v-col cols="auto">
@@ -34,38 +24,30 @@
         <div class="text-h6 font-weight-bold mb-4">Địa chỉ giao hàng</div>
 
         <!-- Thanh tìm kiếm -->
-        <v-text-field
-          v-model="address"
-          placeholder="Nhập địa chỉ giao hàng"
-          variant="outlined"
-          density="comfortable"
-          hide-details
-          class="mb-4"
-          prepend-inner-icon="mdi-magnify"
-          clearable
-          @click:clear="clearAddress"
-          @input="handleSearchAddress"
-        >
+        <v-text-field v-model="addressStore.address.address" placeholder="Nhập địa chỉ giao hàng" variant="outlined"
+          density="comfortable" hide-details class="mb-4" prepend-inner-icon="mdi-magnify" clearable @click:clear="clearAddress"
+          @input="handleSearchAddress">
         </v-text-field>
 
         <!-- Địa chỉ đã lưu -->
         <div v-if="savedAddresses.length > 0">
           <div class="text-subtitle-1 font-weight-bold mb-2">Địa chỉ đã lưu</div>
           <v-list>
-            <v-list-item
-              v-for="(address, index) in savedAddresses"
-              :key="index"
-              @click="selectAddress(address)"
-            >
+            <v-list-item v-for="(address, index) in savedAddresses" :key="index" @click="selectAddress(address)">
               <template v-slot:prepend>
                 <v-icon color="primary" class="mr-2">
                   {{
-                  address.address_type === 'home' ? 'mdi-home' :
-                  address.address_type === 'office' ? 'mdi-office-building' : 'mdi-map-marker'
+                    address.address_type === 'home' ? 'mdi-home' :
+                      address.address_type === 'office' ? 'mdi-office-building' : 'mdi-map-marker'
                   }}
                 </v-icon>
               </template>
-              <v-list-item-title class="text-caption">{{ address.address }}</v-list-item-title>
+              <v-list-item-title class="text-caption">
+                <div>{{ address.address }}</div>
+                <div v-if="address.user_name" class="text-grey-darken-1">
+                  {{ address.user_name }} - {{ address.mobile_no }}
+                </div>
+              </v-list-item-title>
             </v-list-item>
           </v-list>
         </div>
@@ -74,11 +56,7 @@
         <div v-if="searchResults.length > 0">
           <div class="text-subtitle-1 font-weight-bold my-2">Kết quả tìm kiếm</div>
           <v-list>
-            <v-list-item
-              v-for="(result, index) in searchResults"
-              :key="index"
-              @click="selectSearchResult(result)"
-            >
+            <v-list-item v-for="(result, index) in searchResults" :key="index" @click="selectSearchResult(result)">
               <template v-slot:prepend>
                 <v-icon color="grey" class="mr-2">mdi-map-marker</v-icon>
               </template>
@@ -90,12 +68,9 @@
         </div>
 
         <!-- Không có kết quả -->
-        <v-alert
-          v-if="searchAddress && !searchResults.length"
-          type="info"
-          variant="tonal"
-          class="mt-4"
-        >Không tìm thấy địa chỉ phù hợp</v-alert>
+        <v-alert v-if="searchAddress && !searchResults.length" type="info" variant="tonal" class="mt-4">Không tìm thấy
+          địa
+          chỉ phù hợp</v-alert>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -130,17 +105,16 @@ export default {
   },
 
   computed: {
-    address: {
-      get() {
-        return this.addressStore.address;
-      },
-      set(value) {
-        this.addressStore.updateAddress(value);
-      }
+    addressDisplay() {
+      return this.addressStore.address.address || 'Chưa có địa chỉ giao hàng';
     },
+
+    address() {
+      return this.addressStore.address;
+    },
+
     savedAddresses() {
-        // Lấy danh sách địa chỉ đã lưu từ store nhưng chỉ lấy 4 địa chỉ đầu tiên mới nhất
-        return this.addressStore.addressNote.slice(0, 4);
+      return this.addressStore.addressNote.slice(0, 4);
     }
   },
 
@@ -156,20 +130,37 @@ export default {
     },
 
     selectAddress(address) {
-      this.address = address.address;
+      this.addressStore.updateAddress({
+        address: address.address,
+        user_name: address.user_name,
+        mobile_no: address.mobile_no,
+        address_type: address.address_type,
+        province_code: address.province_code,
+        district_code: address.district_code,
+        ward_code: address.ward_code,
+        is_default: address.is_default
+      });
       this.$emit("update:modelValue", address.address);
       this.closeDialog();
     },
 
     selectSearchResult(result) {
-      const fullAddress = `${result.mainText}, ${result.secondaryText}`;
-      this.address = fullAddress;
-      this.$emit("update:modelValue", fullAddress);
+      const addressObj = {
+        address: `${result.mainText}, ${result.secondaryText}`,
+        address_type: 'other',
+        is_default: false
+      };
+      this.addressStore.updateAddress(addressObj);
+      this.$emit("update:modelValue", addressObj.address);
       this.closeDialog();
     },
 
     clearAddress() {
-      this.address = '';
+      this.addressStore.updateAddress({
+        address: '',
+        address_type: '',
+        is_default: false
+      });
       this.searchResults = [];
     }
   }
@@ -187,7 +178,8 @@ export default {
 }
 
 .address-container {
-  width: 120px; /* Đặt chiều rộng cố định cho phần địa chỉ */
+  width: 120px;
+  /* Đặt chiều rộng cố định cho phần địa chỉ */
   overflow: hidden;
 }
 

@@ -205,6 +205,7 @@ import RecommendCheckout from './components/RecommendCheckout.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
+import { useAddressStore } from '@/stores/address'
 import { useVoucherStore } from '@/stores/voucher'
 import { formatPrice } from '@/utils/format'
 
@@ -223,7 +224,8 @@ export default {
     const authStore = useAuthStore()
     const notificationStore = useNotificationStore()
     const voucherStore = useVoucherStore()
-    return { cartStore, authStore, notificationStore, voucherStore }
+    const addressStore = useAddressStore()
+    return { cartStore, authStore, notificationStore, voucherStore, addressStore }
   },
 
   data() {
@@ -309,9 +311,9 @@ export default {
       try {
         const orderData = {
           user_id: this.authStore.userInfo.id,
-          user_name: this.authStore.userInfo.first_name,
-          mobile_no: this.deliveryInfo.phone,
-          address: this.deliveryInfo.address,
+          user_name: this.addressStore.address.user_name,
+          mobile_no: this.addressStore.address.mobile_no,
+          address: this.addressStore.address.address,
           note: this.deliveryInfo.note || '',
           shipping_fee: 15000.00,
           total_price: this.orderData.totalPrice,
@@ -328,13 +330,23 @@ export default {
             topping_items: item.topping_items
           }))
         }
-
+        // console.log(orderData)
+        // return
         const { data: { order_code } } = await orderAPI.createOrder(orderData)
 
-        if (this.paymentMethod === 'cod') {
-          await this.handleCodPayment()
+        // Map các phương thức thanh toán với hàm xử lý tương ứng
+        const paymentHandlers = {
+          'cod': this.handleCodPayment,
+          'momo': () => this.handleOnlinePayment(order_code, 'momo'),
+          'vnpay': () => this.handleOnlinePayment(order_code, 'vnpay'),
+          'zalopay': () => this.handleOnlinePayment(order_code, 'zalopay')
+        }
+
+        const handler = paymentHandlers[this.paymentMethod]
+        if (handler) {
+          await handler()
         } else {
-          await this.handleOnlinePayment(order_code)
+          throw new Error('Phương thức thanh toán không hợp lệ')
         }
       } catch (error) {
         this.notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message, 3000)
@@ -345,10 +357,7 @@ export default {
 
     async handleCodPayment() {
       try {
-        // Xóa giỏ hàng và voucher
-        this.cartStore.clearCart()
-        this.voucherStore.clearVoucher()
-
+        this.clearCartAndVoucher()
         this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
         this.$router.push('/user/lich-su')
       } catch (error) {
@@ -356,28 +365,42 @@ export default {
       }
     },
 
-    async handleOnlinePayment(order_code) {
+    async handleOnlinePayment(order_code, paymentType) {
       try {
         const paymentData = {
           order_code: order_code,
           return_url: `${window.location.origin}/user/lich-su`
         }
-        const response = await paymentAPI.createMomoPayment(paymentData)
+
+        // Map các phương thức thanh toán với API tương ứng
+        const paymentAPIs = {
+          'momo': paymentAPI.createMomoPayment,
+          'vnpay': paymentAPI.createVNPayPayment,
+          'zalopay': paymentAPI.createZaloPayPayment
+        }
+
+        const createPayment = paymentAPIs[paymentType]
+        if (!createPayment) {
+          throw new Error('Phương thức thanh toán không được hỗ trợ')
+        }
+
+        const response = await createPayment(paymentData)
         const paymentUrl = response.data.payUrl
 
         if (!paymentUrl) {
           throw new Error('Không nhận được URL thanh toán')
         }
 
-        // Xóa giỏ hàng và voucher
-        this.cartStore.clearCart()
-        this.voucherStore.clearVoucher()
-
-        // Chuyển hướng người dùng đến trang thanh toán MoMo
+        this.clearCartAndVoucher()
         window.location.href = paymentUrl
       } catch (error) {
         this.notificationStore.error('Lỗi khi tạo thanh toán online', 2000)
       }
+    },
+
+    clearCartAndVoucher() {
+      this.cartStore.clearCart()
+      this.voucherStore.clearVoucher()
     },
 
     handleDeleteOrder() {

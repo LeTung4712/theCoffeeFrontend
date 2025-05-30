@@ -1,16 +1,11 @@
 <template>
-    <v-card v-if="product" elevation="2" class="product-card" @click="navigateToProduct" :ripple="true" style="cursor: pointer">
+    <v-card v-if="product" elevation="2" class="product-card" @click="navigateToProduct" :ripple="true"
+        style="cursor: pointer">
         <!-- Desktop Layout -->
         <div class="d-none d-sm-flex flex-column h-100">
             <div class="image-container">
-                <v-img 
-                    :src="product.image_url" 
-                    :width="155" 
-                    :height="155" 
-                    cover
-                    class="rounded-lg bg-grey-lighten-3"
-                    :lazy-src="product.image_url"
-                />
+                <v-img :src="product.image_url" :width="155" :height="155" cover class="rounded-lg bg-grey-lighten-3"
+                    :lazy-src="product.image_url" />
             </div>
 
             <v-card-text class="d-flex flex-column h-100">
@@ -23,13 +18,8 @@
                         {{ formattedPrice }}đ
                     </span>
                     <div class="add-button-wrapper">
-                        <ProductCardDialog 
-                            v-if="currentID" 
-                            :currentID="currentID" 
-                            :dialog="dialog" 
-                            v-bind="product"
-                            :isInProductListing="1" 
-                        />
+                        <ProductCardDialog v-if="currentID" :currentID="currentID" :dialog="dialog" v-bind="product"
+                            :isInProductListing="1" />
                     </div>
                 </div>
             </v-card-text>
@@ -38,13 +28,8 @@
         <!-- Mobile Layout -->
         <div class="d-flex d-sm-none">
             <div class="mobile-image-container">
-                <v-img 
-                    :src="product.image_url" 
-                    cover 
-                    class="rounded-lg bg-grey-lighten-3" 
-                    height="100%"
-                    :lazy-src="product.image_url"
-                />
+                <v-img :src="product.image_url" cover class="rounded-lg bg-grey-lighten-3" height="100%"
+                    :lazy-src="product.image_url" />
             </div>
 
             <v-card-text class="mobile-content">
@@ -57,13 +42,8 @@
                         {{ formattedPrice }}đ
                     </span>
                     <div class="add-button-wrapper">
-                        <ProductCardDialog 
-                            v-if="currentID"
-                            :currentID="currentID" 
-                            :dialog="dialog" 
-                            v-bind="product"
-                            :isInProductListing="1" 
-                        />
+                        <ProductCardDialog v-if="currentID" :currentID="currentID" :dialog="dialog" v-bind="product"
+                            :isInProductListing="1" />
                     </div>
                 </div>
             </v-card-text>
@@ -81,13 +61,16 @@ export default {
     components: {
         ProductCardDialog
     },
-    
+
     props: {
         product: {
             type: Object,
             required: true,
             validator(value) {
-                return value && value.name && value.price && value.image_url
+                return value &&
+                    value.name &&
+                    (typeof value.price === 'string' || typeof value.price === 'number') &&
+                    value.image_url
             }
         },
         currentID: {
@@ -115,11 +98,11 @@ export default {
         async navigateToProduct() {
             try {
                 if (!this.product?.name) return;
-                
+
                 const productNameInUrl = removeVietnameseTones(this.product.name)
                     .replaceAll(' ', '-')
                     .toLowerCase();
-                
+
                 await this.productStore.setProductId(this.product.id);
 
                 if (this.$route.name === 'ProductDetail') {

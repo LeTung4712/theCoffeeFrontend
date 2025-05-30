@@ -96,23 +96,6 @@
             <v-divider></v-divider>
 
             <v-card-text>
-                <v-row class="mb-2">
-                    <v-col cols="12" sm="4" md="3">
-                        <v-text-field v-model="search" prepend-icon="mdi-magnify" label="Tìm kiếm" density="compact"
-                            variant="outlined" hide-details></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="4" md="3">
-                        <v-select v-model="sortBy" :items="sortOptions" label="Sắp xếp theo" density="compact"
-                            variant="outlined" hide-details></v-select>
-                    </v-col>
-                    <v-col cols="12" sm="4" md="3">
-                        <v-select v-model="sortDirection" :items="sortDirections" label="Thứ tự" density="compact"
-                            variant="outlined" hide-details></v-select>
-                    </v-col>
-                    <v-spacer></v-spacer>
-                    
-                </v-row>
-
                 <v-data-table :headers="headers" :items="filteredAndSortedRules" :search="search" class="elevation-0"
                     :items-per-page="10" :footer-props="{
                         'items-per-page-options': [5, 10, 20, 50],

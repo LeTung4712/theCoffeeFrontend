@@ -130,7 +130,6 @@ export default {
                 { title: "Manage Vouchers", icon: "mdi-ticket", to: "/admin/pages/manage-vouchers" },
                 { title: "Manage Orders", icon: "mdi-cart", to: "/admin/pages/manage-orders" },
                 { title: "Payment History", icon: "mdi-history", to: "/admin/pages/payment-history" },
-                { title: "Settings", icon: "mdi-cog", to: "/admin/pages/settings" },
             ],
             notificationMenu: false,
         }

@@ -43,7 +43,8 @@ export default {
     data() {
         return {
             recommendProducts: [],
-            loadingProducts: false
+            loadingProducts: false,
+            dialog: false
         }
     },
 
