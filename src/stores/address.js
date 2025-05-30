@@ -11,17 +11,13 @@ export const useAddressStore = defineStore("address", {
       ? JSON.parse(localStorage.getItem("oldAddress"))
       : {
           address: "",
-          address_type: "",
-          created_at: "",
-          district_code: "",
-          id: null,
+          address_type: "",          
           is_default: false,
           mobile_no: "",
-          province_code: "",
-          updated_at: "",
-          user_id: null,
+          place_id: "",
           user_name: "",
-          ward_code: "",
+          created_at: "",
+          updated_at: "",
         },
     addressNote: localStorage.getItem("addressNote")
       ? JSON.parse(localStorage.getItem("addressNote"))
@@ -84,7 +80,7 @@ export const useAddressStore = defineStore("address", {
       try {
         this.isSearching = true;
         const response = await mapAPI.getAutoCompleteAddress(query);
-        console.log(response);
+        //console.log(response);
         const results = response.data.predictions;
 
         // Lưu vào cache với timestamp
