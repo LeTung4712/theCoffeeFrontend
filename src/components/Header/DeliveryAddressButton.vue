@@ -24,10 +24,28 @@
         <div class="text-h6 font-weight-bold mb-4">Địa chỉ giao hàng</div>
 
         <!-- Thanh tìm kiếm -->
-        <v-text-field v-model="addressStore.address.address" placeholder="Nhập địa chỉ giao hàng" variant="outlined"
-          density="comfortable" hide-details class="mb-4" prepend-inner-icon="mdi-magnify" clearable @click:clear="clearAddress"
-          @input="handleSearchAddress">
+        <v-text-field v-model="searchQuery" placeholder="Nhập địa chỉ giao hàng" variant="outlined"
+          density="comfortable" hide-details class="mb-4" prepend-inner-icon="mdi-magnify" clearable
+          @click:clear="clearSearch" @input="handleSearch" :loading="addressStore.isSearching">
+          <template v-slot:append>
+            <v-progress-circular v-if="addressStore.isSearching" indeterminate size="20" width="2"
+              color="primary"></v-progress-circular>
+          </template>
         </v-text-field>
+
+        <!-- Kết quả tìm kiếm -->
+        <div v-if="addressStore.currentSearchResults.length > 0" class="search-results mb-4">
+          <v-list class="search-results-list">
+            <v-list-item v-for="(result, index) in addressStore.currentSearchResults" :key="index"
+              @click="selectSearchResult(result)" class="search-result-item">
+              <template v-slot:prepend>
+                <v-icon color="grey" class="mr-2">mdi-map-marker</v-icon>
+              </template>
+
+              <v-list-item-title>{{ result.description }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </div>
 
         <!-- Địa chỉ đã lưu -->
         <div v-if="savedAddresses.length > 0">
@@ -52,25 +70,11 @@
           </v-list>
         </div>
 
-        <!-- Kết quả tìm kiếm -->
-        <div v-if="searchResults.length > 0">
-          <div class="text-subtitle-1 font-weight-bold my-2">Kết quả tìm kiếm</div>
-          <v-list>
-            <v-list-item v-for="(result, index) in searchResults" :key="index" @click="selectSearchResult(result)">
-              <template v-slot:prepend>
-                <v-icon color="grey" class="mr-2">mdi-map-marker</v-icon>
-              </template>
-
-              <v-list-item-title>{{ result.mainText }}</v-list-item-title>
-              <v-list-item-subtitle class="text-caption">{{ result.secondaryText }}</v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
-        </div>
-
         <!-- Không có kết quả -->
-        <v-alert v-if="searchAddress && !searchResults.length" type="info" variant="tonal" class="mt-4">Không tìm thấy
-          địa
-          chỉ phù hợp</v-alert>
+        <v-alert v-if="searchQuery && !addressStore.isSearching && !addressStore.currentSearchResults.length"
+          type="info" variant="tonal" class="mt-4">
+          Không tìm thấy địa chỉ phù hợp
+        </v-alert>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -99,8 +103,7 @@ export default {
   data() {
     return {
       showDialog: false,
-      searchAddress: "",
-      searchResults: [],
+      searchQuery: "",
     };
   },
 
@@ -109,35 +112,28 @@ export default {
       return this.addressStore.address.address || 'Chưa có địa chỉ giao hàng';
     },
 
-    address() {
-      return this.addressStore.address;
-    },
-
     savedAddresses() {
       return this.addressStore.addressNote.slice(0, 4);
     }
   },
 
   methods: {
-    closeDialog() {
-      this.showDialog = false;
-      this.searchAddress = "";
-      this.searchResults = [];
+    handleSearch() {
+      this.addressStore.searchAddress(this.searchQuery);
     },
 
-    handleSearchAddress() {
-      this.searchResults = [];
+    clearSearch() {
+      this.searchQuery = "";
+      this.addressStore.clearSearchCache();
     },
 
     selectAddress(address) {
       this.addressStore.updateAddress({
         address: address.address,
+        place_id: address.place_id,
         user_name: address.user_name,
         mobile_no: address.mobile_no,
         address_type: address.address_type,
-        province_code: address.province_code,
-        district_code: address.district_code,
-        ward_code: address.ward_code,
         is_default: address.is_default
       });
       this.$emit("update:modelValue", address.address);
@@ -146,7 +142,8 @@ export default {
 
     selectSearchResult(result) {
       const addressObj = {
-        address: `${result.mainText}, ${result.secondaryText}`,
+        address: result.description,
+        place_id: result.place_id,
         address_type: 'other',
         is_default: false
       };
@@ -155,13 +152,10 @@ export default {
       this.closeDialog();
     },
 
-    clearAddress() {
-      this.addressStore.updateAddress({
-        address: '',
-        address_type: '',
-        is_default: false
-      });
-      this.searchResults = [];
+    closeDialog() {
+      this.showDialog = false;
+      this.searchQuery = "";
+      this.addressStore.clearSearchCache();
     }
   }
 };
@@ -208,6 +202,28 @@ export default {
 }
 
 .delivery-dialog .v-list-item:hover {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+
+.search-results {
+  position: relative;
+  z-index: 1;
+}
+
+.search-results-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  background: white;
+}
+
+.search-result-item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
   background-color: rgb(var(--v-theme-surface-variant));
 }
 </style>
