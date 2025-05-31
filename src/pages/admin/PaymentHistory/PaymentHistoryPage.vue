@@ -1,95 +1,139 @@
 <template>
-    <v-container>
+    <v-container fluid class="pa-4">
         <v-row>
             <v-col cols="12">
-                <v-card>
-                    <!-- Header section -->
-                    <v-row class="pa-4">
-                        <v-col cols="12" sm="6">
-                            <v-row>
-                                <v-col cols="auto">
-                                    <v-avatar size="120" rounded>
-                                        <v-img :src=logo cover alt="logo" />
-                                    </v-avatar>
+                <v-card class="rounded-lg" elevation="2">
+                    <!-- Header section với gradient background -->
+                    <v-card class="rounded-t-lg" color="primary" flat>
+                        <v-container>
+                            <v-row align="center" class="py-4">
+                                <v-col cols="12" sm="6">
+                                    <v-row align="center" no-gutters>
+                                        <v-col cols="auto" class="mr-4">
+                                            <v-avatar size="80" class="elevation-4">
+                                                <v-img :src="logo" cover alt="logo" />
+                                            </v-avatar>
+                                        </v-col>
+                                        <v-col>
+                                            <h2 class="text-h4 font-weight-bold text-white mb-1">THE COFFEE PAYMENT</h2>
+                                            <div class="text-subtitle-1 text-white text-opacity-80">The CoffeeShop Bách
+                                                Khoa</div>
+                                        </v-col>
+                                    </v-row>
                                 </v-col>
-                                <v-col>
-                                    <h4 class="text-h5 font-weight-medium">THE COFFEE PAYMENT</h4>
-                                    <div class="text-subtitle-1 text-medium-emphasis">The CoffeeShop Bách Khoa</div>
+
+                                <!-- Date picker với style mới -->
+                                <v-col cols="12" sm="6" class="d-flex justify-sm-end">
+                                    <v-card class="rounded-lg" color="white" flat>
+                                        <v-card-text class="pa-4">
+                                            <div class="text-subtitle-2 text-primary mb-2">CHỌN NGÀY XEM BÁO CÁO</div>
+                                            <v-text-field v-model="mydate" type="date" density="compact"
+                                                variant="outlined" hide-details class="date-picker-custom"
+                                                bg-color="white" />
+                                        </v-card-text>
+                                    </v-card>
                                 </v-col>
                             </v-row>
-                        </v-col>
+                        </v-container>
+                    </v-card>
 
-                        <!-- Stats section -->
-                        <v-col cols="12" sm="6">
-                            <v-row>
-                                <v-col cols="12" sm="6">
-                                    <v-card-text class="text-center">
-                                        <div class="text-medium-emphasis mb-2">TỔNG TIỀN GD TRONG NGÀY</div>
-                                        <div class="text-h5">{{ saleTotal }}VNĐ</div>
-                                    </v-card-text>
-                                </v-col>
-                                <v-col cols="12" sm="6">
-                                    <v-card-text class="text-center">
-                                        <div class="text-medium-emphasis mb-2">TỔNG SỐ GD TRONG NGÀY</div>
-                                        <div class="text-h5">{{ countOrders }}</div>
-                                    </v-card-text>
-                                </v-col>
-                                <v-col cols="12" sm="6">
-                                    <v-card-text>
-                                        <div class="text-medium-emphasis">NGÀY {{ mydate }}</div>
-                                        <v-text-field v-model="mydate" type="date" density="compact" variant="outlined"
-                                            hide-details />
-                                    </v-card-text>
-                                </v-col>
-                            </v-row>
-                        </v-col>
-                    </v-row>
-
-                    <!-- Search and Table section -->
-                    <v-card-text>
+                    <!-- Stats cards với animation -->
+                    <v-container class="mt-n8">
                         <v-row>
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Nhập mã đơn hàng"
-                                    single-line density="compact" variant="outlined" hide-details class="mb-4" />
+                                <v-card class="rounded-lg" color="white" elevation="4">
+                                    <v-card-text class="text-center pa-4">
+                                        <v-icon size="32" color="primary" class="mb-2">mdi-cash-multiple</v-icon>
+                                        <div class="text-subtitle-2 text-medium-emphasis mb-1">TỔNG TIỀN GIAO DỊCH</div>
+                                        <div class="text-h4 font-weight-bold text-primary">{{ saleTotal }} VNĐ</div>
+                                        <div class="text-caption text-medium-emphasis">Tính đến {{ formatTime(new
+                                            Date()) }}</div>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-card class="rounded-lg" color="white" elevation="4">
+                                    <v-card-text class="text-center pa-4">
+                                        <v-icon size="32" color="success" class="mb-2">mdi-cart-check</v-icon>
+                                        <div class="text-subtitle-2 text-medium-emphasis mb-1">TỔNG SỐ GIAO DỊCH</div>
+                                        <div class="text-h4 font-weight-bold text-success">{{ countOrders }}</div>
+                                        <div class="text-caption text-medium-emphasis">Giao dịch trong ngày</div>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-card class="rounded-lg" color="white" elevation="4">
+                                    <v-card-text class="text-center pa-4">
+                                        <v-icon size="32" color="info" class="mb-2">mdi-chart-line</v-icon>
+                                        <div class="text-subtitle-2 text-medium-emphasis mb-1">TRUNG BÌNH/ĐƠN</div>
+                                        <div class="text-h4 font-weight-bold text-info">
+                                            {{ countOrders ? formatPrice(Math.round(parseInt(saleTotal.replace(/\./g,
+                                                '')) / countOrders)) : '0' }} VNĐ
+                                        </div>
+                                        <div class="text-caption text-medium-emphasis">Giá trị trung bình mỗi đơn</div>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+
+                    <!-- Search and Table section với style mới -->
+                    <v-container>
+                        <v-row>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify"
+                                    label="Tìm kiếm theo mã đơn hàng" single-line density="comfortable"
+                                    variant="outlined" hide-details class="search-field" bg-color="white" />
                             </v-col>
                         </v-row>
 
-                        <v-data-table :headers="headers" :items="filteredOrders" :search="search" :items-per-page="10"
-                            density="comfortable">
-                            <template v-slot:item.order_code="{ item }">
-                                <span class="text-primary cursor-pointer" style="cursor: pointer;"
-                                    @click="openOrderDetail(item)">
-                                    {{ item.order_code }}
-                                </span>
-                            </template>
-                            <template v-slot:item.final_price="{ item }">
-                                {{ formattedPrice(item.final_price) }}
-                            </template>
-                            <template v-slot:item.status="{ item }">
-                                <v-chip :color="getStatusColor(item.status)" size="small">
-                                    {{ getStatusText(item.status) }}
-                                </v-chip>
-                            </template>
-                        </v-data-table>
-                    </v-card-text>
+                        <v-card class="mt-4 rounded-lg" elevation="1">
+                            <v-data-table :headers="headers" :items="filteredOrders" :search="search"
+                                :items-per-page="10" density="comfortable" class="elevation-0" hover>
+                                <template v-slot:item.created_at="{ item }">
+                                    {{ formatDateTime(item.created_at) }}
+                                </template>
+                                <template v-slot:item.order_code="{ item }">
+                                    <span class="text-primary font-weight-medium cursor-pointer"
+                                        @click="showOrderDetail(item)">
+                                        {{ item.order_code }}
+                                    </span>
+                                </template>
+                                <template v-slot:item.final_price="{ item }">
+                                    <span class="font-weight-medium text-success">
+                                        {{ formatPrice(item.final_price) }} VNĐ
+                                    </span>
+                                </template>
+                                <template v-slot:item.status="{ item }">
+                                    <v-chip :color="getStatusColor(item.status)" size="small" class="font-weight-medium"
+                                        :class="{ 'text-white': item.status === '3' }">
+                                        <v-icon start size="small"
+                                            :icon="item.status === '3' ? 'mdi-check-circle' : 'mdi-close-circle'" />
+                                        {{ getStatusText(item.status) }}
+                                    </v-chip>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-container>
                 </v-card>
             </v-col>
         </v-row>
 
-        <PaymentDetailDialog v-model="showDialog" :order-detail="selectedOrder" />
+        <OrderDetailDialog v-model="showDetailDialog" :order-detail="selectedOrder" />
     </v-container>
 </template>
 
 <script>
-import logoImage from '@/assets/logo.jpg'
+import { formatDateTime } from '@/utils/format';
+import logoImage from '@/assets/logo-admin.png'
 import { formatPrice } from '@/utils/format';
 import { orderAPI } from "@/api/order";
-import PaymentDetailDialog from './PaymentDetailDialog.vue'
+import OrderDetailDialog from '@/components/Orders/OrderDetailDialog.vue'
 
 export default {
     name: "PaymentHistoryPage",
     components: {
-        PaymentDetailDialog
+        OrderDetailDialog
     },
     data() {
         return {
@@ -97,15 +141,15 @@ export default {
             mydate: new Date().toISOString().slice(0, 10),
             search: '',
             headers: [
-                { title: 'THỜI GIAN', key: 'formatted_time', width: '15%' },
+                { title: 'THỜI GIAN', key: 'created_at', width: '10%' },
                 { title: 'Mã ĐƠN', key: 'order_code', width: '15%' },
-                { title: 'SỐ TIỀN', key: 'final_price', width: '10%' },
+                { title: 'SỐ TIỀN', key: 'final_price', width: '15%' },
                 { title: 'TÊN KHÁCH HÀNG', key: 'user_name', width: '20%' },
                 { title: 'ĐỊA CHỈ', key: 'address', width: '30%' },
                 { title: 'TRẠNG THÁI', key: 'status', width: '30%' },
             ],
             contents: [],
-            showDialog: false,
+            showDetailDialog: false,
             selectedOrder: null
         }
     },
@@ -114,12 +158,11 @@ export default {
             return this.contents.filter(item => item.created_at.slice(0, 10) === this.mydate)
                 .map(item => ({
                     ...item,
-                    formatted_time: this.formatTime(item.created_at)
                 }));
         },
 
         saleTotal() {
-            return this.formattedPrice(
+            return this.formatPrice(
                 this.filteredOrders.reduce((total, item) =>
                     total + parseInt(item.final_price), 0)
             );
@@ -135,9 +178,8 @@ export default {
     },
 
     methods: {
-        formattedPrice(price) {
-            return formatPrice(price);
-        },
+        formatDateTime,
+        formatPrice,
         //lấy danh sách các đơn hàng thành công
         async getOrders() {
             try {
@@ -151,17 +193,17 @@ export default {
             }
         },
 
-        openOrderDetail(item) {
-            this.selectedOrder = item;
-            this.showDialog = true;
+        showOrderDetail(order) {
+            this.selectedOrder = order;
+            this.showDetailDialog = true;
         },
 
         getStatusColor(status) {
-            return status === '3' ? 'success' : 'error';
+            return status === '2' ? 'success' : 'error';
         },
 
         getStatusText(status) {
-            return status === '3' ? 'Thành công' : 'Đã Hủy';
+            return status === '2' ? 'Thành công' : 'Đã Hủy';
         },
 
         formatTime(timeString) {
@@ -189,3 +231,47 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.date-picker-custom {
+    max-width: 250px;
+}
+
+.search-field {
+    max-width: 400px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Thêm hiệu ứng hover cho các card */
+.v-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.v-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Custom style cho data table */
+:deep(.v-data-table) {
+    border-radius: 8px;
+}
+
+:deep(.v-data-table-header th) {
+    font-weight: 600 !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+    background-color: #f5f5f5 !important;
+}
+
+:deep(.v-data-table-row:hover) {
+    background-color: #f5f5f5 !important;
+}
+
+/* Style cho chip status */
+:deep(.v-chip) {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+</style>

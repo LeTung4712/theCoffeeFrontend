@@ -96,24 +96,95 @@
             <v-divider></v-divider>
 
             <v-card-text>
-                <v-data-table :headers="headers" :items="formattedRules" class="elevation-0">
+                <v-data-table :headers="headers" :items="filteredAndSortedRules" :search="search" class="elevation-0"
+                    :items-per-page="10" :footer-props="{
+                        'items-per-page-options': [5, 10, 20, 50],
+                        showFirstLastPage: true,
+                    }">
                     <template v-slot:item.index="{ item, index }">
                         {{ index + 1 }}
                     </template>
                     <template v-slot:item.antecedent="{ item }">
-                        <v-chip v-for="product in item.antecedent_products" :key="product.id" class="ma-1"
-                            color="primary" size="small">
-                            {{ product.name }}
-                        </v-chip>
+                        <div class="product-list">
+                            <div v-for="product in item.antecedent_products" :key="product.id" class="product-item">
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props }">
+                                        <v-chip v-bind="props" class="ma-1" color="primary" size="small" link
+                                            variant="elevated">
+                                            <template v-slot:prepend v-if="product.image_url">
+                                                <v-avatar size="24">
+                                                    <v-img :src="product.image_url" />
+                                                </v-avatar>
+                                            </template>
+                                            {{ product.name }}
+                                        </v-chip>
+                                    </template>
+                                    <div class="tooltip-content">
+                                        <p><strong>{{ product.name }}</strong></p>
+                                        <p v-if="product.price">Giá: {{ formattedPrice(product.price) }}</p>
+                                        <p v-if="product.category">Danh mục: {{ product.category }}</p>
+                                    </div>
+                                </v-tooltip>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-slot:item.arrow="{ item }">
+                        <div class="arrow-container">
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon v-bind="props" color="primary" icon="mdi-arrow-right-bold-circle"
+                                        size="large"></v-icon>
+                                </template>
+                                <div>
+                                    <p><strong>Thông tin luật kết hợp:</strong></p>
+                                    <p>Support: {{ (Number(item.support) * 100).toFixed(1) }}%</p>
+                                    <p>Confidence: {{ (Number(item.confidence) * 100).toFixed(1) }}%</p>
+                                    <p>Lift: {{ Number(item.lift).toFixed(2) }}</p>
+                                    <p class="tooltip-explanation" v-if="item.lift > 1">
+                                        Lift > 1: Các sản phẩm có liên kết dương với nhau
+                                    </p>
+                                    <p class="tooltip-explanation" v-else-if="item.lift < 1">
+                                        Lift &lt; 1: Các sản phẩm có liên kết âm với nhau
+                                    </p>
+                                    <p class="tooltip-explanation" v-else>
+                                        Lift = 1: Các sản phẩm độc lập với nhau
+                                    </p>
+                                </div>
+                            </v-tooltip>
+                        </div>
                     </template>
                     <template v-slot:item.consequent="{ item }">
-                        <v-chip v-for="product in item.consequent_products" :key="product.id" class="ma-1"
-                            color="success" size="small">
-                            {{ product.name }}
-                        </v-chip>
+                        <div class="product-list">
+                            <div v-for="product in item.consequent_products" :key="product.id" class="product-item">
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props }">
+                                        <v-chip v-bind="props" class="ma-1" color="success" size="small" link
+                                            variant="elevated">
+                                            <template v-if="product.image_url" v-slot:prepend>
+                                                <v-avatar size="24">
+                                                    <v-img :src="product.image_url"></v-img>
+                                                </v-avatar>
+                                            </template>
+                                            {{ product.name }}
+                                        </v-chip>
+                                    </template>
+                                    <div class="tooltip-content">
+                                        <p><strong>{{ product.name }}</strong></p>
+                                        <p v-if="product.price">Giá: {{ formattedPrice(product.price) }}</p>
+                                        <p v-if="product.category">Danh mục: {{ product.category }}</p>
+                                    </div>
+                                </v-tooltip>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-slot:item.support="{ item }">
+                        {{ (Number(item.support) * 100).toFixed(1) }}%
                     </template>
                     <template v-slot:item.confidence="{ item }">
                         {{ (Number(item.confidence) * 100).toFixed(1) }}%
+                    </template>
+                    <template v-slot:item.lift="{ item }">
+                        {{ Number(item.lift).toFixed(2) }}
                     </template>
                 </v-data-table>
             </v-card-text>
@@ -152,8 +223,11 @@ export default {
             headers: [
                 { title: 'STT', key: 'index', align: 'center', width: '80px' },
                 { title: 'Sản phẩm gốc', key: 'antecedent', align: 'start' },
+                { title: '', key: 'arrow', align: 'center', width: '80px' },
                 { title: 'Sản phẩm gợi ý', key: 'consequent', align: 'start' },
-                { title: 'Độ tin cậy', key: 'confidence', align: 'center', width: '120px' }
+                { title: 'Support', key: 'support', align: 'center', width: '120px' },
+                { title: 'Confidence', key: 'confidence', align: 'center', width: '120px' },
+                { title: 'Lift', key: 'lift', align: 'center', width: '120px' },
             ],
             minSupport: 0.1,
             minConfidence: 0.5,
@@ -166,9 +240,23 @@ export default {
                 {
                     antecedent: ['A', 'B'],
                     consequent: ['C'],
-                    confidence: 0.8
+                    confidence: 0.8,
+                    support: 0.4,
+                    lift: 1.2
                 }
-            ]
+            ],
+            search: '',
+            sortBy: 'confidence',
+            sortDirection: 'desc',
+            sortOptions: [
+                { title: 'Confidence', value: 'confidence' },
+                { title: 'Support', value: 'support' },
+                { title: 'Lift', value: 'lift' },
+            ],
+            sortDirections: [
+                { title: 'Giảm dần', value: 'desc' },
+                { title: 'Tăng dần', value: 'asc' },
+            ],
         }
     },
 
@@ -177,8 +265,30 @@ export default {
             return this.associationRules.map(rule => ({
                 antecedent_products: rule.antecedent_products || [],
                 consequent_products: rule.consequent_products || [],
-                confidence: rule.confidence
+                confidence: rule.confidence,
+                support: rule.support || 0,
+                lift: rule.lift || 0
             }));
+        },
+
+        filteredAndSortedRules() {
+            let result = [...this.formattedRules];
+
+            // Sắp xếp kết quả
+            if (this.sortBy && this.sortDirection) {
+                result.sort((a, b) => {
+                    let aValue = Number(a[this.sortBy]);
+                    let bValue = Number(b[this.sortBy]);
+
+                    if (this.sortDirection === 'asc') {
+                        return aValue - bValue;
+                    } else {
+                        return bValue - aValue;
+                    }
+                });
+            }
+
+            return result;
         }
     },
 
@@ -242,7 +352,8 @@ export default {
                 hour: '2-digit',
                 minute: '2-digit'
             }).format(date);
-        }
+        },
+
     }
 }
 </script>
@@ -273,5 +384,72 @@ export default {
 
 .text-subtitle-2 {
     color: #e70c0c !important;
+}
+
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    max-width: 350px;
+}
+
+.product-item {
+    display: inline-flex;
+    margin-bottom: 6px;
+    flex-basis: 100%;
+}
+
+.v-chip.v-chip--size-small .v-avatar {
+    height: 20px;
+    width: 20px;
+    margin-left: -6px;
+    margin-right: 4px;
+}
+
+.v-chip.v-chip--size-small {
+    max-width: 100%;
+}
+
+.arrow-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.tooltip-content {
+    max-width: 250px;
+    color: white !important;
+    background-color: rgba(33, 33, 33, 0.9);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.tooltip-content p {
+    margin: 4px 0;
+    color: white !important;
+}
+
+.tooltip-explanation {
+    font-style: italic;
+    margin-top: 8px;
+    color: #e0e0e0 !important;
+}
+
+/* Override Vuetify tooltip style */
+.v-tooltip .v-overlay__content {
+    background-color: rgba(33, 33, 33, 0.95) !important;
+    color: white !important;
+    font-size: 14px;
+    max-width: 300px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Highlight row on hover */
+.v-data-table .v-data-table__tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
 }
 </style>

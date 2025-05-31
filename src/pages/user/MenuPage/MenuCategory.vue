@@ -16,10 +16,7 @@
             <!-- Menu Tree Column - Chỉ hiển thị trên desktop -->
             <v-col cols="12" md="3" class="d-none d-md-block">
                 <v-card flat>
-                    <v-card-title class="d-flex align-center">
-                        <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
-                        Danh mục
-                    </v-card-title>
+
 
                     <v-card-text>
                         <!-- Loading state -->
@@ -147,36 +144,30 @@
                 </div>
 
                 <!-- Products loading state -->
-                <div v-if="loadingProducts" class="d-flex flex-column align-center py-8">
-                    <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-                    <span class="mt-4">Đang tải sản phẩm...</span>
-                </div>
+                <template v-if="loadingProducts">
+                    <div class="d-flex flex-column align-center py-8">
+                        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+                        <span class="mt-4">Đang tải sản phẩm...</span>
+                    </div>
+                </template>
 
-                <!-- Products error state -->
-                <v-alert v-else-if="productError" type="error" class="mb-4">
-                    {{ productError }}
-                    <v-btn variant="text" color="error" class="mt-2" @click="loadProducts">
-                        Thử lại
-                    </v-btn>
-                </v-alert>
+                <template v-else-if="productError">
+                    <v-alert type="error" class="mb-4">
+                        {{ productError }}
+                        <v-btn variant="text" color="error" class="mt-2" @click="loadProducts">
+                            Thử lại
+                        </v-btn>
+                    </v-alert>
+                </template>
 
-                <!-- Empty state -->
-                <v-card v-else-if="displayedProducts.length === 0" class="pa-4 text-center" flat>
-                    <v-icon size="64" color="grey">mdi-package-variant</v-icon>
-                    <h3 class="text-h6 mt-4">Không có sản phẩm</h3>
-                    <p class="text-body-2 text-grey">Không tìm thấy sản phẩm nào trong danh mục này</p>
-                    <v-btn color="primary" class="mt-4" @click="selectCategory(null)">
-                        Xem tất cả sản phẩm
-                    </v-btn>
-                </v-card>
-
-                <!-- Products grid -->
-                <v-row v-else>
-                    <v-col v-for="product in displayedProducts" :key="product.id" cols="12" sm="6" md="4" lg="3">
-                        <ProductCard :currentID="product.id" :dialog="dialog" :product="product" :isInProductListing="1"
-                            class="product-card" @add-to-cart="addToCart(product)" />
-                    </v-col>
-                </v-row>
+                <template v-else>
+                    <v-row>
+                        <v-col v-for="product in displayedProducts" :key="product.id" cols="12" sm="6" md="4" lg="3">
+                            <ProductCard :currentID="product.id" :dialog="dialog" :product="product"
+                                :isInProductListing="1" class="product-card" @add-to-cart="addToCart(product)" />
+                        </v-col>
+                    </v-row>
+                </template>
 
                 <!-- Pagination -->
                 <div v-if="totalPages > 1" class="d-flex justify-center mt-6">

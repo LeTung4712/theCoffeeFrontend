@@ -18,18 +18,29 @@
         <!-- Stepper -->
         <v-stepper v-model="currentStep" class="mb-6">
           <v-stepper-header>
-            <v-stepper-item value="1">
-              <span :class="{ 'd-none d-sm-flex': true }">Giỏ hàng</span>
+            <v-stepper-item value="1" :complete="currentStep > 1">
+              <template #icon>
+                <v-icon :color="currentStep > 1 ? 'success' : (currentStep >= 1 ? 'primary' : 'grey')"
+                  :icon="currentStep > 1 ? 'mdi-check' : 'mdi-cart'"></v-icon>
+              </template>
+              <span :class="{ 'd-none d-sm-flex': true, 'text-primary': currentStep >= 1 }">Giỏ hàng</span>
               <span class="d-flex d-sm-none">1</span>
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item value="2">
-              <span :class="{ 'd-none d-sm-flex': true }">Giao hàng</span>
+            <v-stepper-item value="2" :complete="currentStep > 2">
+              <template #icon>
+                <v-icon :color="currentStep > 2 ? 'success' : (currentStep >= 2 ? 'primary' : 'grey')"
+                  :icon="currentStep > 2 ? 'mdi-check' : 'mdi-truck-delivery'"></v-icon>
+              </template>
+              <span :class="{ 'd-none d-sm-flex': true, 'text-primary': currentStep >= 2 }">Giao hàng</span>
               <span class="d-flex d-sm-none">2</span>
             </v-stepper-item>
             <v-divider></v-divider>
             <v-stepper-item value="3">
-              <span :class="{ 'd-none d-sm-flex': true }">Thanh toán</span>
+              <template #icon>
+                <v-icon :color="currentStep >= 3 ? 'primary' : 'grey'" icon="mdi-credit-card-check"></v-icon>
+              </template>
+              <span :class="{ 'd-none d-sm-flex': true, 'text-primary': currentStep >= 3 }">Thanh toán</span>
               <span class="d-flex d-sm-none">3</span>
             </v-stepper-item>
           </v-stepper-header>
@@ -37,9 +48,9 @@
           <v-stepper-window>
             <!-- Bước 1: Giỏ hàng & Gợi ý -->
             <v-stepper-window-item value="1">
-              <v-card elevation="4" rounded="lg" class="pa-0 mb-6">
+              <v-card elevation="4" rounded="lg" class="pa-0 mb-2">
                 <OrderSummary ref="orderSummary" @order-loaded="handleOrderLoaded"
-                  @add-more="$router.push('/collections/menu')" />
+                  @add-more="$router.push('/collections/menu/0')" />
               </v-card>
 
               <!-- Component Gợi ý -->
@@ -63,7 +74,7 @@
                       Quay lại
                     </v-btn>
                     <v-btn color="primary" prepend-icon="mdi-arrow-right" @click="goToStep(3)"
-                      :disabled="!deliveryInfo || !deliveryInfo.address || deliveryInfo.address === 'Chưa có địa chỉ giao hàng'">
+                      :disabled="!deliveryInfo || !deliveryInfo.address || deliveryInfo.user_name === '' || !deliveryInfo.isPhoneValid">
                       Tiếp tục
                     </v-btn>
                   </div>
@@ -144,8 +155,7 @@
                         </v-col>
                         <v-col cols="6">
                           <v-btn color="primary" variant="elevated" prepend-icon="mdi-cart-check" block
-                            :loading="isLoading" :disabled="!isValidCheckout || !agreedToTerms"
-                            @click="validateAndCheckout">
+                            :loading="isLoading" :disabled="!agreedToTerms" @click="validateAndCheckout">
                             Đặt hàng
                           </v-btn>
                         </v-col>
@@ -195,6 +205,7 @@ import RecommendCheckout from './components/RecommendCheckout.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 import { useAuthStore } from '@/stores/auth'
+import { useAddressStore } from '@/stores/address'
 import { useVoucherStore } from '@/stores/voucher'
 import { formatPrice } from '@/utils/format'
 
@@ -213,7 +224,8 @@ export default {
     const authStore = useAuthStore()
     const notificationStore = useNotificationStore()
     const voucherStore = useVoucherStore()
-    return { cartStore, authStore, notificationStore, voucherStore }
+    const addressStore = useAddressStore()
+    return { cartStore, authStore, notificationStore, voucherStore, addressStore }
   },
 
   data() {
@@ -282,6 +294,7 @@ export default {
     },
 
     handleDeliveryInfoLoaded(data) {
+      //console.log('data', data)
       this.deliveryInfo = data
     },
 
@@ -299,10 +312,10 @@ export default {
       try {
         const orderData = {
           user_id: this.authStore.userInfo.id,
-          user_name: this.authStore.userInfo.first_name,
-          mobile_no: this.deliveryInfo.phone,
+          user_name: this.deliveryInfo.user_name.trim(),
+          mobile_no: this.deliveryInfo.mobile_no.trim(),
           address: this.deliveryInfo.address,
-          note: this.deliveryInfo.note || '',
+          note: this.deliveryInfo.note?.trim() || '',
           shipping_fee: 15000.00,
           total_price: this.orderData.totalPrice,
           discount_amount: this.orderData.voucherDiscount || 0,
@@ -318,13 +331,23 @@ export default {
             topping_items: item.topping_items
           }))
         }
-
+        // console.log(orderData)
+        // return
         const { data: { order_code } } = await orderAPI.createOrder(orderData)
 
-        if (this.paymentMethod === 'cod') {
-          await this.handleCodPayment()
+        // Map các phương thức thanh toán với hàm xử lý tương ứng
+        const paymentHandlers = {
+          'cod': this.handleCodPayment,
+          'momo': () => this.handleOnlinePayment(order_code, 'momo'),
+          'vnpay': () => this.handleOnlinePayment(order_code, 'vnpay'),
+          'zalopay': () => this.handleOnlinePayment(order_code, 'zalopay')
+        }
+
+        const handler = paymentHandlers[this.paymentMethod]
+        if (handler) {
+          await handler()
         } else {
-          await this.handleOnlinePayment(order_code)
+          throw new Error('Phương thức thanh toán không hợp lệ')
         }
       } catch (error) {
         this.notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message, 3000)
@@ -335,10 +358,7 @@ export default {
 
     async handleCodPayment() {
       try {
-        // Xóa giỏ hàng và voucher
-        this.cartStore.clearCart()
-        this.voucherStore.clearVoucher()
-
+        this.clearCartAndVoucher()
         this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
         this.$router.push('/user/lich-su')
       } catch (error) {
@@ -346,28 +366,42 @@ export default {
       }
     },
 
-    async handleOnlinePayment(order_code) {
+    async handleOnlinePayment(order_code, paymentType) {
       try {
         const paymentData = {
           order_code: order_code,
           return_url: `${window.location.origin}/user/lich-su`
         }
-        const response = await paymentAPI.createMomoPayment(paymentData)
+
+        // Map các phương thức thanh toán với API tương ứng
+        const paymentAPIs = {
+          'momo': paymentAPI.createMomoPayment,
+          'vnpay': paymentAPI.createVNPayPayment,
+          'zalopay': paymentAPI.createZaloPayPayment
+        }
+
+        const createPayment = paymentAPIs[paymentType]
+        if (!createPayment) {
+          throw new Error('Phương thức thanh toán không được hỗ trợ')
+        }
+
+        const response = await createPayment(paymentData)
         const paymentUrl = response.data.payUrl
 
         if (!paymentUrl) {
           throw new Error('Không nhận được URL thanh toán')
         }
 
-        // Xóa giỏ hàng và voucher
-        this.cartStore.clearCart()
-        this.voucherStore.clearVoucher()
-
-        // Chuyển hướng người dùng đến trang thanh toán MoMo
+        this.clearCartAndVoucher()
         window.location.href = paymentUrl
       } catch (error) {
         this.notificationStore.error('Lỗi khi tạo thanh toán online', 2000)
       }
+    },
+
+    clearCartAndVoucher() {
+      this.cartStore.clearCart()
+      this.voucherStore.clearVoucher()
     },
 
     handleDeleteOrder() {
@@ -405,11 +439,6 @@ export default {
       if (!this.deliveryInfo?.address ||
         this.deliveryInfo.address === "Chưa có địa chỉ giao hàng") {
         this.notificationStore.warning('Vui lòng nhập địa chỉ giao hàng', 3000)
-        return
-      }
-
-      if (!this.isValidCheckout) {
-        this.notificationStore.warning('Vui lòng kiểm tra lại thông tin đặt hàng', 3000)
         return
       }
 
@@ -457,7 +486,6 @@ export default {
   }
 
   .v-container {
-    padding-bottom: 0 !important;
     min-height: calc(100vh - 56px - env(safe-area-inset-bottom));
     max-width: 100vw;
     overflow-x: hidden;
@@ -470,6 +498,10 @@ export default {
 
   .v-col {
     padding: 0;
+  }
+
+  .v-stepper-window-item {
+    margin-bottom: 100px;
   }
 }
 
@@ -536,6 +568,62 @@ export default {
   .delete-order-btn {
     font-size: 0.875rem;
     padding: 0 16px;
+  }
+}
+
+/* Thêm style cho stepper */
+.v-stepper {
+  background: transparent !important;
+}
+
+.v-stepper-header {
+  box-shadow: none !important;
+  border-radius: 8px;
+  background: rgba(var(--v-theme-surface), 0.8);
+  backdrop-filter: blur(10px);
+  margin-bottom: 24px;
+}
+
+.v-stepper-item {
+  transition: all 0.3s ease;
+}
+
+.v-stepper-item:hover {
+  transform: translateY(-2px);
+}
+
+.v-stepper-item .v-icon {
+  transition: all 0.3s ease;
+}
+
+.v-stepper-item:hover .v-icon {
+  transform: scale(1.1);
+}
+
+.v-stepper-item span {
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.v-stepper-item:hover span {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.v-divider {
+  border-color: rgba(var(--v-theme-primary), 0.2) !important;
+}
+
+@media (max-width: 600px) {
+  .v-stepper-header {
+    margin: 0 16px 16px 16px;
+  }
+
+  .v-stepper-item {
+    padding: 8px !important;
+  }
+
+  .v-stepper-item .v-icon {
+    font-size: 20px !important;
   }
 }
 </style>

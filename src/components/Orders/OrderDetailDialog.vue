@@ -13,14 +13,19 @@
                 <template v-if="orderDetail">
                     <v-row>
                         <v-col cols="6">
-                            <p><strong>Thời gian:</strong> {{ formatTime(orderDetail.created_at) }}</p>
+                            <p><strong>Thời gian:</strong> {{ formatDateTime(orderDetail.created_at) }}</p>
                             <p><strong>Khách hàng:</strong> {{ orderDetail.user_name }}</p>
                             <p><strong>Địa chỉ:</strong> {{ orderDetail.address }}</p>
+                            <p><strong>Số điện thoại:</strong> {{ orderDetail.mobile_no }}</p>
+                            <p><strong>Hướng dẫn giao hàng:</strong> {{ orderDetail.note }}</p>
                         </v-col>
                         <v-col cols="6">
                             <p><strong>Tổng tiền:</strong>{{ formatPrice(orderDetail.final_price) }}VNĐ</p>
-                            <p><strong>Trạng thái:</strong> {{ orderDetail.status === '3' ? 'Thành công' : 'Đã Hủy' }}
-                            </p>
+                            <p><strong>Trạng thái:</strong> {{ getStatusText(orderDetail.status) }}</p>
+                            <p v-if="orderDetail.status === '-1'"><strong>Thời gian hủy:</strong>{{
+                                formatDateTime(orderDetail.updated_at) }}</p>
+                            <p v-if="orderDetail.status === '2'"><strong>Thời gian hoàn thành:</strong>{{
+                                formatDateTime(orderDetail.updated_at) }}</p>
                         </v-col>
                     </v-row>
 
@@ -29,10 +34,11 @@
                     <h3 class="text-h6 mb-3">Chi tiết sản phẩm </h3>
                     <h4 class="text-subtitle-1 text-medium-emphasis">Thành tiền = (Đơn giá + Tổng giá trị Topping + Giá
                         size) * Số lượng</h4>
-                    <v-table density="comfortable">
+                    <v-table density="comfortable" class="responsive-table">
                         <thead>
                             <tr>
                                 <th>Sản phẩm</th>
+                                <th>Ghi chú</th>
                                 <th>Số lượng</th>
                                 <th>Đơn giá</th>
                                 <th>Thành tiền</th>
@@ -50,6 +56,7 @@
                                         </div>
                                     </template>
                                 </td>
+                                <td>{{ item.item_note || '' }}</td>
                                 <td>{{ item.product_quantity }}</td>
                                 <td>{{ formatPrice(item.product_price) }}VNĐ</td>
                                 <td>{{ formatPrice(calculateItemTotal(item)) }}VNĐ</td>
@@ -78,6 +85,12 @@
                                 <span class="text-primary font-weight-bold">{{ formatPrice(orderDetail.final_price)
                                 }}VNĐ</span>
                             </div>
+                            <v-divider class="my-2"></v-divider>
+                            <div class="d-flex justify-space-between">
+                                <strong>Phương thức thanh toán:</strong>
+                                <span class="text-primary font-weight-bold">{{
+                                    getPaymentMethodText(orderDetail.payment_method) }}</span>
+                            </div>
                         </v-col>
                     </v-row>
                 </template>
@@ -87,10 +100,10 @@
 </template>
 
 <script>
-import { formatPrice } from '@/utils/format'
+import { formatPrice, formatDateTime } from '@/utils/format'
 
 export default {
-    name: 'PaymentDetailDialog',
+    name: 'OrderDetailDialog',
     props: {
         modelValue: {
             type: Boolean,
@@ -103,6 +116,7 @@ export default {
     },
     emits: ['update:modelValue'],
     methods: {
+        formatDateTime,
         formatPrice(price) {
             return formatPrice(price)
         },
@@ -116,28 +130,25 @@ export default {
             return total
         },
 
-        formatTime(timeString) {
-            if (!timeString) return '';
-
-            try {
-                // Xử lý chuỗi thời gian ISO
-                const date = new Date(timeString);
-
-                // Lấy giờ và phút
-                const hours = date.getHours().toString().padStart(2, '0');
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-
-                // Định dạng ngày
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-
-                // Trả về định dạng "DD/MM HH:MM"
-                return `${day}/${month} ${hours}:${minutes}`;
-            } catch (error) {
-                console.error('Lỗi định dạng thời gian:', error);
-                return timeString;
-            }
+        getStatusText(status) {
+            const statusTexts = {
+                '-1': 'Đã hủy',
+                '0': 'Chờ xác nhận',
+                '1': 'Đang giao hàng',
+                '2': 'Đã giao hàng',
+            };
+            return statusTexts[status] || 'Không xác định';
         },
+
+        getPaymentMethodText(method) {
+            const methods = {
+                'cod': 'Thanh toán khi nhận hàng',
+                'vnpay': 'Thanh toán qua VNPay',
+                'momo': 'Ví MoMo',
+                'zalopay': 'Ví ZaloPay'
+            };
+            return methods[method] || 'Không xác định';
+        }
     }
 }
 </script>

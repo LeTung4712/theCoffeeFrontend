@@ -2,10 +2,12 @@ export const ROUTES = {
   MAIN_PAGE: "mainpage",
   PRODUCT_DETAIL: "products/:product_name_convert",
   USER_PAGE: "user/:name",
-  BLOG_PAGE: "blog",
+  BLOG_PAGE: "tin-tuc",
   MENU: "collections/:category_name/:category_id",
   CHECKOUT: "thanh-toan",
-  BLOG_DETAIL: "blog/:blog_name_convert",
+  BLOG_DETAIL: "tin-tuc/:blog_name_convert",
+  STORE_PAGE: "cua-hang",
+  ABOUT_US: "ve-chung-toi",
   // routes cho admin
   ADMIN: {
     PROFILE: "profile",
@@ -13,11 +15,11 @@ export const ROUTES = {
     ANALYZE: "analyze",
     SHOPPING_BEHAVIOR: "shopping-behavior",
     MANAGE_PRODUCTS: "manage-products",
+    MANAGE_PRODUCTS_CATEGORY: "manage-products/:category_name/:category_id",
     MANAGE_VOUCHERS: "manage-vouchers",
     MANAGE_TOPPINGS: "manage-toppings",
-    NEW_ORDERS: "new-orders", 
+    MANAGE_ORDERS: "manage-orders",
     PAYMENT_HISTORY: "payment-history",
-    DELIVERY_ORDERS: "delivery-orders",
-    LOGIN: "login"
-  }
+    LOGIN: "login",
+  },
 };

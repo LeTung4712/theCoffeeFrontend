@@ -113,10 +113,9 @@ export default {
       displayClick: false,
       menuItems: [
         { title: 'Menu', to: '/collections/menu/0' },
-        { title: 'Tin tức', to: '/blog' },
-        { title: 'Cửa hàng', to: '/store' },
-        { title: 'Khuyến mãi', to: '/promotion' },
-        { title: 'Tuyển dụng', to: '/job' },
+        { title: 'Tin tức', to: '/tin-tuc' },
+        { title: 'Cửa hàng', to: '/cua-hang' },
+        { title: 'Về chúng tôi', to: '/ve-chung-toi' },
       ],
       userMenuItems: [
         { title: 'Thông tin tài khoản', icon: 'mdi-account', route: 'user-info' },
@@ -136,7 +135,7 @@ export default {
     },
     userAvatar() {
       return this.logged
-        ? 'https://th.bing.com/th/id/OIP.4bP4PqQqYnMYbub5PNgXeQHaEK?w=311&h=180&c=7&r=0&o=5&pid=1.7'
+        ? 'https://th.bing.com/th/id/OIP.TqNTqcNAcekKylput9ydiwHaHa?w=198&h=198&c=7&r=0&o=5&pid=1.7'
         : 'https://order.thecoffeehouse.com/_nuxt/img/Login.70dc3d8.png'
     }
   },

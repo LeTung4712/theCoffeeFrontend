@@ -13,8 +13,10 @@
     "@mdi/font": "7.4.47",
     "axios": "^1.7.7",
     "chart.js": "^4.4.7",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "jsbarcode": "^3.11.6",
+    "pusher-js": "^8.4.0",
     "roboto-fontface": "*",
     "vue": "^3.4.31",
     "vuetify": "^3.6.14"

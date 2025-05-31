@@ -28,7 +28,19 @@ export function formatPrice(price) {
   return new Intl.NumberFormat("vi-VN").format(price || 0);
 }
 
+export function formatDateTime(dateTimeString) {
+  if (!dateTimeString) return "";
+  return new Date(dateTimeString).toLocaleString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default {
   removeVietnameseTones,
   formatPrice,
+  formatDateTime,
 };

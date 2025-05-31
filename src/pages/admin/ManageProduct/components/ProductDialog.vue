@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="600px">
         <v-card>
             <v-card-title class="text-h5 bg-primary py-3 text-white">
-                <span class="text-h5">Thêm Sản Phẩm Mới</span>
+                <span class="text-h5">{{ isEditing ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới' }}</span>
             </v-card-title>
 
             <v-card-text>
@@ -50,12 +50,11 @@
                         <v-text-field class="mt-4" v-model.number="productData.price_sale" label="Giá khuyến mãi"
                             type="number" variant="outlined" density="comfortable"></v-text-field>
 
-                        <v-switch v-model="productData.active" label="Kích hoạt" color="primary"
-                            :true-value="1" :false-value="0" variant="outlined" density="comfortable"></v-switch>
+                        <v-switch v-model="productData.active" label="Kích hoạt" color="primary" :true-value="1"
+                            :false-value="0" variant="outlined" density="comfortable"></v-switch>
 
-                        <v-select v-model="productData.toppings" :items="toppings" item-title="name"
-                            item-value="id" label="Toppings" multiple chips variant="outlined"
-                            density="comfortable"></v-select>
+                        <v-select v-model="productData.toppings" :items="toppings" item-title="name" item-value="id"
+                            label="Toppings" multiple chips variant="outlined" density="comfortable"></v-select>
                     </v-container>
                 </v-form>
             </v-card-text>
@@ -64,7 +63,7 @@
                 <v-spacer></v-spacer>
                 <v-btn color="error" variant="text" @click="closeDialog">Hủy</v-btn>
                 <v-btn color="primary" @click="saveProduct" :loading="loading">
-                    Lưu
+                    {{ isEditing ? 'Cập nhật' : 'Lưu' }}
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -83,7 +82,13 @@ export default {
 
     props: {
         modelValue: Boolean,
+        editProduct: {
+            type: Object,
+            default: null
+        }
     },
+
+    emits: ['update:modelValue', 'update:editProduct', 'refresh', 'close'],
 
     data() {
         return {
@@ -114,15 +119,33 @@ export default {
     computed: {
         subCategories() {
             return this.categories.filter(cat => cat.parent_id !== null)
+        },
+        isEditing() {
+            return !!this.editProduct;
         }
     },
 
     watch: {
-        modelValue(val) {
-            this.dialog = val
+        modelValue: {
+            immediate: true,
+            handler(val) {
+                this.dialog = val;
+                if (val) {
+                    if (this.editProduct) {
+                        this.initEditMode();
+                    } else {
+                        this.resetForm();
+                    }
+                }
+            }
         },
         dialog(val) {
-            if (!val) this.$emit('update:modelValue', val)
+            if (!val) {
+                this.$emit('update:modelValue', false);
+                this.$emit('update:editProduct', null);
+                this.$emit('close');
+                this.resetForm();
+            }
         }
     },
 
@@ -140,31 +163,23 @@ export default {
             }
         },
 
-        async saveProduct() {
-            if (!this.$refs.form.validate()) return
-            this.loading = true
-            //console.log(this.productData)
-            //return
-            try {
-                await productAPI.create(this.productData)
-                this.$emit('refresh')
-                this.closeDialog()
-                this.notificationStore.success('Thêm sản phẩm thành công!', 3000);
-            } catch (error) {
-                if (error.response && error.response.status === 409) {
-                    this.notificationStore.error('Đã có sản phẩm này!', 3000);
-                } else {
-                    console.error('Error creating product:', error)
+        initEditMode() {
+            if (this.editProduct) {
+                //console.log(this.editProduct)
+                this.productData = {
+                    id: this.editProduct.id,
+                    name: this.editProduct.name,
+                    category_id: this.editProduct.category_id,
+                    description: this.editProduct.description || '',
+                    image_url: this.editProduct.image_url,
+                    price: this.editProduct.price,
+                    price_sale: this.editProduct.price_sale || 0,
+                    active: this.editProduct.active === true ? 1 : 0,
+                    toppings: Array.isArray(this.editProduct.toppings)
+                        ? this.editProduct.toppings.map(t => typeof t === 'object' ? t.id : t)
+                        : []
                 }
-            } finally {
-                this.loading = false
             }
-        },
-
-        closeDialog() {
-            this.dialog = false
-            this.resetForm()
-            this.$emit('update:modelValue', false)
         },
 
         resetForm() {
@@ -177,6 +192,43 @@ export default {
                 price_sale: null,
                 active: 1,
                 toppings: []
+            };
+            if (this.$refs.form) {
+                this.$refs.form.reset();
+            }
+        },
+
+        closeDialog() {
+            this.dialog = false;
+            this.$emit('update:modelValue', false);
+            this.$emit('update:editProduct', null);
+            this.$emit('close');
+            this.resetForm();
+        },
+
+        async saveProduct() {
+            if (!this.$refs.form.validate()) return;
+            this.loading = true;
+
+            try {
+                if (this.editProduct) {
+                    await productAPI.update(this.productData);
+                    this.notificationStore.success('Cập nhật sản phẩm thành công!', 3000);
+                } else {
+                    await productAPI.create(this.productData);
+                    this.notificationStore.success('Thêm sản phẩm thành công!', 3000);
+                }
+                this.$emit('refresh');
+                this.closeDialog();
+            } catch (error) {
+                if (error.response && error.response.status === 409) {
+                    this.notificationStore.error('Đã có sản phẩm này!', 3000);
+                } else {
+                    console.error('Error creating/updating product:', error);
+                    this.notificationStore.error('Có lỗi xảy ra khi lưu sản phẩm', 3000);
+                }
+            } finally {
+                this.loading = false;
             }
         }
     }

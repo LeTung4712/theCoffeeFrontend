@@ -7,10 +7,13 @@
 
         <notification-list class="notification-container" />
 
-        <v-main class="bg-white main-content">
-            <router-view />
-        </v-main>
-        <Footer />
+        <div class="content-wrapper">
+            <v-main class="bg-white main-content">
+                <router-view />
+            </v-main>
+            <Footer />
+        </div>
+
         <MobileNavBar />
     </v-app>
 </template>
@@ -55,9 +58,20 @@ export default {
     background-color: white !important;
 }
 
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 .v-main {
     background-color: white !important;
-    padding-top: calc(42px + 80px) !important;
+    flex: 1 0 auto;
+}
+
+.main-content {
+    padding-top: calc(42px + 80px);
+    /* Cho desktop */
 }
 
 .headers-wrapper {
@@ -96,15 +110,16 @@ export default {
 
 /* Thêm padding bottom cho main content trên mobile */
 @media (max-width: 599px) {
-  .v-main {
-    padding-bottom: 56px !important;
-  }
+    .main-content {
+        padding-top: 83px;
+        /* Chỉ giữ lại chiều cao của user-header trên mobile */
+    }
 }
 
 /* Thêm style mới cho notification-list */
 :deep(.notification-list) {
     position: fixed;
-    top: calc(42px + 80px); /* 42px từ header-intro + 80px từ user-header */
+    top: calc(42px + 80px);
     right: 20px;
     z-index: 99;
 }

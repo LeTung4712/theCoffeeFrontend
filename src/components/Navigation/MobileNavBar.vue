@@ -15,8 +15,8 @@ export default {
       navItems: [
         { title: 'Trang chủ', icon: 'mdi-home', to: '/mainpage' },
         { title: 'Đặt hàng', icon: 'mdi-coffee', to: '/collections/menu/0' },
-        { title: 'Tin tức', icon: 'mdi-newspaper', to: '/blog' },
-        { title: 'Cửa hàng', icon: 'mdi-store', to: '/store' },
+        { title: 'Tin tức', icon: 'mdi-newspaper', to: '/tin-tuc' },
+        { title: 'Cửa hàng', icon: 'mdi-store', to: '/cua-hang' },
       ]
     }
   }

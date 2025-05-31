@@ -16,21 +16,29 @@ export const orderAPI = {
     return httpClient.get(`${PREFIX}/getSuccessOrders`, { params: data });
   },
 
-  getUnsuccessOrders(data) {
-    return httpClient.get(`${PREFIX}/getUnsuccessOrders`, { params: data });
+  // Thông tin đơn hàng chờ thanh toán
+  getPendingPaymentOrders(data) {
+    return httpClient.get(`${PREFIX}/getPendingPaymentOrders`, { params: data });
   },
 
-  getDeliveryOrders(data) {
-    return httpClient.get(`${PREFIX}/getDeliveryOrders`, { params: data });
+  // Thông tin đơn hàng chờ giao
+  getPendingDeliveryOrders(data) {
+    return httpClient.get(`${PREFIX}/getPendingDeliveryOrders`, { params: data });
   },
+
+  // Thông tin đơn hàng đang giao
+  getDeliveringOrders(data) {
+    return httpClient.get(`${PREFIX}/getDeliveringOrders`, { params: data });
+  },
+
 
   // Thao tác với đơn hàng
   createOrder(data) {
     return httpClient.post(`${PREFIX}/addOrder`, data);
   },
 
-  acceptOrder(data) {
-    return httpClient.put(`${PREFIX}/acceptOrder`, data);
+  startDelivery(data) {
+    return httpClient.put(`${PREFIX}/startDelivery`, data);
   },
 
   successOrder(data) {
