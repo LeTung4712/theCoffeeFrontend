@@ -11,13 +11,11 @@ export const useAddressStore = defineStore("address", {
       ? JSON.parse(localStorage.getItem("oldAddress"))
       : {
           address: "",
-          address_type: "",          
+          address_type: "",
           is_default: false,
           mobile_no: "",
           place_id: "",
           user_name: "",
-          created_at: "",
-          updated_at: "",
         },
     addressNote: localStorage.getItem("addressNote")
       ? JSON.parse(localStorage.getItem("addressNote"))
@@ -33,9 +31,7 @@ export const useAddressStore = defineStore("address", {
   actions: {
     updateAddress(newAddress) {
       this.address = {
-        ...this.address,
         ...newAddress,
-        updated_at: new Date().toISOString(),
       };
       localStorage.setItem("oldAddress", JSON.stringify(this.address));
     },

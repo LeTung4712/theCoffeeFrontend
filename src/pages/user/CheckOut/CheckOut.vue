@@ -74,7 +74,7 @@
                       Quay lại
                     </v-btn>
                     <v-btn color="primary" prepend-icon="mdi-arrow-right" @click="goToStep(3)"
-                      :disabled="!deliveryInfo || !deliveryInfo.address || deliveryInfo.address === 'Chưa có địa chỉ giao hàng'">
+                      :disabled="!deliveryInfo || !deliveryInfo.address || deliveryInfo.user_name === '' || !deliveryInfo.isPhoneValid">
                       Tiếp tục
                     </v-btn>
                   </div>
@@ -294,6 +294,7 @@ export default {
     },
 
     handleDeliveryInfoLoaded(data) {
+      //console.log('data', data)
       this.deliveryInfo = data
     },
 
@@ -311,10 +312,10 @@ export default {
       try {
         const orderData = {
           user_id: this.authStore.userInfo.id,
-          user_name: this.addressStore.address.user_name,
-          mobile_no: this.addressStore.address.mobile_no,
-          address: this.addressStore.address.address,
-          note: this.deliveryInfo.note || '',
+          user_name: this.deliveryInfo.user_name.trim(),
+          mobile_no: this.deliveryInfo.mobile_no.trim(),
+          address: this.deliveryInfo.address,
+          note: this.deliveryInfo.note?.trim() || '',
           shipping_fee: 15000.00,
           total_price: this.orderData.totalPrice,
           discount_amount: this.orderData.voucherDiscount || 0,
@@ -438,11 +439,6 @@ export default {
       if (!this.deliveryInfo?.address ||
         this.deliveryInfo.address === "Chưa có địa chỉ giao hàng") {
         this.notificationStore.warning('Vui lòng nhập địa chỉ giao hàng', 3000)
-        return
-      }
-
-      if (!this.isValidCheckout) {
-        this.notificationStore.warning('Vui lòng kiểm tra lại thông tin đặt hàng', 3000)
         return
       }
 

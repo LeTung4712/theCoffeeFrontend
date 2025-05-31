@@ -23,15 +23,15 @@
     </v-card>
 
     <!-- Customer Info -->
-    <v-form class="pa-4">
-      <v-text-field :value="addressStore.address.user_name" @input="updateAddressField('user_name', $event)"
-        placeholder="Họ và tên người nhận" variant="outlined" density="comfortable" class="mb-4" />
+    <v-form ref="form" class="pa-4" @submit.prevent>
+      <v-text-field v-model="addressStore.address.user_name" placeholder="Họ và tên người nhận" variant="outlined"
+        density="comfortable" class="mb-4" :rules="nameRules" required />
 
-      <v-text-field :value="addressStore.address.mobile_no" @input="updateAddressField('mobile_no', $event)"
-        placeholder="Số điện thoại" variant="outlined" density="comfortable" class="mb-4" />
+      <v-text-field v-model="addressStore.address.mobile_no" placeholder="Số điện thoại" variant="outlined"
+        density="comfortable" class="mb-4" :rules="phoneRules" required />
 
       <v-text-field v-model="noteDelivery" placeholder="Thêm hướng dẫn giao hàng" variant="outlined"
-        density="comfortable" />
+        density="comfortable" :rules="noteRules" />
     </v-form>
   </v-card>
 </template>
@@ -53,13 +53,29 @@ export default {
 
   data() {
     return {
-      noteDelivery: ''
+      noteDelivery: '',
+      nameRules: [
+        v => !!v || 'Họ tên không được để trống',
+        v => v.length >= 2 || 'Họ tên phải có ít nhất 2 ký tự',
+        v => v.length <= 50 || 'Họ tên không được vượt quá 50 ký tự'
+      ],
+      phoneRules: [
+        v => !!v || 'Số điện thoại không được để trống',
+        v => /^0\d{9,10}$/.test(v) || 'Số điện thoại không đúng định dạng '
+      ],
+      noteRules: [
+        v => !v || v.length <= 200 || 'Ghi chú không được vượt quá 200 ký tự'
+      ]
     }
   },
 
   computed: {
     addressDisplay() {
       return this.addressStore.address.address || 'Chưa có địa chỉ giao hàng'
+    },
+
+    isPhoneValid() {
+      return /^0\d{9,10}$/.test(this.addressStore.address.mobile_no)
     },
 
     userData() {
@@ -80,39 +96,33 @@ export default {
     },
 
     deliveryInfo() {
-      const savedAddress = JSON.parse(localStorage.getItem("oldAddress"))
       return {
-        name: this.userData.name,
-        phone: this.userData.phone,
         address: this.addressDisplay,
         note: this.noteDelivery,
-        isLogged: this.userData.isLogged,
-        user_name: savedAddress?.user_name,
-        mobile_no: savedAddress?.mobile_no,
-        address_type: savedAddress?.address_type,
-        district_code: savedAddress?.district_code,
-        province_code: savedAddress?.province_code,
-        ward_code: savedAddress?.ward_code
+        user_name: this.addressStore.address.user_name,
+        mobile_no: this.addressStore.address.mobile_no,
       }
-    }
+    },
   },
 
   watch: {
     deliveryInfo: {
       handler(newInfo) {
-        this.$emit('delivery-info-loaded', newInfo)
+        this.$emit('delivery-info-loaded', {
+          ...newInfo,
+          isPhoneValid: this.isPhoneValid,
+          isFormValid: this.isFormValid
+        })
       },
       deep: true,
       immediate: true
+    },
+    'addressStore.address': {
+      handler(newVal) {
+        localStorage.setItem("oldAddress", JSON.stringify(newVal));
+      },
+      deep: true
     }
   },
-
-  methods: {
-    updateAddressField(field, value) {
-      this.addressStore.updateAddress({
-        [field]: value
-      })
-    }
-  }
 }
 </script>

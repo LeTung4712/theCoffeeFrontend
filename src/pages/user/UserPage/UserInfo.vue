@@ -224,7 +224,8 @@ export default {
                 this.listAddresses = this.addressStore.addressNote
                 const defaultAddress = this.listAddresses.find(address => address.is_default)
                 if (defaultAddress) {
-                    this.addressStore.updateAddress(defaultAddress.address)
+                    //console.log('defaultAddress',defaultAddress)
+                    this.addressStore.updateAddress(defaultAddress)
                 }
             } catch (error) {
                 this.notificationStore.error('Không thể tải danh sách địa chỉ', 3000)

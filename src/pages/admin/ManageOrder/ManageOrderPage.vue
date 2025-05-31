@@ -188,22 +188,25 @@ export default {
       this.loading = true;
       try {
         // Gọi đồng thời cả 3 API
-        const [pendingResponse, confirmedResponse, deliveringResponse] = await Promise.all([
+        const [pendingResponse, confirmedResponse, deliveringResponse] = await Promise.allSettled([
           orderAPI.getPendingPaymentOrders(),
           orderAPI.getPendingDeliveryOrders(),
           orderAPI.getDeliveringOrders()
         ]);
 
-        // Cập nhật dữ liệu cho từng tab
-        this.pendingOrders = pendingResponse.data.orders || [];
-        this.confirmedOrders = confirmedResponse.data.orders || [];
-        this.deliveringOrders = deliveringResponse.data.orders || [];
+        // Xử lý từng response
+        this.pendingOrders = (pendingResponse.status === 'fulfilled' && pendingResponse.value.data.orders)
+          ? pendingResponse.value.data.orders
+          : [];
+        this.confirmedOrders = (confirmedResponse.status === 'fulfilled' && confirmedResponse.value.data.orders)
+          ? confirmedResponse.value.data.orders
+          : [];
+        this.deliveringOrders = (deliveringResponse.status === 'fulfilled' && deliveringResponse.value.data.orders)
+          ? deliveringResponse.value.data.orders
+          : [];
       } catch (error) {
         console.error('Error fetching orders:', error);
-        // Reset data nếu có lỗi
-        this.pendingOrders = [];
-        this.confirmedOrders = [];
-        this.deliveringOrders = [];
+        // Có thể hiển thị thông báo lỗi tổng quát nếu cần
       } finally {
         this.loading = false;
       }
