@@ -284,10 +284,12 @@ export default {
     },
 
     handleOrderLoaded(data) {
+      //console.log('data', data)
       this.orderData = {
         items: data.items,
         totalPrice: data.totalPrice,
         finalPrice: data.finalPrice,
+        voucherId: data.voucherId,
         voucherDiscount: data.voucherDiscount
       }
       this.finalPrice = data.finalPrice
@@ -318,6 +320,7 @@ export default {
           note: this.deliveryInfo.note?.trim() || '',
           shipping_fee: 15000.00,
           total_price: this.orderData.totalPrice,
+          voucher_id: this.orderData.voucherId || null,
           discount_amount: this.orderData.voucherDiscount || 0,
           final_price: this.orderData.finalPrice,
           payment_method: this.paymentMethod,
@@ -370,7 +373,7 @@ export default {
       try {
         const paymentData = {
           order_code: order_code,
-          return_url: `${window.location.origin}/user/lich-su`
+          return_url: `${window.location.origin}/thanh-toan-process`
         }
 
         // Map các phương thức thanh toán với API tương ứng

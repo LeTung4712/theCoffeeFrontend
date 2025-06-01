@@ -5,6 +5,7 @@ export const ROUTES = {
   BLOG_PAGE: "tin-tuc",
   MENU: "collections/:category_name/:category_id",
   CHECKOUT: "thanh-toan",
+  PAYMENT_PROCESS: "thanh-toan-process",
   BLOG_DETAIL: "tin-tuc/:blog_name_convert",
   STORE_PAGE: "cua-hang",
   ABOUT_US: "ve-chung-toi",

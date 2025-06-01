@@ -284,6 +284,7 @@ export default {
     emitOrderData() {
       this.$emit('order-loaded', {
         items: this.safeOrders,
+        voucherId: this.selectedVoucher?.id,
         voucherDiscount: this.voucherDiscount,
         totalPrice: this.totalPrice,
         finalPrice: this.finalTotal

@@ -38,6 +38,11 @@ export const userRoutes = {
       component: () => import("@/pages/user/CheckOut/CheckOut"),
     },
     {
+      name: "PaymentProcess",
+      path: ROUTES.PAYMENT_PROCESS,
+      component: () => import("@/pages/user/PaymentPage/PaymentProcessing"),
+    },
+    {
       name: "Blog",
       path: ROUTES.BLOG_PAGE,
       component: () => import("@/pages/user/BlogPage/BlogPage"),
