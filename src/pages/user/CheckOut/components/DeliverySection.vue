@@ -61,7 +61,7 @@ export default {
       ],
       phoneRules: [
         v => !!v || 'Số điện thoại không được để trống',
-        v => /^0\d{9,10}$/.test(v) || 'Số điện thoại không đúng định dạng '
+        v => /^0\d{9}$/.test(v) || 'Số điện thoại không đúng định dạng '
       ],
       noteRules: [
         v => !v || v.length <= 200 || 'Ghi chú không được vượt quá 200 ký tự'

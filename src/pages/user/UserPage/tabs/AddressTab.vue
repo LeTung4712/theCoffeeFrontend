@@ -64,12 +64,12 @@
           <v-row dense>
             <v-col cols="12" sm="6">
               <v-text-field v-model="newAddress.user_name" label="Tên người dùng" variant="outlined"
-                density="comfortable" hide-details="auto" class="mb-3" required></v-text-field>
+                density="comfortable" hide-details="auto" class="mb-3" :rules="nameRules" required></v-text-field>
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-text-field v-model="newAddress.mobile_no" label="Số điện thoại" variant="outlined"
-                density="comfortable" hide-details="auto" class="mb-3" required></v-text-field>
+                density="comfortable" hide-details="auto" class="mb-3" :rules="phoneRules" required></v-text-field>
             </v-col>
 
             <v-col cols="12">
@@ -139,9 +139,6 @@ export default {
         mobile_no: '',
         address_type: 'home',
         is_default: false,
-        province_code: '1',
-        district_code: '1',
-        ward_code: '1'
       },
       showDeleteDialog: false,
       addressToDelete: null,
@@ -149,6 +146,15 @@ export default {
         { text: 'Nhà riêng', value: 'home' },
         { text: 'Văn phòng', value: 'office' },
         { text: 'Khác', value: 'other' }
+      ],
+      nameRules: [
+        v => !!v || 'Họ tên không được để trống',
+        v => v.length >= 2 || 'Họ tên phải có ít nhất 2 ký tự',
+        v => v.length <= 50 || 'Họ tên không được vượt quá 50 ký tự'
+      ],
+      phoneRules: [
+        v => !!v || 'Số điện thoại không được để trống',
+        v => /^0\d{9}$/.test(v) || 'Số điện thoại không đúng định dạng '
       ],
     };
   },
@@ -177,9 +183,6 @@ export default {
           mobile_no: address.mobile_no,
           address_type: address.address_type,
           is_default: Boolean(Number(address.is_default)),
-          province_code: address.province_code || '1',
-          district_code: address.district_code || '1',
-          ward_code: address.ward_code || '1'
         };
       } else {
         this.resetNewAddress();
@@ -194,9 +197,6 @@ export default {
         mobile_no: '',
         address_type: 'home',
         is_default: false,
-        province_code: '1',
-        district_code: '1',
-        ward_code: '1'
       };
     },
 
@@ -215,16 +215,6 @@ export default {
         this.notificationStore.error('Bạn chỉ được phép thêm tối đa 4 địa chỉ.', 3000);
         return;
       }
-      // Kiểm tra xem tất cả các trường có được điền hay không
-      if (!this.newAddress.user_name || !this.newAddress.mobile_no || !this.newAddress.address) {
-        this.notificationStore.error('Vui lòng điền đầy đủ thông tin.', 3000);
-        return;
-      }
-      if (!this.validatePhoneNumber(this.newAddress.mobile_no)) {
-        this.notificationStore.error('Số điện thoại không hợp lệ. Vui lòng nhập đúng số điện thoại Việt Nam (11 số)', 3000);
-        return;
-      }
-
       try {
         const addressData = {
           ...this.newAddress,
@@ -281,11 +271,6 @@ export default {
     confirmDeleteDialog(addressId) {
       this.addressToDelete = addressId;
       this.showDeleteDialog = true;
-    },
-
-    validatePhoneNumber(phoneNumber) {
-      const phoneRegex = /^[0-9]{10,11}$/; // Kiểm tra số điện thoại từ 10 đến 11 số
-      return phoneRegex.test(phoneNumber);
     },
 
     closeDialog() {

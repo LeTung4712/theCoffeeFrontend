@@ -58,7 +58,7 @@ export default {
                 {
                     icon: 'mdi-email',
                     title: 'Liên hệ',
-                    content: 'Địa chỉ: 123 Đường ABC, Quận XYZ, TP. HCM\nĐiện thoại: (028) 1234 5678\nEmail: info@restaurant.com\nGiờ mở cửa: 10:00 - 22:00'
+                    content: 'Địa chỉ: 123 Đường Đại Cồ Việt, Quận Hai Bà Trưng, Hà Nội\nĐiện thoại: 1800 6936\nEmail: hi@thecoffeeshop.com\nGiờ mở cửa: 10:00 - 22:00'
                 }
             ]
         }
