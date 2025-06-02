@@ -7,8 +7,8 @@ export const voucherAPI = {
     return httpClient.get(`${PREFIX}/index`);
   },
 
-  getVoucherActive() {
-    return httpClient.get(`${PREFIX}/indexActive`);
+  getVoucherActive(data) {
+    return httpClient.get(`${PREFIX}/indexActive`, { params: data });
   },
 
   createVoucher(data) {

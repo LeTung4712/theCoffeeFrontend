@@ -12,6 +12,14 @@ export const userAPI = {
     return httpClient.post(`${PREFIX}/auth/checkOtp`, data);
   },
 
+  logout(data) {
+    return httpClient.post(`${PREFIX}/auth/logout`, data);
+  },
+
+  refreshToken(data) {
+    return httpClient.post(`${PREFIX}/auth/refreshToken`, data);
+  },
+
   // Thông tin người dùng
   updateInfo(data) {
     return httpClient.put(`${PREFIX}/info/updateInfo`, data);

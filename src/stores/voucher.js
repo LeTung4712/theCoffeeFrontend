@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { voucherAPI } from "@/api/voucher";
+import { useAuthStore } from "@/stores/auth";
 
 export const useVoucherStore = defineStore("voucher", {
   state: () => ({
@@ -13,7 +14,9 @@ export const useVoucherStore = defineStore("voucher", {
     async fetchVouchers() {
       this.loading = true;
       try {
-        const response = await voucherAPI.getVoucherActive();
+        const response = await voucherAPI.getVoucherActive({
+          user_id: useAuthStore().user.id,
+        });
         this.voucherList = response.data.vouchers;
       } catch (error) {
         this.error = error.message;
