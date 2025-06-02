@@ -14,12 +14,22 @@ export const useVoucherStore = defineStore("voucher", {
     async fetchVouchers() {
       this.loading = true;
       try {
+        const authStore = useAuthStore();
+
+        // Kiểm tra nếu chưa đăng nhập
+        if (!authStore.isLoggedIn) {
+          this.voucherList = [];
+          return;
+        }
+
         const response = await voucherAPI.getVoucherActive({
-          user_id: useAuthStore().user.id,
+          user_id: authStore.user.id,
         });
         this.voucherList = response.data.vouchers;
       } catch (error) {
         this.error = error.message;
+        // Nếu có lỗi, reset danh sách voucher về mảng rỗng
+        this.voucherList = [];
         throw error;
       } finally {
         this.loading = false;

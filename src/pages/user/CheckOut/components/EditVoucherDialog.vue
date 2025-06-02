@@ -11,10 +11,10 @@
     </template>
 
     <v-card>
-      <v-card-title class="d-flex align-center pa-2 border-b header-fixed">
+      <v-card-title class="d-flex align-center pa-2 border-b header-fixed"> 
+        <span class="mx-auto text-subtitle-1 font-weight-bold">Chọn khuyến mãi</span>
         <v-btn icon="mdi-close" variant="text" @click="dialog = false" class="ml-n1" density="comfortable"
           size="small" />
-        <span class="mx-auto text-subtitle-1 font-weight-bold">Chọn khuyến mãi</span>
       </v-card-title>
 
       <v-card-text class="pa-4">
@@ -127,11 +127,18 @@ export default {
       handler(newValue) {
         this.selectedVoucher = newValue
       }
+    },
+    dialog: {
+      async handler(newValue) {
+        if (newValue) {
+          try {
+            await this.voucherStore.fetchVouchers()
+          } catch (error) {
+            this.notificationStore.error('Không thể tải danh sách voucher', 3000)
+          }
+        }
+      }
     }
-  },
-
-  created() {
-    this.voucherStore.fetchVouchers()
   },
 
   computed: {

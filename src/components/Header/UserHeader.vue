@@ -86,6 +86,7 @@
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
 import LoginPopup from '@/pages/user/Auth/LoginPopup.vue'
+import { userAPI } from '@/api/user'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
 import { useNotificationStore } from '@/stores/notification'
@@ -172,7 +173,8 @@ export default {
       this.displayClick = false;
     },
 
-    logout() {
+    async logout() {
+      await userAPI.logout()
       this.authStore.logout()
       this.displayClick = false
       this.notificationStore.success('Đăng xuất thành công', 3000)
