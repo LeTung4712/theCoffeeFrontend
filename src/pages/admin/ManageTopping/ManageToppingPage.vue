@@ -110,7 +110,7 @@
 </template>
 
 <script>
-import { toppingAPI } from "@/api/topping";
+import { adminAPI } from "@/api/admin";
 import { formatPrice } from "@/utils/format";
 import { useNotificationStore } from "@/stores/notification";
 
@@ -160,7 +160,7 @@ export default {
 
         async fetchToppings() {
             try {
-                const { data } = await toppingAPI.getAllToppings();
+                const { data } = await adminAPI.topping.getAll();
                 this.toppings = data.toppings;
             } catch (error) {
                 console.error('Error fetching toppings:', error);
@@ -193,9 +193,9 @@ export default {
             this.isLoading = true;
             try {
                 if (this.isEdit) {
-                    await toppingAPI.updateTopping(this.toppingForm);
+                    await adminAPI.topping.update(this.toppingForm.id, this.toppingForm);
                 } else {
-                    await toppingAPI.createTopping(this.toppingForm);
+                    await adminAPI.topping.create(this.toppingForm);
                 }
                 this.closeDialog();
                 this.fetchToppings();
@@ -216,7 +216,7 @@ export default {
         async deleteToppingConfirm() {
             this.isLoading = true;
             try {
-                await toppingAPI.deleteTopping({ id: this.toppingToDelete });
+                await adminAPI.topping.delete(this.toppingToDelete);
                 this.fetchToppings();
                 this.closeDeleteDialog();
                 this.notificationStore.success('Topping đã được xóa', 3000);

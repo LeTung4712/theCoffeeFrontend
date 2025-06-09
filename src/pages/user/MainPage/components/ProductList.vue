@@ -83,7 +83,7 @@
 
 <script>
 import { removeVietnameseTones } from "@/utils/format";
-import { productAPI } from "@/api/product";
+import { userAPI } from "@/api/user";
 import ProductCard from "@/components/Products/ProductCard.vue";
 import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
@@ -154,7 +154,7 @@ export default {
       this.error = null
 
       try {
-        const response = await productAPI.getByCategory({ category_id: this.category_type })
+        const response = await userAPI.product.getByCategory(this.category_type)
         if (response?.data?.products) {
           this.products = response.data.products
         }
@@ -168,7 +168,7 @@ export default {
 
     async getAllProducts() {
       try {
-        const response = await productAPI.getAll()
+        const response = await userAPI.product.getAll()
         if (response?.data?.products) {
           this.product_searchs = response.data.products
         }

@@ -71,8 +71,7 @@
 </template>
 
 <script>
-import { productAPI } from '@/api/product'
-import { toppingAPI } from '@/api/topping'
+import { adminAPI } from '@/api/admin'
 import { useCategoryStore } from '@/stores/category'
 import { useNotificationStore } from '@/stores/notification'
 import { storeToRefs } from 'pinia'
@@ -156,7 +155,7 @@ export default {
     methods: {
         async fetchToppings() {
             try {
-                const response = await toppingAPI.getActiveToppings()
+                const response = await adminAPI.topping.getAll()
                 this.toppings = response.data.toppings
             } catch (error) {
                 console.error('Lỗi khi lấy danh sách topping:', error)
@@ -165,7 +164,7 @@ export default {
 
         initEditMode() {
             if (this.editProduct) {
-                //console.log(this.editProduct)
+                console.log(this.editProduct)
                 this.productData = {
                     id: this.editProduct.id,
                     name: this.editProduct.name,
@@ -212,10 +211,10 @@ export default {
 
             try {
                 if (this.editProduct) {
-                    await productAPI.update(this.productData);
+                    await adminAPI.product.update(this.productData.id, this.productData);
                     this.notificationStore.success('Cập nhật sản phẩm thành công!', 3000);
                 } else {
-                    await productAPI.create(this.productData);
+                    await adminAPI.product.create(this.productData);
                     this.notificationStore.success('Thêm sản phẩm thành công!', 3000);
                 }
                 this.$emit('refresh');

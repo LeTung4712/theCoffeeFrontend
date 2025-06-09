@@ -31,8 +31,8 @@
           <div class="address-info ml-9">
             <div class="text-body-2 text-grey-darken-1 mb-1">{{ address.address }}</div>
             <div class="text-caption text-grey">
-              {{ (addressTypes.find(t => t.value === address.address_type) && addressTypes.find(t => t.value ===
-                address.address_type).text) || address.address_type }}
+              {{(addressTypes.find(t => t.value === address.address_type) && addressTypes.find(t => t.value ===
+                address.address_type).text) || address.address_type}}
             </div>
           </div>
 
@@ -61,31 +61,56 @@
         </v-card-title>
 
         <v-card-text class="px-0 py-4">
-          <v-row dense>
-            <v-col cols="12" sm="6">
-              <v-text-field v-model="newAddress.user_name" label="Tên người dùng" variant="outlined"
-                density="comfortable" hide-details="auto" class="mb-3" :rules="nameRules" required></v-text-field>
-            </v-col>
+          <v-form ref="form" v-model="isFormValid">
+            <v-row dense>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model="newAddress.user_name" label="Tên người nhận" variant="outlined"
+                  density="comfortable" hide-details="auto" class="mb-3" :rules="nameRules" required></v-text-field>
+              </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field v-model="newAddress.mobile_no" label="Số điện thoại" variant="outlined"
-                density="comfortable" hide-details="auto" class="mb-3" :rules="phoneRules" required></v-text-field>
-            </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model="newAddress.mobile_no" label="Số điện thoại" variant="outlined"
+                  density="comfortable" hide-details="auto" class="mb-3" :rules="phoneRules" required></v-text-field>
+              </v-col>
 
-            <v-col cols="12">
-              <v-text-field v-model="newAddress.address" label="Địa chỉ" variant="outlined" density="comfortable"
-                hide-details="auto" class="mb-3" required></v-text-field>
-            </v-col>
+              <v-col cols="12">
+                <div class="search-container">
+                  <v-text-field v-model="newAddress.address" label="Địa chỉ" variant="outlined" density="comfortable"
+                    hide-details="auto" class="mb-3" :rules="addressRules" required prepend-inner-icon="mdi-magnify"
+                    clearable @click:clear="clearSearch" @update:model-value="handleSearch" :loading="addressStore.isSearching"
+                    bg-color="surface" color="primary"></v-text-field>
 
-            <v-col cols="12" sm="6">
-              <v-select v-model="newAddress.address_type" :items="addressTypes" item-title="text" item-value="value"
-                label="Loại địa chỉ" variant="outlined" density="comfortable" hide-details="auto" class="mb-3"
-                required></v-select>
-            </v-col>
-          </v-row>
+                  <!-- Kết quả tìm kiếm -->
+                  <div v-if="addressStore.currentSearchResults.length > 0" class="search-results mb-4">
+                    <v-list class="search-results-list">
+                      <v-list-item v-for="(result, index) in addressStore.currentSearchResults" :key="index"
+                        @click="selectSearchResult(result)" class="search-result-item">
+                        <template v-slot:prepend>
+                          <v-icon color="grey">mdi-map-marker</v-icon>
+                        </template>
+                        <v-list-item-title class="search-result-text">{{ result.description }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </div>
 
-          <v-switch v-model="newAddress.is_default" label="Đặt làm địa chỉ mặc định" color="success" hide-details
-            class="mt-4"></v-switch>
+                  <!-- Không có kết quả -->
+                  <v-alert v-if="newAddress.address && !addressStore.isSearching && !addressStore.currentSearchResults.length"
+                    type="info" variant="tonal" class="mt-4" density="comfortable">
+                    Không tìm thấy địa chỉ phù hợp
+                  </v-alert>
+                </div>
+              </v-col>
+
+              <v-col cols="12" sm="6">
+                <v-select v-model="newAddress.address_type" :items="addressTypes" item-title="text" item-value="value"
+                  label="Loại địa chỉ" variant="outlined" density="comfortable" hide-details="auto" class="mb-3"
+                  required></v-select>
+              </v-col>
+            </v-row>
+
+            <v-switch v-model="newAddress.is_default" label="Đặt làm địa chỉ mặc định" color="success" hide-details
+              class="mt-4"></v-switch>
+          </v-form>
         </v-card-text>
 
         <v-card-actions class="px-0 pt-2">
@@ -93,7 +118,7 @@
           <v-btn variant="outlined" color="grey" @click="closeDialog" class="mr-2" min-width="100">
             Hủy
           </v-btn>
-          <v-btn color="primary" @click="saveAddress" min-width="100">
+          <v-btn color="primary" @click="saveAddress" :disabled="!isFormValid" min-width="100">
             {{ isEdit ? 'Cập nhật' : 'Lưu' }}
           </v-btn>
         </v-card-actions>
@@ -156,6 +181,12 @@ export default {
         v => !!v || 'Số điện thoại không được để trống',
         v => /^0\d{9}$/.test(v) || 'Số điện thoại không đúng định dạng '
       ],
+      addressRules: [
+        v => !!v || 'Địa chỉ không được để trống',
+        v => v.length >= 2 || 'Địa chỉ phải có ít nhất 2 ký tự',
+        v => v.length <= 255 || 'Địa chỉ không được vượt quá 255 ký tự'
+      ],
+      isFormValid: false,
     };
   },
 
@@ -177,9 +208,9 @@ export default {
       if (address) {
         this.newAddress = {
           address_id: address.id,
-          user_id: this.authStore.user.id,
           user_name: address.user_name,
           address: address.address,
+          place_id: address.place_id,
           mobile_no: address.mobile_no,
           address_type: address.address_type,
           is_default: Boolean(Number(address.is_default)),
@@ -191,9 +222,9 @@ export default {
 
     resetNewAddress() {
       this.newAddress = {
-        user_id: this.authStore.user.id,
         user_name: '',
         address: '',
+        place_id: '',
         mobile_no: '',
         address_type: 'home',
         is_default: false,
@@ -211,7 +242,7 @@ export default {
 
     async saveAddress() {
       // Kiểm tra số lượng địa chỉ hiện tại
-      if (this.addresses.length >= 4) {
+      if (this.addresses.length > 4) {
         this.notificationStore.error('Bạn chỉ được phép thêm tối đa 4 địa chỉ.', 3000);
         return;
       }
@@ -223,9 +254,9 @@ export default {
 
         let response;
         if (this.isEdit) {
-          response = await userAPI.updateAddressNote(addressData);
+          response = await userAPI.address.update(this.newAddress.address_id, addressData);
         } else {
-          response = await userAPI.createAddressNote(addressData);
+          response = await userAPI.address.create(addressData);
         }
 
         // Cập nhật store và emit event để parent component biết
@@ -250,10 +281,7 @@ export default {
     async deleteAddress() {
       if (this.addressToDelete) {
         try {
-          await userAPI.deleteAddressNote({
-            user_id: this.authStore.user.id,
-            address_id: this.addressToDelete
-          });
+          await userAPI.address.delete(this.addressToDelete);
 
           // Xóa khỏi store và emit event
           this.addressStore.removeAddressNoteById(this.addressToDelete);
@@ -276,6 +304,24 @@ export default {
     closeDialog() {
       this.dialog = false;
       this.resetNewAddress();
+    },
+
+    handleSearch() {
+      this.addressStore.searchAddress(this.newAddress.address);
+    },
+
+    clearSearch() {
+      this.newAddress.address = "";
+      this.addressStore.clearSearchCache();
+    },
+
+    selectSearchResult(result) {
+      // Tạm thời tắt watch để tránh trigger handleSearch
+      this.$nextTick(() => {
+        this.newAddress.address = result.description;
+        this.newAddress.place_id = result.place_id;
+        this.addressStore.clearSearchCache();
+      });
     },
   }
 }
@@ -322,5 +368,48 @@ export default {
   .text-body-2 {
     font-size: 0.875rem;
   }
+}
+
+.search-container {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.search-results {
+  position: relative;
+  z-index: 1;
+}
+
+.search-results-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: white;
+  margin: 0 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.search-results-list::-webkit-scrollbar {
+  display: none;
+}
+
+.search-result-text {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.search-result-item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 8px 16px;
+  min-height: 40px;
+}
+
+.search-result-item:hover {
+  background-color: rgb(var(--v-theme-surface-variant));
 }
 </style>

@@ -157,7 +157,7 @@
 </template>
 
 <script>
-import { voucherAPI } from "@/api/voucher";
+import { adminAPI } from "@/api/admin";
 import { useNotificationStore } from "@/stores/notification";
 import { formatPrice } from "@/utils/format";
 
@@ -225,11 +225,12 @@ export default {
 
         async fetchVouchers() {
             try {
-                const { data } = await voucherAPI.getAllVouchers();
+                const { data } = await adminAPI.voucher.getAll();
                 this.vouchers = data.vouchers;
-                console.log(this.vouchers);
+                //console.log(this.vouchers);
             } catch (error) {
-                console.error('Error fetching vouchers:', error);
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách voucher';
+                this.notificationStore.error(errorMessage, 3000);
             }
         },
 
@@ -267,19 +268,16 @@ export default {
             this.isLoading = true;
             try {
                 if (this.isEdit) {
-                    await voucherAPI.updateVoucher(this.voucherForm);
+                    await adminAPI.voucher.update(this.voucherForm.id, this.voucherForm);
                 } else {
-                    await voucherAPI.createVoucher(this.voucherForm);
+                    await adminAPI.voucher.create(this.voucherForm);
                 }
                 this.closeDialog();
                 this.fetchVouchers();
                 this.notificationStore.success('Voucher đã được lưu', 3000);
             } catch (error) {
-                if (error.response && error.response.status === 409) {
-                    this.notificationStore.error('Đã có voucher này!', 3000);
-                } else {
-                    console.error('Error creating voucher:', error)
-                }
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi lưu voucher';
+                this.notificationStore.error(errorMessage, 3000);
             } finally {
                 this.isLoading = false;
             }
@@ -293,12 +291,13 @@ export default {
         async deleteVoucherConfirm() {
             this.isLoading = true;
             try {
-                await voucherAPI.deleteVoucher({ id: this.voucherToDelete });
+                await adminAPI.voucher.delete(this.voucherToDelete);
                 this.fetchVouchers();
                 this.closeDeleteDialog();
                 this.notificationStore.success('Voucher đã được xóa', 3000);
             } catch (error) {
-                console.error('Error deleting voucher:', error);
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi xóa voucher';
+                this.notificationStore.error(errorMessage, 3000);
             } finally {
                 this.isLoading = false;
             }

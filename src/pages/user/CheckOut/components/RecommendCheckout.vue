@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { recommendAPI } from '@/api/recommend'
+import { userAPI } from '@/api/user'
 import { useCartStore } from '@/stores/cart'
 import { useNotificationStore } from '@/stores/notification'
 import ProductCard from '@/components/Products/ProductCard.vue'
@@ -55,7 +55,7 @@ export default {
         async getRecommendProducts() {
             this.loadingProducts = true
             try {
-                const response = await recommendAPI.getRecommendation({
+                const response = await userAPI.product.getRecommendations({
                     cartItems: this.cartItems
                 })
                 this.recommendProducts = response.data.recommend_products.slice(0, 6) // Giới hạn 6 sản phẩm

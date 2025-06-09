@@ -28,44 +28,74 @@
             <!-- Main Content -->
             <v-card-text class="pa-6">
                 <!-- Customer Information Card -->
-                <v-card class="mb-6 info-card" elevation="1">
-                    <v-card-title class="card-title">
-                        <v-icon start color="primary" class="mr-2">mdi-account-details</v-icon>
-                        THÔNG TIN KHÁCH HÀNG
-                    </v-card-title>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6" v-for="field in customerFields" :key="field.label">
-                                <v-row align="center" class="mb-2">
-                                    <v-col cols="12" md="4">
-                                        <div class="text-subtitle-2 text-medium-emphasis">{{ field.label }}:</div>
-                                    </v-col>
-                                    <v-col cols="12" md="8">
-                                        <v-skeleton-loader v-if="loading" type="text"></v-skeleton-loader>
-                                        <v-text-field v-else :model-value="userOrderInfor[field.key]" readonly
-                                            density="comfortable" variant="outlined" hide-details
-                                            class="custom-field"></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-col>
-
-                            <!-- Delivery Note -->
-                            <v-col cols="12">
-                                <v-row align="center">
-                                    <v-col cols="12" md="2">
-                                        <div class="text-subtitle-2 text-medium-emphasis">Ghi chú giao hàng:</div>
-                                    </v-col>
-                                    <v-col cols="12" md="10">
-                                        <v-skeleton-loader v-if="loading" type="text"></v-skeleton-loader>
-                                        <v-text-field v-else :model-value="userOrderInfor.order_note || 'Không có'"
-                                            readonly density="comfortable" variant="outlined" hide-details
-                                            class="custom-field"></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
+                <div class="customer-info">
+                    <div class="section-title">
+                        <i class="fas fa-user-circle"></i>
+                        <h3>THÔNG TIN KHÁCH HÀNG</h3>
+                    </div>
+                    <div class="info-content">
+                        <template v-if="loading">
+                            <div class="info-row contact-row">
+                                <div class="info-item">
+                                    <div class="skeleton-label"></div>
+                                    <div class="skeleton-value"></div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="skeleton-label"></div>
+                                    <div class="skeleton-value"></div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-item contact-item">
+                                    <div class="skeleton-label"></div>
+                                    <div class="skeleton-value"></div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-item contact-item">
+                                    <div class="skeleton-label"></div>
+                                    <div class="skeleton-value note"></div>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="info-row contact-row">
+                                <div class="info-item contact-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-user"></i>
+                                        <span>Tên khách hàng:</span>
+                                    </div>
+                                    <div class="info-value">{{ userOrderInfor.order_username }}</div>
+                                </div>
+                                <div class="info-item contact-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-phone"></i>
+                                        <span>Số điện thoại:</span>
+                                    </div>
+                                    <div class="info-value">{{ userOrderInfor.order_userphone }}</div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-item contact-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Địa chỉ giao hàng:</span>
+                                    </div>
+                                    <div class="info-value">{{ userOrderInfor.order_useraddress }}</div>
+                                </div>
+                            </div>
+                            <div class="info-row" v-if="userOrderInfor.order_note">
+                                <div class="info-item contact-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-sticky-note"></i>
+                                        <span>Ghi chú:</span>
+                                    </div>
+                                    <div class="info-value note">{{ userOrderInfor.order_note }}</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
 
                 <!-- Products Card -->
                 <v-card class="mb-6 info-card" elevation="1">
@@ -173,7 +203,7 @@
 </template>
 
 <script>
-import { orderAPI } from "@/api/order"
+import { adminAPI } from "@/api/admin"
 import { useNotificationStore } from '@/stores/notification';
 import { formatPrice } from '@/utils/format';
 export default {
@@ -239,9 +269,9 @@ export default {
         '$route': {
             immediate: true,
             handler(to) {
-                const orderCode = to.params.order_code;
-                if (orderCode && orderCode !== this.currentCODE) {
-                    this.currentCODE = orderCode;
+                const orderId = to.params.order_id;
+                if (orderId && orderId !== this.currentCODE) {
+                    this.currentCODE = orderId;
                     this.getOrderInfo();
                 }
             }
@@ -273,7 +303,7 @@ export default {
         async getOrderInfo() {
             try {
                 this.loading = true;
-                const { data } = await orderAPI.getOrderInfo(this.currentCODE);
+                const { data } = await adminAPI.order.getById(this.currentCODE);
                 this.updatePaymentInfo(data.order);
                 this.updateUserOrderInfo(data.order);
                 this.updateProductsInfo(data.order.order_items);
@@ -335,7 +365,7 @@ export default {
 
         async handleGiaoHang() {
             try {
-                await orderAPI.startDelivery({ order_id: this.userOrderInfor.order_id });
+                await adminAPI.order.startDelivery(this.userOrderInfor.order_id);
                 this.notificationStore.success("Xác nhận giao hàng thành công", 3000);
                 this.$router.push('/admin/pages/manage-orders');
             } catch (error) {
@@ -345,7 +375,7 @@ export default {
 
         async handleCancel() {
             try {
-                await orderAPI.cancelOrder({ order_id: this.userOrderInfor.order_id });
+                await adminAPI.order.cancel(this.userOrderInfor.order_id);
                 this.notificationStore.success("Xác nhận hủy đơn hàng thành công", 3000);
                 this.$router.push('/admin/pages/manage-orders');
             } catch (error) {
@@ -557,6 +587,231 @@ export default {
 
     .action-button {
         min-width: 160px;
+    }
+}
+
+.customer-info {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.section-title i {
+    font-size: 24px;
+    color: #1890ff;
+}
+
+.section-title h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f1f1f;
+    margin: 0;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-row {
+    display: flex;
+    gap: 24px;
+}
+
+.info-item {
+    flex: 1;
+    min-width: 0;
+}
+
+.info-item.full-width {
+    flex: 2;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #666;
+    font-size: 14px;
+}
+
+.info-label i {
+    color: #1890ff;
+    font-size: 16px;
+}
+
+.info-value {
+    font-size: 15px;
+    color: #1f1f1f;
+    font-weight: 500;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.info-value.note {
+    color: #666;
+    font-style: italic;
+    background: #fafafa;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 3px solid #1890ff;
+}
+
+@media (max-width: 768px) {
+    .info-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .info-item {
+        width: 100%;
+    }
+
+    .info-item.full-width {
+        width: 100%;
+    }
+}
+
+/* Skeleton Loading Styles */
+.skeleton-label {
+    height: 16px;
+    width: 120px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.skeleton-value {
+    height: 20px;
+    width: 100%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeleton-value.note {
+    height: 60px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Thêm hiệu ứng hover cho các info-item */
+.info-item {
+    transition: transform 0.2s ease;
+}
+
+.info-item:hover {
+    transform: translateX(4px);
+}
+
+.info-value {
+    transition: color 0.2s ease;
+}
+
+.info-item:hover .info-value {
+    color: #1890ff;
+}
+
+/* Thêm hiệu ứng cho icon */
+.info-label i {
+    transition: transform 0.2s ease;
+}
+
+.info-item:hover .info-label i {
+    transform: scale(1.1);
+}
+
+/* Thêm hiệu ứng cho note */
+.info-value.note {
+    transition: all 0.3s ease;
+}
+
+.info-item:hover .info-value.note {
+    border-left-color: #40a9ff;
+    background: #f5f5f5;
+}
+
+.contact-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.contact-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.contact-item .info-label {
+    margin-bottom: 0;
+    white-space: nowrap;
+    min-width: 160px;
+    padding-top: 2px;
+}
+
+.contact-item .info-value {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.5;
+}
+
+.contact-item .info-value.note {
+    background: #fafafa;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 3px solid #1890ff;
+    margin-top: -2px;
+}
+
+@media (max-width: 768px) {
+    .contact-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .contact-item {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .contact-item .info-label {
+        margin-bottom: 8px;
+        min-width: auto;
+    }
+
+    .contact-item .info-value.note {
+        width: 100%;
+        margin-top: 0;
     }
 }
 </style>

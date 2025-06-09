@@ -127,7 +127,7 @@
 import { formatDateTime } from '@/utils/format';
 import logoImage from '@/assets/logo-admin.png'
 import { formatPrice } from '@/utils/format';
-import { orderAPI } from "@/api/order";
+import { adminAPI } from "@/api/admin";
 import OrderDetailDialog from '@/components/Orders/OrderDetailDialog.vue'
 
 export default {
@@ -183,7 +183,7 @@ export default {
         //lấy danh sách các đơn hàng thành công
         async getOrders() {
             try {
-                const response = await orderAPI.getSuccessOrders();
+                const response = await adminAPI.order.getCompleted();
                 this.contents = response.data.orders;
                 console.log("Sucess: ", response.data);
             } catch (error) {

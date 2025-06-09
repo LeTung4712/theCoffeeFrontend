@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { userAPI } from "@/api/user";
+import { userAuth } from "@/api/auth";
 import { useNotificationStore } from '@/stores/notification';
 import { useAuthStore } from '@/stores/auth'
 
@@ -146,22 +146,19 @@ export default {
     async sendPhoneNumber() {
       try {
         this.loading = true;
-        this.errorMessage = '';
+        this.errorMessage = ''
         //console.log('this.data.mobile_no', this.data.mobile_no);
-        const phoneWithCode = this.data.mobile_no;
-        const response = await userAPI.login({ mobile_no: phoneWithCode });
+        const response = await userAuth.login(this.data.mobile_no);
 
         if (response.status === 200) {
           this.otpActive = true;
           this.loginHidden = true;
-          this.data.mobile_no = phoneWithCode; // Lưu số điện thoại đã format
           this.startCountdown();
         }
       } catch (error) {
         this.errorMessage = error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
         this.otpActive = true;
         this.loginHidden = true;
-        this.data.mobile_no = phoneWithCode;
         console.error('Login error:', error);
         this.startCountdown();
       } finally {
@@ -182,17 +179,14 @@ export default {
       try {
         this.loading = true;
         this.errorMessage = '';
-        const response = await userAPI.verifyOtp(this.data);
+        const response = await userAuth.verifyOtp(this.data);
         if (!response.data?.userInfo) {
           throw new Error('Xác thực không thành công');
         }
 
         // Lưu thông tin user và token vào store
-        const { userInfo, access_token, refresh_token } = response.data;
-        authStore.login(userInfo, {
-          access_token,
-          refresh_token
-        });
+        const { userInfo, access_token } = response.data;
+        await authStore.loginUser(userInfo, access_token);
 
         // Emit event login success
         this.$emit('login-success', userInfo);

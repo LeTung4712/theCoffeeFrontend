@@ -23,7 +23,7 @@
 
 <script>
 import { formatPrice } from '@/utils/format'
-import { recommendAPI } from '@/api/recommend'
+import { userAPI } from '@/api/user'
 import { useCartStore } from '@/stores/cart'
 import ProductCard from '@/components/Products/ProductCard.vue'
 
@@ -67,7 +67,7 @@ export default {
             this.loadingProducts = true
             try {
                 //console.log(this.cartItems)
-                const response = await recommendAPI.getRecommendation({
+                const response = await userAPI.product.getRecommendations({
                     cartItems: this.cartItems
                 })
                 //console.log(response)

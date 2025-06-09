@@ -190,7 +190,7 @@
 
 <script>
 import { removeVietnameseTones } from "@/utils/format";
-import { productAPI } from "@/api/product";
+import { userAPI } from "@/api/user";
 import ProductCard from "@/components/Products/ProductCard.vue";
 import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
@@ -230,6 +230,8 @@ export default {
                 { title: 'Trang chủ', disabled: false, href: '/' },
                 { title: 'Menu', disabled: false, href: '/menu' },
             ],
+            categoryError: null,
+            loadingCategories: true,
         }
     },
 
@@ -354,9 +356,9 @@ export default {
             try {
                 let response;
                 if (this.currentCategoryId) {
-                    response = await productAPI.getByCategory({ category_id: this.currentCategoryId });
+                    response = await userAPI.product.getByCategory(this.currentCategoryId);
                 } else {
-                    response = await productAPI.getAll();
+                    response = await userAPI.product.getAll();
                 }
 
                 this.products = response.data.products || [];

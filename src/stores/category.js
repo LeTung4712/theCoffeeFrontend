@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { categoryAPI } from "@/api/category";
+import { userAPI } from "@/api/user";
 
 export const useCategoryStore = defineStore("category", {
   state: () => ({
@@ -37,7 +37,7 @@ export const useCategoryStore = defineStore("category", {
       this.error = null;
 
       try {
-        const response = await categoryAPI.getAll();
+        const response = await userAPI.category.getAll();
         if (response?.data?.categories) {
           this.categories = response.data.categories;
           this.lastFetchTime = Date.now();

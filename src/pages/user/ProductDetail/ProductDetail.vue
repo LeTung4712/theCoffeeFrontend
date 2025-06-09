@@ -147,7 +147,7 @@
 
 <script>
 import { formatPrice } from "@/utils/format";
-import { productAPI } from "@/api/product";
+import { userAPI } from "@/api/user";
 import ProductCard from '@/components/Products/ProductCard.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
@@ -234,7 +234,7 @@ export default {
 
         async loadProductData() {
             try {
-                const response = await productAPI.getInfo({ product_id: this.product_id });
+                const response = await userAPI.product.getById(this.product_id);
                 const data = response.data;
                 this.product = {
                     ...data.product,

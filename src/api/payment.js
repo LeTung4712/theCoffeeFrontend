@@ -1,17 +1,31 @@
-import httpClient from './index';
+import api from "./index";
 
-const PREFIX = '/payment';
-
+// Payment APIs
 export const paymentAPI = {
-  createMomoPayment(data) {
-    return httpClient.post(`${PREFIX}/momo`, data);
-  },
+  // Thanh toán VNPay
+  createVNPayPayment: (orderData) =>
+    api.post("/payments/vnpay", orderData),
+  handleVNPayCallback: (queryParams) =>
+    api.get("/payments/vnpay/callback", { params: queryParams }),
 
-  createVNPayPayment(data) {
-    return httpClient.post(`${PREFIX}/vnpay`, data);
-  },
+  // Thanh toán Momo
+  createMomoPayment: (orderData) =>
+    api.post("/payments/momo", orderData),
+  handleMomoCallback: (queryParams) =>
+    api.get("/payments/momo/callback", { params: queryParams }),
 
-  createZaloPayPayment(data) {
-    return httpClient.post(`${PREFIX}/zalopay`, data);
-  },
+  // Thanh toán ZaloPay
+  createZaloPayPayment: (orderData) =>
+    api.post("/payments/zalopay", orderData),
+  handleZaloPayCallback: (queryParams) =>
+    api.get("/payments/zalopay/callback", { params: queryParams }),
+
+  // Thanh toán COD
+  createCODPayment: (orderData) => api.post("/payments/cod", orderData),
+
+  // Lịch sử thanh toán
+  getPaymentHistory: (orderId) => api.get(`/payments/history/${orderId}`),
+
+  // Kiểm tra trạng thái thanh toán
+  checkPaymentStatus: (orderId) => api.get(`/payments/status/${orderId}`),
 };

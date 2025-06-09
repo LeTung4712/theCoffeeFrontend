@@ -86,7 +86,6 @@
 import logoImage from '@/assets/logo.png'
 import DeliveryAddressButton from './DeliveryAddressButton.vue'
 import LoginPopup from '@/pages/user/Auth/LoginPopup.vue'
-import { userAPI } from '@/api/user'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
 import { useNotificationStore } from '@/stores/notification'
@@ -129,7 +128,7 @@ export default {
 
   computed: {
     logged() {
-      return this.authStore.isLoggedIn
+      return this.authStore.isUserLoggedIn
     },
     user() {
       return this.authStore.userInfo
@@ -174,11 +173,15 @@ export default {
     },
 
     async logout() {
-      await userAPI.logout()
-      this.authStore.logout()
-      this.displayClick = false
-      this.notificationStore.success('Đăng xuất thành công', 3000)
-      this.$router.push('/mainpage')
+      try {
+        await this.authStore.logoutUser()
+        this.displayClick = false
+        this.notificationStore.success('Đăng xuất thành công', 3000)
+        window.location.reload();
+      } catch (error) {
+        console.error('Logout error:', error)
+        this.notificationStore.error('Đăng xuất thất bại', 3000)
+      }
     },
 
     handelClickCart() {
@@ -190,8 +193,6 @@ export default {
     },
 
     handleLoginSuccess(userData) {
-      this.user = userData;
-      this.logged = true;
       this.displayClick = false;
     },
 

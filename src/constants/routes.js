@@ -12,7 +12,7 @@ export const ROUTES = {
   // routes cho admin
   ADMIN: {
     PROFILE: "profile",
-    ORDER_DETAIL: "order-detail/:order_code",
+    ORDER_DETAIL: "order-detail/:order_id",
     ANALYZE: "analyze",
     SHOPPING_BEHAVIOR: "shopping-behavior",
     MANAGE_PRODUCTS: "manage-products",

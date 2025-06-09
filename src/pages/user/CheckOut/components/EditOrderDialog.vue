@@ -110,7 +110,7 @@
 
 <script>
 import { formatPrice } from "@/utils/format";
-import { productAPI } from "@/api/product";
+import { userAPI } from "@/api/user";
 import { useCartStore } from '@/stores/cart'
 import { useNotificationStore } from '@/stores/notification'
 import { useVoucherStore } from '@/stores/voucher'
@@ -190,7 +190,7 @@ export default {
       if (!this.order?.product_item?.id) return;
       this.isLoading = true;
       try {
-        const response = await productAPI.getInfo({ product_id: this.order.product_item.id });
+        const response = await userAPI.product.getById(this.order.product_item.id);
         const data = response.data;
         this.product = data.product;
         this.topping_items = data.product.toppings.map(topping => ({

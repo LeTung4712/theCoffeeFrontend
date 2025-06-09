@@ -19,19 +19,28 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-const httpClient = axios.create({
+// Tạo instance axios với base URL và cấu hình credentials
+const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
+    Accept: "application/json",
   },
+  withCredentials: true, // Quan trọng: cho phép gửi/nhận cookies
 });
 
-// Thêm interceptor cho request
-httpClient.interceptors.request.use(
+// Request interceptor – tự gắn access token
+api.interceptors.request.use(
   (config) => {
     const authStore = useAuthStore();
-    if (authStore.accessToken) {
-      config.headers.Authorization = `Bearer ${authStore.accessToken}`;
+    // Lấy token dựa vào URL của request
+    const isAdminRequest = config.url.startsWith("/admin");
+    const token = isAdminRequest
+      ? authStore.admin.accessToken
+      : authStore.user.accessToken;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -40,15 +49,24 @@ httpClient.interceptors.request.use(
   }
 );
 
-// Thêm interceptor cho response
-httpClient.interceptors.response.use(
-  (response) => response,
+// Response interceptor – tự động refresh token khi hết hạn
+api.interceptors.response.use(
+  (response) => {
+    // Transform response data để lấy trực tiếp data từ response
+    if (response.data && response.data.data) {
+      return {
+        ...response,
+        data: response.data.data,
+      };
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const authStore = useAuthStore();
     const notificationStore = useNotificationStore();
 
-    // Nếu lỗi 401 và chưa retry
+    // Nếu lỗi 401 và chưa thử refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         // Nếu đang refresh token, thêm request vào queue
@@ -57,36 +75,58 @@ httpClient.interceptors.response.use(
         })
           .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
-            return httpClient(originalRequest);
+            return api(originalRequest);
           })
-          .catch((err) => Promise.reject(err));
+          .catch((err) => {
+            return Promise.reject(err);
+          });
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        // Gọi API refresh token bằng httpClient
-        const response = await httpClient.post("/user/auth/refreshToken", {
-          refresh_token: authStore.refreshToken,
-        });
+        // Xác định loại request (admin hay user) dựa vào URL
+        const isAdminRequest = originalRequest.url.startsWith("/admin");
+        const refreshEndpoint = isAdminRequest
+          ? "admin/auth/refresh-token"
+          : "users/auth/refresh-token";
 
-        const { access_token } = response.data;
-        authStore.updateAccessToken(access_token);
+        const response = await axios.post(
+          `${api.defaults.baseURL}${refreshEndpoint}`,
+          {}, // Không cần gửi refresh token trong body nữa
+          { withCredentials: true } // Đảm bảo gửi cookie
+        );
 
-        // Xử lý các request trong queue
+        const { access_token } = response.data.data;
+
+        // Cập nhật token tương ứng với loại request
+        if (isAdminRequest) {
+          authStore.updateAdminToken(access_token);
+        } else {
+          authStore.updateUserToken(access_token);
+        }
+
+        // Thử lại các request trong queue
         processQueue(null, access_token);
 
-        // Retry request ban đầu
+        // Thử lại request ban đầu với token mới
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
-        return httpClient(originalRequest);
+        return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        // Nếu refresh thất bại, logout user
-        authStore.logout();
-        notificationStore.error(
-          "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
-        );
+        // Xác định loại request để logout đúng
+        const isAdminRequest = originalRequest.url.startsWith("/admin");
+        // Logout tương ứng với loại request
+        if (isAdminRequest) {
+          await authStore.logoutAdmin();
+          // Chuyển về trang login admin
+          window.location.href = "/admin/login";
+        } else {
+          await authStore.logoutUser();
+          // Chuyển về trang chủ vì user login là popup
+          window.location.href = "/";
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -97,4 +137,4 @@ httpClient.interceptors.response.use(
   }
 );
 
-export default httpClient;
+export default api;

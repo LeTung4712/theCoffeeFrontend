@@ -81,12 +81,14 @@ export const useOrderStore = defineStore("order", {
         });
 
         this.channel.bind("new-order", (data) => {
+          console.log(data);
           const newNotification = {
             id: Date.now(),
             message: `Đơn hàng mới #${data.order_code}`,
             type: "success",
             timestamp: new Date(),
             read: false,
+            orderId: data.order_id,
             orderCode: data.order_code,
           };
 
