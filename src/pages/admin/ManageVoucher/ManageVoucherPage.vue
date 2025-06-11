@@ -182,6 +182,7 @@ export default {
                 { title: 'Giảm tối đa', key: 'max_discount_amount' },
                 { title: 'Đơn hàng tối thiểu', key: 'min_order_amount' },
                 { title: 'Tổng số lượng', key: 'total_quantity' },
+                { title: 'Số lượng đã sử dụng', key: 'used_quantity' },
                 { title: 'Giới hạn mỗi người dùng', key: 'limit_per_user' },
                 { title: 'Ngày hết hạn', key: 'expire_at' },
                 { title: 'Trạng thái', key: 'active' },

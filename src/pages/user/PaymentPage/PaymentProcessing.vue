@@ -30,7 +30,7 @@
                                         <span class="text-body-2">Mã giao dịch</span>
                                     </div>
                                     <span class="text-primary font-weight-medium">{{ paymentData && paymentData.txnRef
-                                    }}</span>
+                                        }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -39,7 +39,7 @@
                                         <span class="text-body-2">Phương thức</span>
                                     </div>
                                     <span class="text-primary font-weight-medium">{{ paymentData && paymentData.bankCode
-                                    }}</span>
+                                        }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -106,7 +106,7 @@
                                         <span class="text-body-2">Mã giao dịch</span>
                                     </div>
                                     <span class="text-error font-weight-medium">{{ paymentData && paymentData.txnRef
-                                    }}</span>
+                                        }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -115,7 +115,7 @@
                                         <span class="text-body-2">Phương thức</span>
                                     </div>
                                     <span class="text-error font-weight-medium">{{ paymentData && paymentData.bankCode
-                                    }}</span>
+                                        }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -184,6 +184,40 @@ export default {
         try {
             // Lấy thông tin thanh toán từ URL parameters
             const urlParams = new URLSearchParams(window.location.search)
+
+            // Xác định loại thanh toán từ URL
+            const paymentType = this.determinePaymentType(urlParams)
+
+            // Xử lý kết quả thanh toán dựa trên loại
+            switch (paymentType) {
+                case 'vnpay':
+                    await this.handleVNPayResult(urlParams)
+                    break
+                case 'momo':
+                    await this.handleMomoResult(urlParams)
+                    break
+                case 'zalopay':
+                    await this.handleZaloPayResult(urlParams)
+                    break
+                default:
+                    throw new Error('Phương thức thanh toán không được hỗ trợ')
+            }
+        } catch (error) {
+            console.error('Payment processing error:', error)
+            this.handleError(error)
+        }
+    },
+
+    methods: {
+        determinePaymentType(urlParams) {
+            // Kiểm tra các tham số đặc trưng của từng loại thanh toán
+            if (urlParams.has('vnp_ResponseCode')) return 'vnpay'
+            if (urlParams.has('resultCode')) return 'momo'
+            if (urlParams.has('apptransid')) return 'zalopay'
+            return null
+        },
+
+        async handleVNPayResult(urlParams) {
             const vnpResponseCode = urlParams.get('vnp_ResponseCode')
             const vnpTransactionNo = urlParams.get('vnp_TransactionNo')
             const vnpOrderInfo = urlParams.get('vnp_OrderInfo')
@@ -201,23 +235,64 @@ export default {
                 payDate: vnpPayDate,
                 txnRef: vnpTxnRef
             }
-            this.paymentStatus = ''
+
             if (vnpResponseCode === '00') {
-                // Thanh toán thành công
                 await this.handleSuccessfulPayment()
             } else {
-                // Thanh toán thất bại
                 this.handleFailedPayment()
             }
-        } catch (error) {
-            console.error('Payment processing error:', error)
-            this.handleError(error)
-        }
-    },
+        },
 
-    methods: {
+        async handleMomoResult(urlParams) {
+            const resultCode = urlParams.get('resultCode')
+            const transId = urlParams.get('transId')
+            const orderId = urlParams.get('orderId')
+            const amount = urlParams.get('amount')
+            const message = urlParams.get('message')
+            const payType = urlParams.get('payType')
+
+            this.paymentData = {
+                responseCode: resultCode,
+                transactionNo: transId,
+                orderInfo: orderId,
+                amount: amount,
+                bankCode: payType,
+                message: message
+            }
+
+            if (resultCode === '0') {
+                await this.handleSuccessfulPayment()
+            } else {
+                this.handleFailedPayment()
+            }
+        },
+
+        async handleZaloPayResult(urlParams) {
+            const status = urlParams.get('status')
+            const apptransid = urlParams.get('apptransid')
+            const amount = urlParams.get('amount')
+            const message = urlParams.get('message')
+
+            this.paymentData = {
+                responseCode: status,
+                transactionNo: apptransid,
+                amount: amount,
+                message: message
+            }
+
+            if (status === '1') {
+                await this.handleSuccessfulPayment()
+            } else {
+                this.handleFailedPayment()
+            }
+        },
+
         formatPrice(price) {
             if (!price) return '0'
+            // Xử lý số tiền từ các cổng thanh toán khác nhau
+            if (typeof price === 'string' && price.includes('.')) {
+                return formatPrice(parseFloat(price))
+            }
             return formatPrice(price / 100) // VNPay trả về số tiền nhân 100
         },
 

@@ -67,9 +67,7 @@ export default {
             this.loadingProducts = true
             try {
                 //console.log(this.cartItems)
-                const response = await userAPI.product.getRecommendations({
-                    cartItems: this.cartItems
-                })
+                const response = await userAPI.product.getRecommendations(this.cartItems)
                 //console.log(response)
                 this.recommendProducts = response.data.recommend_products
             } catch (error) {

@@ -14,7 +14,6 @@
     <RecommendList />
     <ProductList />
     <IntroductionSection />
-    <IntroductionSection />
   </v-container>
 </template>
 

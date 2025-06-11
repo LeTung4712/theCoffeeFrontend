@@ -55,10 +55,10 @@ export default {
         async getRecommendProducts() {
             this.loadingProducts = true
             try {
-                const response = await userAPI.product.getRecommendations({
-                    cartItems: this.cartItems
-                })
-                this.recommendProducts = response.data.recommend_products.slice(0, 6) // Giới hạn 6 sản phẩm
+                console.log(this.cartItems)
+                const response = await userAPI.product.getRecommendations(this.cartItems)
+                console.log(response.data.recommend_products)
+                this.recommendProducts = response.data.recommend_products.slice(0, 4) // Giới hạn 4 sản phẩm
             } catch (error) {
                 console.error('Error fetching recommend products:', error)
             } finally {
