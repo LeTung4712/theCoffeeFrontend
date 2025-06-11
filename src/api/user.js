@@ -36,7 +36,8 @@ export const userAPI = {
     getById: (id) => api.get(`/products/${id}`),
     getByCategory: (categoryId) =>
       api.get(`/categories/${categoryId}/products`),
-    getRecommendations: () => api.get("/recommendations"),
+    getRecommendations: (cartItems) =>
+      api.get("/recommendations", { params: { cartItems: cartItems.join(",") } }),
   },
 
   // Danh mục và topping

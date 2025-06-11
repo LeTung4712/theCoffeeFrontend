@@ -5,7 +5,7 @@
         <!-- Header -->
         <v-row align="center" justify="center" class="mb-8">
           <v-icon class="mr-3" color="primary" size="35">mdi-beer-outline</v-icon>
-          <span class="text-h4 font-weight-bold">Sản phẩm từ Nhà</span>
+          <span class="text-h4 font-weight-bold">Sản phẩm của Shop</span>
 
           <!-- Search Dialog -->
           <v-dialog v-model="dialogSearch" max-width="700" class="mt-16">

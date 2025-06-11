@@ -41,6 +41,7 @@
                   size="large"
                   rounded="pill"
                   class="px-8 text-none"
+                  @click="handleExplore"
                 >
                   Khám phá ngay
                 </v-btn>
@@ -60,6 +61,11 @@ export default {
   data() {
     return {
       desImage
+    }
+  },
+  methods: {
+    handleExplore() {
+      this.$router.push('/collections/matcha/23')
     }
   }
 }
