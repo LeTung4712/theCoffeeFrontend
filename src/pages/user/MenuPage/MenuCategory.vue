@@ -504,5 +504,24 @@ export default {
     .v-col {
         padding: 6px 12px !important;
     }
+
+    /* CSS cho phân trang trên mobile */
+    :deep(.v-pagination__list) {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    :deep(.v-pagination__item) {
+        min-width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+    }
+
+    :deep(.v-pagination__prev),
+    :deep(.v-pagination__next) {
+        min-width: 32px !important;
+        height: 32px !important;
+    }
 }
 </style>
