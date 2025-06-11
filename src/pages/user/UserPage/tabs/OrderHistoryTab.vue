@@ -216,7 +216,7 @@
 
 <script>
 import { formatPrice } from '@/utils/format'
-import { orderAPI } from '@/api/order'
+import { userAPI } from '@/api/user'
 import { paymentAPI } from '@/api/payment'
 import { useNotificationStore } from '@/stores/notification'
 export default {
@@ -262,7 +262,7 @@ export default {
     // Đếm số lượng đơn chờ xác nhận - chỉ đếm đơn online chưa thanh toán
     pendingOrdersCount() {
       return this.orders.filter(order =>
-        order.payment_status === '0' && order.payment_method !== 'cod'
+        order.payment_status === '0' && order.payment_method !== 'cod' && order.status !== '-1'
       ).length;
     },
 
@@ -285,9 +285,11 @@ export default {
     filteredByTabOrders() {
       switch (this.activeTab) {
         case 'pending':
-          // Tab chờ xác nhận: chỉ lấy đơn online chưa thanh toán
+          // Tab chờ xác nhận: chỉ lấy đơn online chưa thanh toán và chưa hủy
           return this.orders.filter(order =>
-            order.payment_status === '0' && order.payment_method !== 'cod'
+            order.payment_status === '0' &&
+            order.payment_method !== 'cod' &&
+            order.status !== '-1'
           );
 
         case 'processing':
@@ -564,11 +566,11 @@ export default {
 
       try {
         if (this.dialogType === 'receive') {
-          await orderAPI.successOrder({ order_id: this.selectedOrderId });
+          await userAPI.order.complete(this.selectedOrderId);
           this.notificationStore.success("Xác nhận giao hàng thành công", 3000);
           this.$emit('order-status-updated', { orderId: this.selectedOrderId, status: '3' });
         } else if (this.dialogType === 'cancel') {
-          await orderAPI.cancelOrder({ order_id: this.selectedOrderId });
+          await userAPI.order.cancel(this.selectedOrderId);
           this.notificationStore.success("Hủy đơn hàng thành công", 3000);
           this.$emit('order-status-updated', { orderId: this.selectedOrderId, status: '-1' });
         }

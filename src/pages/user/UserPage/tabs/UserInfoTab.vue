@@ -10,6 +10,7 @@
             variant="outlined"
             density="comfortable"
             bg-color="grey-lighten-4"
+            :rules="rules.last_name"
           />
         </v-col>
         <v-col cols="12" sm="6">
@@ -19,6 +20,7 @@
             variant="outlined"
             density="comfortable"
             bg-color="grey-lighten-4"
+            :rules="rules.first_name"
           />
         </v-col>
       </v-row>
@@ -37,6 +39,7 @@
         density="comfortable"
         bg-color="grey-lighten-4"
         type="date"
+        :rules="rules.date_of_birth"
       />
       <v-text-field
         v-model="form.email"
@@ -45,6 +48,7 @@
         variant="outlined"
         density="comfortable"
         bg-color="grey-lighten-4"
+        :rules="rules.email"
       />
       <v-radio-group v-model="form.gender" row class="mt-4">
         <v-radio label="Nam" value="male"></v-radio>
@@ -66,7 +70,25 @@ export default {
   },
   data() {
     return {
-      form: { ...this.userInfo }
+      form: { ...this.userInfo },
+      rules: {
+        email: [
+          v => !!v || 'Vui lòng nhập email',
+          v => /.+@.+/.test(v) || 'Email không hợp lệ'
+        ],
+        date_of_birth: [
+          v => !!v || 'Vui lòng chọn ngày sinh',
+          v => new Date(v) < new Date() || 'Ngày sinh không hợp lệ'
+        ],
+        last_name: [
+          v => !!v || 'Vui lòng nhập họ',
+          v => v.length <= 50 || 'Họ không được vượt quá 50 ký tự'
+        ],
+        first_name: [
+          v => !!v || 'Vui lòng nhập tên',
+          v => v.length <= 50 || 'Tên không được vượt quá 50 ký tự'
+        ]
+      }
     }
   },
   methods: {

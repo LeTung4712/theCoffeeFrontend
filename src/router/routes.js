@@ -26,6 +26,7 @@ export const userRoutes = {
       name: "UserInfo",
       path: ROUTES.USER_PAGE,
       component: () => import("@/pages/user/UserPage/UserInfo"),
+      meta: { requiresAuth: true },
     },
     {
       name: "Menu",
@@ -36,6 +37,12 @@ export const userRoutes = {
       name: "ThanhToan",
       path: ROUTES.CHECKOUT,
       component: () => import("@/pages/user/CheckOut/CheckOut"),
+    },
+    {
+      name: "PaymentProcess",
+      path: ROUTES.PAYMENT_PROCESS,
+      component: () => import("@/pages/user/PaymentPage/PaymentProcessing"),
+      meta: { requiresAuth: true },
     },
     {
       name: "Blog",

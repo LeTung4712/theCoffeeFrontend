@@ -12,9 +12,9 @@
 
     <v-card>
       <v-card-title class="d-flex align-center pa-2 border-b header-fixed">
+        <span class="mx-auto text-subtitle-1 font-weight-bold">Chọn khuyến mãi</span>
         <v-btn icon="mdi-close" variant="text" @click="dialog = false" class="ml-n1" density="comfortable"
           size="small" />
-        <span class="mx-auto text-subtitle-1 font-weight-bold">Chọn khuyến mãi</span>
       </v-card-title>
 
       <v-card-text class="pa-4">
@@ -75,8 +75,8 @@
       </v-card-text>
     </v-card>
 
-    <voucher-detail-dialog v-model="detailDialog" :voucher="selectedVoucherForDetail" :total-price="totalPrice"
-      @voucher-selected="handleVoucherSelected" />
+    <voucher-detail-dialog v-if="detailDialog && selectedVoucherForDetail" v-model="detailDialog"
+      :voucher="selectedVoucherForDetail" :total-price="totalPrice" @voucher-selected="handleVoucherSelected" />
   </v-dialog>
 </template>
 
@@ -127,11 +127,32 @@ export default {
       handler(newValue) {
         this.selectedVoucher = newValue
       }
+    },
+    dialog: {
+      async handler(newValue) {
+        if (newValue) {
+          try {
+            await this.voucherStore.fetchVouchers()
+          } catch (error) {
+            const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách voucher';
+            this.notificationStore.error(errorMessage, 3000);
+          }
+        } else {
+          // Reset các giá trị khi đóng dialog
+          this.selectedVoucherForDetail = null
+          this.detailDialog = false
+          this.voucher_code = ""
+        }
+      }
+    },
+    detailDialog: {
+      handler(newValue) {
+        if (!newValue) {
+          // Reset selectedVoucherForDetail khi đóng detail dialog
+          this.selectedVoucherForDetail = null
+        }
+      }
     }
-  },
-
-  created() {
-    this.voucherStore.fetchVouchers()
   },
 
   computed: {
@@ -184,12 +205,16 @@ export default {
     },
 
     showVoucherDetail(voucher) {
-      this.selectedVoucherForDetail = voucher
+      if (!voucher) return
+      this.selectedVoucherForDetail = { ...voucher } // Clone voucher để tránh reference
       this.detailDialog = true
     },
 
     handleVoucherSelected(voucher) {
+      if (!voucher) return
       this.applyVoucher(voucher)
+      this.detailDialog = false
+      this.selectedVoucherForDetail = null
     },
 
     applyVoucher(voucher) {

@@ -219,7 +219,7 @@ export default {
         // Lấy danh sách địa chỉ của người dùng
         async getAddresses(userId) {
             try {
-                const response = await userAPI.getAddressNote({ user_id: userId })
+                const response = await userAPI.address.getAll()
                 this.addressStore.setAddressNote(response.data.address_note)
                 this.listAddresses = this.addressStore.addressNote
                 const defaultAddress = this.listAddresses.find(address => address.is_default)
@@ -228,24 +228,20 @@ export default {
                     this.addressStore.updateAddress(defaultAddress)
                 }
             } catch (error) {
-                this.notificationStore.error('Không thể tải danh sách địa chỉ', 3000)
-                console.error('Lỗi khi lấy địa chỉ:', error)
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách địa chỉ';
+                this.notificationStore.error(errorMessage, 3000);
             }
         },
 
         // Lấy danh sách đơn hàng của người dùng
         async getOrders(userId) {
             try {
-                const response = await userAPI.getOrdersUser({ user_id: userId })
+                const response = await userAPI.order.getHistory()
                 this.listOrders = response.data.orders
             } catch (error) {
-                if (error.response && error.response.status === 404) {
-                    this.notificationStore.info('Bạn chưa có lịch sử mua hàng', 3000)
-                    this.listOrders = [] // Đảm bảo mảng rỗng khi không có đơn hàng
-                } else {
-                    this.notificationStore.error('Không thể tải lịch sử đơn hàng', 3000)
-                }
-                console.error('Lỗi khi lấy đơn hàng:', error)
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách đơn hàng';
+                this.notificationStore.error(errorMessage, 3000);
+                this.listOrders = []
             }
         },
 
@@ -263,15 +259,16 @@ export default {
         async handleUpdate(updatedInfo) {
             this.loading = true
             try {
-                const response = await userAPI.updateInfo(updatedInfo)
+                console.log('updatedInfo', updatedInfo)
+                const response = await userAPI.profile.update(updatedInfo)
                 this.userInfomation = { ...this.userInfomation, ...updatedInfo }
                 if (response.data?.userInfo) {
                     this.authStore.updateUser(response.data.userInfo)
                 }
                 this.notificationStore.success('Cập nhật thông tin thành công', 3000)
             } catch (error) {
-                console.error('Lỗi khi cập nhật thông tin:', error)
-                this.notificationStore.error('Có lỗi xảy ra khi cập nhật thông tin', 3000)
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi cập nhật thông tin';
+                this.notificationStore.error(errorMessage, 3000);
             } finally {
                 this.loading = false
             }

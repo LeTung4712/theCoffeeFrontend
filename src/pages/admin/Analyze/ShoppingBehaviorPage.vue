@@ -196,7 +196,7 @@
 <script>
 import { formatPrice } from "@/utils/format";
 import { useNotificationStore } from "@/stores/notification";
-import { recommendAPI } from "@/api/recommend";
+import { adminAPI } from "@/api/admin";
 export default {
     name: 'ShoppingBehaviorPage',
 
@@ -304,7 +304,7 @@ export default {
         async getAssociationRules() {
             this.isLoading = true;
             try {
-                const response = await recommendAPI.getAssociationRules();
+                const response = await adminAPI.recommendation.getAssociationRules();
                 if (response.data) {
                     this.associationRules = response.data.associationRules;
                     this.time_analyze = response.data.associationRules.updated_at;
@@ -320,7 +320,7 @@ export default {
         async analyzeShoppingBehavior() {
             this.isLoading = true;
             try {
-                const response = await recommendAPI.analyzeShoppingBehavior({
+                const response = await adminAPI.recommendation.analyzeShoppingBehavior({
                     algorithm: this.selectedAlgorithm,
                     minSupport: this.minSupport,
                     minConfidence: this.minConfidence,

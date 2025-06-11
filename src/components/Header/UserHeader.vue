@@ -128,7 +128,7 @@ export default {
 
   computed: {
     logged() {
-      return this.authStore.isLoggedIn
+      return this.authStore.isUserLoggedIn
     },
     user() {
       return this.authStore.userInfo
@@ -172,11 +172,16 @@ export default {
       this.displayClick = false;
     },
 
-    logout() {
-      this.authStore.logout()
-      this.displayClick = false
-      this.notificationStore.success('Đăng xuất thành công', 3000)
-      this.$router.push('/mainpage')
+    async logout() {
+      try {
+        await this.authStore.logoutUser()
+        this.displayClick = false
+        this.notificationStore.success('Đăng xuất thành công', 3000)
+        window.location.reload();
+      } catch (error) {
+        console.error('Logout error:', error)
+        this.notificationStore.error('Đăng xuất thất bại', 3000)
+      }
     },
 
     handelClickCart() {
@@ -188,8 +193,6 @@ export default {
     },
 
     handleLoginSuccess(userData) {
-      this.user = userData;
-      this.logged = true;
       this.displayClick = false;
     },
 

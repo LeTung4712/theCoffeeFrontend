@@ -134,7 +134,7 @@
 import Chart from 'chart.js/auto'
 import { formatPrice } from "@/utils/format";
 import { useAnalyzeStore } from '@/stores/analyze'
-import { orderAPI } from "@/api/order"
+import { adminAPI } from "@/api/admin"
 
 export default {
     name: 'AnalyzePage',
@@ -164,7 +164,7 @@ export default {
         async updateData() {
             this.analyzeStore.isLoading = true
             try {
-                const res = await orderAPI.getAnalyzeOrders({ timeRange: this.analyzeStore.timeRange })
+                const res = await adminAPI.order.AnalyzeOrders({ timeRange: this.analyzeStore.timeRange })
                 this.analyzeStore.setStatistics(res.data)
                 this.analyzeStore.setTopProducts(res.data.topProducts)
                 this.analyzeStore.setChartData(res.data)
@@ -220,12 +220,6 @@ export default {
                     }
                 })
             }
-        }
-    },
-
-    watch: {
-        'analyzeStore.timeRange'() {
-            this.updateData()
         }
     }
 }

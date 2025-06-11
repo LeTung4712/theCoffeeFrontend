@@ -62,7 +62,7 @@
         <v-data-table v-else :headers="headers" :items="tableItems" :search="search" :items-per-page="5" hover
           class="elevation-1 rounded-lg custom-table">
           <template v-slot:item.order_code="{ item }">
-            <div class="order-code-link" @click="navigateToDetails(item.order_code)">
+            <div class="order-code-link" @click="navigateToDetails(item.id)">
               {{ item.order_code }}
             </div>
           </template>
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { orderAPI } from "@/api/order";
+import { adminAPI } from "@/api/admin";
 import { formatDateTime } from "@/utils/format";
 
 export default {
@@ -189,9 +189,9 @@ export default {
       try {
         // Gọi đồng thời cả 3 API
         const [pendingResponse, confirmedResponse, deliveringResponse] = await Promise.allSettled([
-          orderAPI.getPendingPaymentOrders(),
-          orderAPI.getPendingDeliveryOrders(),
-          orderAPI.getDeliveringOrders()
+          adminAPI.order.getPendingPayment(),
+          adminAPI.order.getPendingDelivery(),
+          adminAPI.order.getDelivering()
         ]);
 
         // Xử lý từng response
@@ -260,10 +260,10 @@ export default {
       return texts[method] || method;
     },
 
-    navigateToDetails(orderCode) {
+    navigateToDetails(orderId) {
       this.$router.push({
         name: "OrderDetails",
-        params: { order_code: orderCode },
+        params: { order_id: orderId },
       }).catch(() => { });
     },
   },

@@ -1,56 +1,27 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    max-width="420"
-    :scrim="true"
-  >
+  <v-dialog v-model="dialog" max-width="420" :scrim="true">
     <v-card class="rounded-lg">
       <!-- Phần ảnh header -->
-      <v-img
-        src="https://order.thecoffeehouse.com/_nuxt/img/thumbnail-login-pop-up.e10d0dd.png"
-        height="200"
-        cover
-      />
+      <v-img src="https://order.thecoffeehouse.com/_nuxt/img/thumbnail-login-pop-up.e10d0dd.png" height="200" cover />
 
       <!-- Form đăng nhập -->
       <v-card-item v-show="!loginHidden" class="text-center">
         <v-card-title class="text-body-1 mb-2">
           Chào mừng bạn đến với
         </v-card-title>
-        <v-img
-          src="@/assets/logo.png"
-          alt="Logo"
-          class="mx-auto mb-6"
-          width="65%"
-        />
-        
+        <v-img src="@/assets/logo.png" alt="Logo" class="mx-auto mb-6" width="65%" />
+
         <v-form @submit.prevent="handleLogin">
           <v-sheet class="d-flex align-center mb-4 bg-grey-lighten-4 rounded">
             <div class="px-3 py-2 border-r d-flex align-center">
-              <v-img
-                src="@/assets/flag-vietnam.svg"
-                width="24"
-                class="me-2"
-              />
+              <v-img src="@/assets/flag-vietnam.svg" width="24" class="me-2" />
               <span>+84</span>
             </div>
-            <v-text-field
-              v-model="data.mobile_no"
-              placeholder="Nhập số điện thoại"
-              variant="plain"
-              hide-details
-              density="compact"
-              class="flex-grow-1 phone-input"
-            />
+            <v-text-field v-model="data.mobile_no" placeholder="Nhập số điện thoại" variant="plain" hide-details
+              density="compact" class="flex-grow-1 phone-input" />
           </v-sheet>
 
-          <v-btn
-            type="submit"
-            block
-            color="primary"
-            rounded="pill"
-            :loading="loading"
-          >
+          <v-btn type="submit" block color="primary" rounded="pill" :loading="loading">
             Đăng nhập
           </v-btn>
         </v-form>
@@ -72,52 +43,28 @@
         <v-form @submit.prevent="sendOTP">
           <v-row justify="space-around" no-gutters class="mb-4">
             <v-col v-for="n in 6" :key="n" cols="auto">
-              <v-text-field
-                :ref="'otpInput' + n"
-                v-model="otpDigits[n - 1]"
-                type="tel"
-                maxlength="1"
-                class="otp-input"
-                variant="outlined"
-                hide-details
-                width="44"
-                @keydown="handleOtpKeydown($event, n)"
-                @input="handleOtpInput(n)"
-              />
+              <v-text-field :ref="'otpInput' + n" v-model="otpDigits[n - 1]" type="tel" maxlength="1" class="otp-input"
+                variant="outlined" hide-details width="44" @keydown="handleOtpKeydown($event, n)"
+                @input="handleOtpInput(n)" />
             </v-col>
           </v-row>
 
           <v-row align="center" justify="center" class="mb-4">
             <span>Bạn không nhận được mã?</span>
-            <v-btn
-              variant="text"
-              color="primary"
-              class="ms-2 resend-btn"
-              :disabled="loading || countdown > 0"
-              @click="resendOTP"
-            >
+            <v-btn variant="text" color="primary" class="ms-2 resend-btn" :disabled="loading || countdown > 0"
+              @click="resendOTP">
               {{ countdown > 0 ? `Gửi lại (${countdown}s)` : 'Gửi lại' }}
             </v-btn>
           </v-row>
 
-          <v-btn
-            type="submit"
-            block
-            color="primary"
-            rounded="pill"
-            :loading="loading"
-          >
+          <v-btn type="submit" block color="primary" rounded="pill" :loading="loading">
             Xác nhận
           </v-btn>
         </v-form>
       </v-card-item>
 
       <!-- Hiển thị lỗi -->
-      <v-snackbar
-        v-model="showError"
-        color="error"
-        timeout="3000"
-      >
+      <v-snackbar v-model="showError" color="error" timeout="3000">
         {{ errorMessage }}
       </v-snackbar>
     </v-card>
@@ -125,7 +72,7 @@
 </template>
 
 <script>
-import { userAPI } from "@/api/user";
+import { userAuth } from "@/api/auth";
 import { useNotificationStore } from '@/stores/notification';
 import { useAuthStore } from '@/stores/auth'
 
@@ -164,73 +111,54 @@ export default {
     validatePhoneNumber(phone) {
       if (!phone) return false;
       const numberOnly = phone.replace(/\D/g, '');
-      
+
       // Kiểm tra xem chuỗi có chứa ký tự không phải số không
       if (phone !== numberOnly) {
         return false;
       }
-      
-      // Kiểm tra độ dài số điện thoại (10 hoặc 11 số, tính cả số 0)
+
+      // Kiểm tra độ dài số điện thoại (10 số, tính cả số 0)
       if (numberOnly.startsWith('0')) {
         return numberOnly.length === 10;
-      } else {
-        return numberOnly.length === 9;
       }
     },
 
     // Xử lý chuyển sang màn hình OTP sau khi gửi số điện thoại
     handleLogin() {
       const notificationStore = useNotificationStore();
-      
+
       // Kiểm tra số điện thoại trống
       if (!this.data.mobile_no) {
         notificationStore.error('Vui lòng nhập số điện thoại', 3000);
         return;
       }
-      
+
       // Kiểm tra định dạng số điện thoại
       if (!this.validatePhoneNumber(this.data.mobile_no)) {
         notificationStore.error('Số điện thoại không hợp lệ. Vui lòng nhập đúng số điện thoại Việt Nam (10 số)', 3000);
         return;
       }
-      
-      this.sendPhoneNumber();
-    },
 
-    // Xử lý input số điện thoại
-    formatPhoneNumber(phone) {
-      if (!phone) return '';
-      // Loại bỏ tất cả ký tự không phải số
-      const numberOnly = phone.replace(/\D/g, '');
-      // Nếu số bắt đầu bằng 0, bỏ số 0
-      return numberOnly.startsWith('0') ? numberOnly.slice(1) : numberOnly;
+      this.sendPhoneNumber();
     },
 
     // Gửi số điện thoại để nhận OTP
     async sendPhoneNumber() {
       try {
         this.loading = true;
-        this.errorMessage = '';
-        
-        // Format số điện thoại
-        const formattedPhone = this.formatPhoneNumber(this.data.mobile_no);
-        const phoneWithCode = `+84${formattedPhone}`;
-        //console.log('phoneWithCode', phoneWithCode);
-        const response = await userAPI.login({ mobile_no: phoneWithCode });
-        
+        this.errorMessage = ''
+        //console.log('this.data.mobile_no', this.data.mobile_no);
+        const response = await userAuth.login(this.data.mobile_no);
+
         if (response.status === 200) {
           this.otpActive = true;
           this.loginHidden = true;
-          this.data.mobile_no = phoneWithCode; // Lưu số điện thoại đã format
           this.startCountdown();
         }
       } catch (error) {
         this.errorMessage = error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
-        const formattedPhone = this.formatPhoneNumber(this.data.mobile_no);
-        const phoneWithCode = `+84${formattedPhone}`;
         this.otpActive = true;
         this.loginHidden = true;
-        this.data.mobile_no = phoneWithCode;
         console.error('Login error:', error);
         this.startCountdown();
       } finally {
@@ -242,33 +170,34 @@ export default {
     async sendOTP() {
       const notificationStore = useNotificationStore();
       const authStore = useAuthStore();
-      
+
       if (this.data.otp.length !== 6) {
-        notificationStore.error('Vui lòng nhập đủ 6 số OTP',3000);
+        notificationStore.error('Vui lòng nhập đủ 6 số OTP', 3000);
         return;
       }
 
       try {
         this.loading = true;
         this.errorMessage = '';
-        const response = await userAPI.verifyOtp(this.data);
+        const response = await userAuth.verifyOtp(this.data);
         if (!response.data?.userInfo) {
           throw new Error('Xác thực không thành công');
         }
 
-        // Lưu thông tin user vào store
-        authStore.login(response.data.userInfo);
-        
+        // Lưu thông tin user và token vào store
+        const { userInfo, access_token } = response.data;
+        await authStore.loginUser(userInfo, access_token);
+
         // Emit event login success
-        this.$emit('login-success', response.data.userInfo);
-        
+        this.$emit('login-success', userInfo);
+
         // Đóng dialog
         this.dialog = false;
-        
+
         // Thông báo thành công
-        notificationStore.success('Đăng nhập thành công',3000); 
+        notificationStore.success('Đăng nhập thành công', 3000);
       } catch (error) {
-        notificationStore.error(error.response?.data?.message || 'Mã OTP không chính xác',3000);
+        notificationStore.error(error.response?.data?.message || 'Mã OTP không chính xác', 3000);
         console.error('OTP verification error:', error);
       } finally {
         this.loading = false;
@@ -291,7 +220,7 @@ export default {
     handleOtpInput(index) {
       // Đảm bảo chỉ nhận input số
       this.otpDigits[index - 1] = this.otpDigits[index - 1].replace(/\D/g, '');
-      
+
       // Cập nhật giá trị OTP
       this.data.otp = this.otpDigits.join('');
 
@@ -310,9 +239,9 @@ export default {
         this.otpDigits = Array(6).fill('');
         this.data.otp = '';
         this.startCountdown();
-        notificationStore.success('Đã gửi lại mã OTP',3000);
+        notificationStore.success('Đã gửi lại mã OTP', 3000);
       } catch (error) {
-        notificationStore.error('Không thể gửi lại mã OTP. Vui lòng thử lại sau.',3000);
+        notificationStore.error('Không thể gửi lại mã OTP. Vui lòng thử lại sau.', 3000);
       } finally {
         this.loading = false;
       }

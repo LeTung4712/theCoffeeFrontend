@@ -7,8 +7,8 @@
           <h3 class="text-h6 text-white font-weight-bold mb-2">The Coffee Shop</h3>
           <div class="text-caption text-white">
             <p>Hotline đặt hàng: 1800 6936</p>
-            <p>Địa chỉ: 86-88 Cao Thắng, phường 04, quận 3, tp Hồ Chí Minh</p>
-            <p>Email: hi@thecoffeeshop.vn</p>
+            <p>Địa chỉ: 123 Đại Cồ Việt, Quận Hai Bà Trưng, Hà Nội</p>
+            <p>Email: hi@thecoffeeshop.com</p>
           </div>
         </v-col>
 

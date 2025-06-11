@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { mapAPI } from "@/api/map";
+import { userAPI } from "@/api/user";
 import debounce from "lodash/debounce";
 
 // Thời gian cache tồn tại (3 tháng)
@@ -75,7 +75,7 @@ export const useAddressStore = defineStore("address", {
 
       try {
         this.isSearching = true;
-        const response = await mapAPI.getAutoCompleteAddress(query);
+        const response = await userAPI.map.searchAddress(query);
         //console.log(response);
         const results = response.data.predictions;
 

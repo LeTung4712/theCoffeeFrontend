@@ -96,6 +96,7 @@
 
 <script>
 import { useAddressStore } from "@/stores/address";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
   name: "DeliveryAddressButton",
@@ -111,7 +112,8 @@ export default {
 
   setup() {
     const addressStore = useAddressStore();
-    return { addressStore };
+    const authStore = useAuthStore();
+    return { addressStore, authStore };
   },
 
   data() {
@@ -155,15 +157,17 @@ export default {
     },
 
     selectSearchResult(result) {
-      const defaultAddress = this.addressStore.addressNote.find(address => address.is_default)
+      const defaultAddress = this.addressStore.addressNote.find(address => address.is_default);
+      const userInfo = this.authStore.userInfo
       const addressObj = {
         address: result.description,
         place_id: result.place_id,
         address_type: 'other',
-        user_name: defaultAddress.user_name,
-        mobile_no: defaultAddress.mobile_no,
+        user_name: defaultAddress?.user_name || userInfo?.last_name + ' ' + userInfo?.first_name || '',
+        mobile_no: defaultAddress?.mobile_no || userInfo?.mobile_no || '',
         is_default: false
       };
+
       this.addressStore.updateAddress(addressObj);
       this.$emit("update:modelValue", addressObj.address);
       this.closeDialog();
@@ -240,7 +244,8 @@ export default {
   font-size: 0.9375rem;
 }
 
-.search-input :deep(.v-field__prepend-inner) {  padding-inline-start: 16px;
+.search-input :deep(.v-field__prepend-inner) {
+  padding-inline-start: 16px;
   opacity: 0.7;
 }
 

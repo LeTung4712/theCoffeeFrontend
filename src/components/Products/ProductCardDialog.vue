@@ -113,7 +113,7 @@
 
 <script>
 import { formatPrice } from "@/utils/format";
-import { productAPI } from "@/api/product";
+import { userAPI } from "@/api/user";
 import { useNotificationStore } from '@/stores/notification'
 import { useCartStore } from '@/stores/cart'
 
@@ -201,7 +201,7 @@ export default {
       this.isLoading = true;
 
       try {
-        const response = await productAPI.getInfo({ product_id: this.id });
+        const response = await userAPI.product.getById(this.id);
         const data = response.data;
         this.product = {
           ...data.product,

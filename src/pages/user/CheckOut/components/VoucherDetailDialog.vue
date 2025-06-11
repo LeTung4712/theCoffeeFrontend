@@ -3,9 +3,9 @@
     :max-height="$vuetify.display.mobile ? '80vh' : 'auto'" :class="{ 'mobile-dialog': $vuetify.display.mobile }">
     <v-card>
       <v-card-title class="d-flex align-center pa-2 border-b header-fixed">
-        <v-btn icon="mdi-close" variant="text" @click="dialog = false" class="ml-n1" density="comfortable"
-          size="small" />
         <span class="mx-auto text-subtitle-1 font-weight-bold">Chi tiết khuyến mãi</span>
+        <v-btn icon="mdi-close" variant="text" @click="dialog = false" class="ml-n1" density="comfortable"
+        size="small" />
       </v-card-title>
 
       <v-card-text class="pa-4">
@@ -130,13 +130,8 @@
       </v-card-text>
 
       <v-card-actions class="pa-4 pt-0">
-        <v-btn
-          block
-          color="primary"
-          @click="handleApplyVoucher"
-          :disabled="!canApplyVoucher"
-          class="text-uppercase font-weight-bold"
-        >
+        <v-btn block color="primary" @click="handleApplyVoucher" :disabled="!canApplyVoucher"
+          class="text-uppercase font-weight-bold">
           {{ applyButtonText }}
         </v-btn>
       </v-card-actions>
@@ -262,4 +257,4 @@ export default {
     overflow-y: auto;
   }
 }
-</style> 
+</style>

@@ -57,6 +57,10 @@
                                             <v-icon>mdi-folder-outline</v-icon>
                                         </template>
                                         <v-list-item-title>{{ category.name }}</v-list-item-title>
+                                        <template v-slot:append>
+                                            <v-btn icon="mdi-pencil" variant="text" size="small" density="compact"
+                                                @click.stop="handleEditCategory(category)" title="Sửa danh mục" />
+                                        </template>
                                     </v-list-item>
                                 </template>
 
@@ -64,10 +68,12 @@
                                 <v-list-item v-for="child in getChildCategories(category.id)" :key="child.id"
                                     :active="currentCategory && currentCategory.id === child.id"
                                     @click="selectCategory(child)" class="pl-4">
-                                    <template v-slot:prepend>
-                                        <v-icon>mdi-coffee-to-go-outline</v-icon>
-                                    </template>
+
                                     <v-list-item-title>{{ child.name }}</v-list-item-title>
+                                    <template v-slot:append>
+                                        <v-btn icon="mdi-pencil" variant="text" size="small" density="compact"
+                                            @click.stop="handleEditCategory(child)" title="Sửa danh mục" />
+                                    </template>
                                 </v-list-item>
                             </v-list-group>
                         </v-list>
@@ -208,7 +214,8 @@
         <!-- Add dialogs -->
         <ProductDialog v-model="dialogs.product" :edit-product="editProduct" @update:edit-product="editProduct = $event"
             @refresh="fetchProducts" @close="closeProductDialog" />
-        <CategoryDialog v-model="dialogs.category" @refresh="initializeMenu" />
+        <CategoryDialog v-model="dialogs.category" :edit-category="editCategory"
+            @update:edit-category="editCategory = $event" @refresh="initializeMenu" />
 
         <!-- Xác nhận xóa -->
         <v-dialog v-model="confirmDeleteDialog" max-width="400px">
@@ -246,7 +253,7 @@
 </template>
 
 <script>
-import { productAPI } from "@/api/product";
+import { adminAPI } from "@/api/admin";
 import ProductCard from "@/components/Products/ProductCard.vue";
 import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
@@ -305,7 +312,8 @@ export default {
             confirmDeleteDialog: false,
             deletingProduct: false,
             deleteConfirmation: '',
-            editProduct: null
+            editProduct: null,
+            editCategory: null
         }
     },
 
@@ -363,27 +371,24 @@ export default {
     },
 
     created() {
-        this.initializeMenu();
+        // Chỉ khởi tạo menu, không gọi fetchProducts ở đây
+        this.categoryStore.fetchCategories();
+        this.categoryStore.buildMenuItems();
     },
 
     mounted() {
-        // Thêm sự kiện lắng nghe route change
-        this.$watch(
-            () => [this.$route.params.category_id, this.$route.params.category_name],
-            () => {
-                this.handleInitialRoute();
-            },
-            { immediate: true }
-        );
+        // Xử lý route ban đầu một lần duy nhất
+        this.handleInitialRoute();
     },
 
     methods: {
         async initializeMenu() {
             try {
-                await this.categoryStore.fetchCategories();
-                this.categoryStore.buildMenuItems();
-                await this.fetchProducts();
-                this.handleInitialRoute();
+                // Chỉ fetch categories nếu chưa có
+                if (this.categories.length === 0) {
+                    await this.categoryStore.fetchCategories();
+                    this.categoryStore.buildMenuItems();
+                }
             } catch (error) {
                 console.error('Error initializing menu:', error);
             }
@@ -403,8 +408,8 @@ export default {
             this.loadingProducts = true
             try {
                 const { data } = categoryId && categoryId !== '0'
-                    ? await productAPI.getByCategory({ category_id: categoryId })
-                    : await productAPI.getAll()
+                    ? await adminAPI.product.getByCategoryId(categoryId)
+                    : await adminAPI.product.getAll()
                 this.products = data.products || [];
 
                 // Cập nhật thông tin category hiện tại
@@ -495,16 +500,35 @@ export default {
 
             // Cập nhật URL nếu có danh mục
             if (category) {
-                this.updateRoute(category);
+                const categorySlug = removeVietnameseTones(category.name)
+                    .replaceAll(' ', '-')
+                    .toLowerCase();
+
+                // Chỉ push route nếu khác với route hiện tại
+                if (this.$route.params.category_id !== category.id.toString()) {
+                    this.$router.push({
+                        name: 'ManageProductsCategory',
+                        params: {
+                            category_name: categorySlug,
+                            category_id: category.id
+                        }
+                    }).catch(err => {
+                        if (err.name !== 'NavigationDuplicated') {
+                            console.error('Lỗi chuyển trang:', err);
+                        }
+                    });
+                }
             } else {
-                // Nếu chọn "Tất cả sản phẩm"
-                this.$router.push({
-                    name: 'ManageProducts'
-                }).catch(err => {
-                    if (err.name !== 'NavigationDuplicated') {
-                        console.error('Lỗi chuyển trang:', err);
-                    }
-                });
+                // Nếu chọn "Tất cả sản phẩm" và đang ở route khác
+                if (this.$route.name !== 'ManageProducts') {
+                    this.$router.push({
+                        name: 'ManageProducts'
+                    }).catch(err => {
+                        if (err.name !== 'NavigationDuplicated') {
+                            console.error('Lỗi chuyển trang:', err);
+                        }
+                    });
+                }
             }
 
             // Đóng menu mobile nếu đang mở
@@ -560,7 +584,7 @@ export default {
 
             this.deletingProduct = true;
             try {
-                await productAPI.delete({ id: this.selectedProduct.id });
+                await adminAPI.product.delete(this.selectedProduct.id);
 
                 // Cập nhật danh sách sản phẩm sau khi xóa
                 const currentCategoryId = this.currentCategory ? this.currentCategory.id : null;
@@ -583,18 +607,16 @@ export default {
             this.confirmDeleteDialog = false;
             this.deleteConfirmation = '';
         },
+
+        // Sửa danh mục
+        handleEditCategory(category) {
+            this.editCategory = category;
+            this.dialogs.category = true;
+        },
     },
 
     watch: {
-        '$route.params': {
-            handler(newParams) {
-                if (newParams.category_id || newParams.category_name) {
-                    this.handleInitialRoute();
-                }
-            },
-            deep: true
-        },
-
+        // Bỏ watch route params vì đã xử lý trong mounted
         sortBy() {
             // Reset trang khi thay đổi sắp xếp
             this.currentPage = 1;
@@ -688,6 +710,7 @@ export default {
     .v-col {
         padding: 6px 12px !important;
     }
+
 }
 
 .gap-2 {

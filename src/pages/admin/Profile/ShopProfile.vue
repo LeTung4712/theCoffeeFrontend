@@ -10,7 +10,7 @@
                             width="300"
                             class="mx-auto shadow-sm rounded"
                         />
-                        <v-card-title class="justify-center mt-2 text-h5 font-weight-bold">The XinhLounge</v-card-title>
+                        <v-card-title class="justify-center mt-2 text-h5 font-weight-bold">The Coffee Shop</v-card-title>
                         <v-card-subtitle class="text-subtitle-1">Bách Khoa</v-card-subtitle>
                     </v-card-text>
                 </v-card>
@@ -80,9 +80,9 @@ export default {
         return {
             logo: logoImage,
             shopInfo: {
-                name: "The Coffee Bách Khoa",
+                name: "The Coffee Shop Bách Khoa",
                 phone: "0828035636",
-                email: "iamrobordiy@gmail.com",
+                email: "iamrobotdiy@gmail.com",
                 address: "Số 1 Đại Cồ Việt, Bách Khoa, Hai Bà Trưng, Hà Nội"
             }
         }

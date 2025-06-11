@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
-import { voucherAPI } from "@/api/voucher";
+import { userAPI } from "@/api/user";
+import { useAuthStore } from "@/stores/auth";
 
 export const useVoucherStore = defineStore("voucher", {
   state: () => ({
     selectedVoucher: null,
     voucherList: [],
+    publicVoucherList: [], // Danh sách voucher công khai cho user chưa đăng nhập
     loading: false,
     error: null,
   }),
@@ -13,10 +15,23 @@ export const useVoucherStore = defineStore("voucher", {
     async fetchVouchers() {
       this.loading = true;
       try {
-        const response = await voucherAPI.getVoucherActive();
-        this.voucherList = response.data.vouchers;
+        const authStore = useAuthStore();
+
+        // Nếu đã đăng nhập user
+        if (authStore.isUserLoggedIn) {
+          const response = await userAPI.voucher.getActive();
+          this.voucherList = response.data.vouchers;
+        } else {
+          // Nếu chưa đăng nhập, lấy danh sách voucher công khai
+          const response = await userAPI.voucher.getAll();
+          this.publicVoucherList = response.data.vouchers;
+          this.voucherList = []; // Reset voucher list của user đã đăng nhập
+        }
       } catch (error) {
         this.error = error.message;
+        // Nếu có lỗi, reset danh sách voucher về mảng rỗng
+        this.voucherList = [];
+        this.publicVoucherList = [];
         throw error;
       } finally {
         this.loading = false;
@@ -40,6 +55,7 @@ export const useVoucherStore = defineStore("voucher", {
         }
       } catch (error) {
         console.error("Lỗi khi load voucher từ storage:", error);
+        this.clearVoucher(); // Clear nếu có lỗi khi parse
       }
     },
 
@@ -55,8 +71,31 @@ export const useVoucherStore = defineStore("voucher", {
   },
 
   getters: {
+    // Lấy danh sách voucher dựa vào trạng thái đăng nhập
     availableVouchers: (state) => {
-      return state.voucherList.filter(
+      const authStore = useAuthStore();
+
+      // Nếu đã đăng nhập, lọc voucher từ voucherList
+      if (authStore.isUserLoggedIn) {
+        return state.voucherList.filter(
+          (voucher) => new Date(voucher.expire_at) > new Date()
+        );
+      }
+
+      // Nếu chưa đăng nhập, lọc voucher từ publicVoucherList
+      return state.publicVoucherList.filter(
+        (voucher) => new Date(voucher.expire_at) > new Date()
+      );
+    },
+
+    // Getter để kiểm tra có voucher nào khả dụng không
+    hasAvailableVouchers: (state) => {
+      const authStore = useAuthStore();
+      const vouchers = authStore.isUserLoggedIn
+        ? state.voucherList
+        : state.publicVoucherList;
+
+      return vouchers.some(
         (voucher) => new Date(voucher.expire_at) > new Date()
       );
     },

@@ -1,40 +1,54 @@
-import httpClient from './index';
+import api from "./index";
 
-const PREFIX = '/user';
-
+// User APIs
 export const userAPI = {
-  // Xác thực
-  login(data) {
-    return httpClient.post(`${PREFIX}/auth/login`, data);
+  // Thông tin cá nhân
+  profile: {
+    get: () => api.get("/users/me"),
+    update: (profileData) => api.put("/users/me", profileData),
   },
 
-  verifyOtp(data) {
-    return httpClient.post(`${PREFIX}/auth/checkOtp`, data);
+  // Quản lý địa chỉ
+  address: {
+    getAll: () => api.get("/users/addresses"),
+    create: (addressData) => api.post("/users/addresses", addressData),
+    update: (id, addressData) => api.put(`/users/addresses/${id}`, addressData),
+    delete: (id) => api.delete(`/users/addresses/${id}`),
   },
 
-  // Thông tin người dùng
-  updateInfo(data) {
-    return httpClient.put(`${PREFIX}/info/updateInfo`, data);
+  // Quản lý đơn hàng
+  order: {
+    create: (orderData) => api.post("/users/orders", orderData),
+    getHistory: () => api.get("/users/orders"),
+    complete: (id) => api.patch(`/users/orders/${id}/complete`),
+    cancel: (id) => api.patch(`/users/orders/${id}/cancel`),
   },
 
-  getAddressNote(data) {
-    return httpClient.get(`${PREFIX}/info/getAddressNote`, { params: data });
+  // Quản lý voucher
+  voucher: {
+    getAll: () => api.get("/vouchers"),
+    getActive: () => api.get("/users/vouchers"),
   },
 
-  createAddressNote(data) {
-    console.log(data)
-    return httpClient.post(`${PREFIX}/info/createAddressNote`, data);
+  // Danh sách sản phẩm
+  product: {
+    getAll: () => api.get("/products"),
+    getById: (id) => api.get(`/products/${id}`),
+    getByCategory: (categoryId) =>
+      api.get(`/categories/${categoryId}/products`),
+    getRecommendations: () => api.get("/recommendations"),
   },
 
-  updateAddressNote(data) {
-    return httpClient.put(`${PREFIX}/info/updateAddressNote`, data);
+  // Danh mục và topping
+  category: {
+    getAll: () => api.get("/categories"),
+  },
+  topping: {
+    getAll: () => api.get("/toppings"),
   },
 
-  deleteAddressNote(data) {
-    return httpClient.delete(`${PREFIX}/info/deleteAddressNote`, { params: data });
-  },
-
-  getOrdersUser(data) {
-    return httpClient.get(`${PREFIX}/info/getOrderHistory`, { params: data });
+  // Dịch vụ bản đồ
+  map: {
+    searchAddress: (query) => api.get("/map/addresses", { params: { query } }),
   },
 };

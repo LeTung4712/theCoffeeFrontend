@@ -196,7 +196,7 @@
 </template>
 
 <script>
-import { orderAPI } from '@/api/order'
+import { userAPI } from '@/api/user'
 import { paymentAPI } from '@/api/payment'
 import DeliverySection from './components/DeliverySection.vue'
 import PaymentMethods from './components/PaymentMethods.vue'
@@ -262,7 +262,7 @@ export default {
     isValidCheckout() {
       return (
         this.orderData?.items?.length > 0 &&
-        this.authStore.isLoggedIn &&
+        this.authStore.isUserLoggedIn &&
         this.deliveryInfo?.address &&
         this.deliveryInfo.address !== "Chưa có địa chỉ giao hàng"
       )
@@ -284,10 +284,12 @@ export default {
     },
 
     handleOrderLoaded(data) {
+      //console.log('data', data)
       this.orderData = {
         items: data.items,
         totalPrice: data.totalPrice,
         finalPrice: data.finalPrice,
+        voucherId: data.voucherId,
         voucherDiscount: data.voucherDiscount
       }
       this.finalPrice = data.finalPrice
@@ -308,16 +310,23 @@ export default {
         return
       }
 
+      // Kiểm tra đăng nhập trước khi checkout
+      if (!this.authStore.isUserLoggedIn) {
+        this.notificationStore.warning('Vui lòng đăng nhập để đặt hàng', 3000)
+        return
+      }
+
       this.isLoading = true
       try {
         const orderData = {
-          user_id: this.authStore.userInfo.id,
+          user_id: this.authStore.userInfo.id, // Lấy user_id từ userInfo
           user_name: this.deliveryInfo.user_name.trim(),
           mobile_no: this.deliveryInfo.mobile_no.trim(),
           address: this.deliveryInfo.address,
           note: this.deliveryInfo.note?.trim() || '',
           shipping_fee: 15000.00,
           total_price: this.orderData.totalPrice,
+          voucher_id: this.orderData.voucherId || null,
           discount_amount: this.orderData.voucherDiscount || 0,
           final_price: this.orderData.finalPrice,
           payment_method: this.paymentMethod,
@@ -331,9 +340,8 @@ export default {
             topping_items: item.topping_items
           }))
         }
-        // console.log(orderData)
-        // return
-        const { data: { order_code } } = await orderAPI.createOrder(orderData)
+
+        const { data: { order_code } } = await userAPI.order.create(orderData)
 
         // Map các phương thức thanh toán với hàm xử lý tương ứng
         const paymentHandlers = {
@@ -350,7 +358,10 @@ export default {
           throw new Error('Phương thức thanh toán không hợp lệ')
         }
       } catch (error) {
-        this.notificationStore.error('Có lỗi xảy ra khi thanh toán: ' + error.message, 3000)
+        //console.error('Payment error:', error);
+        // Lấy thông báo lỗi từ response của backend
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi thanh toán';
+        this.notificationStore.error(errorMessage, 3000);
       } finally {
         this.isLoading = false
       }
@@ -370,7 +381,7 @@ export default {
       try {
         const paymentData = {
           order_code: order_code,
-          return_url: `${window.location.origin}/user/lich-su`
+          return_url: `${window.location.origin}/thanh-toan-process`
         }
 
         // Map các phương thức thanh toán với API tương ứng
@@ -389,13 +400,59 @@ export default {
         const paymentUrl = response.data.payUrl
 
         if (!paymentUrl) {
-          throw new Error('Không nhận được URL thanh toán')
+          // Nếu không nhận được URL thanh toán, vẫn thông báo đơn hàng thành công
+          // và chuyển đến trang lịch sử đơn hàng
+          this.clearCartAndVoucher()
+          this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
+          this.notificationStore.warning('Không thể tạo thanh toán online. Vui lòng thanh toán khi nhận hàng.', 5000)
+          this.$router.push('/user/lich-su')
+          return
         }
 
+        // Nếu có URL thanh toán thì chuyển hướng
         this.clearCartAndVoucher()
         window.location.href = paymentUrl
       } catch (error) {
-        this.notificationStore.error('Lỗi khi tạo thanh toán online', 2000)
+        //console.error('Payment error:', error);
+        // Lấy thông báo lỗi từ response của backend
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi thanh toán';
+        this.notificationStore.error(errorMessage, 3000);
+      }
+    },
+
+    async handleMomoPayment() {
+      try {
+        const { data } = await paymentAPI.createMomoPayment(this.orderData);
+        const paymentUrl = data.payment_url;
+        window.location.href = paymentUrl;
+      } catch (error) {
+        //console.error('Momo payment error:', error);
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi thanh toán qua MoMo';
+        this.notificationStore.error(errorMessage, 3000);
+      }
+    },
+
+    async handleVNPayPayment() {
+      try {
+        const { data } = await paymentAPI.createVNPayPayment(this.orderData);
+        const paymentUrl = data.payment_url;
+        window.location.href = paymentUrl;
+      } catch (error) {
+        //console.error('VNPay payment error:', error);
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi thanh toán qua VNPay';
+        this.notificationStore.error(errorMessage, 3000);
+      }
+    },
+
+    async handleZaloPayPayment() {
+      try {
+        const { data } = await paymentAPI.createZaloPayPayment(this.orderData);
+        const paymentUrl = data.payment_url;
+        window.location.href = paymentUrl;
+      } catch (error) {
+        //console.error('ZaloPay payment error:', error);
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi thanh toán qua ZaloPay';
+        this.notificationStore.error(errorMessage, 3000);
       }
     },
 
@@ -431,7 +488,8 @@ export default {
         return
       }
 
-      if (!this.authStore.isLoggedIn) {
+      // Kiểm tra đăng nhập user
+      if (!this.authStore.isUserLoggedIn) {
         this.notificationStore.warning('Vui lòng đăng nhập để đặt hàng', 3000)
         return
       }

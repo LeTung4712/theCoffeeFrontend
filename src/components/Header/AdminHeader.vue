@@ -111,6 +111,7 @@
 
 <script>
 import { useOrderStore } from '@/stores/order';
+import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -147,7 +148,8 @@ export default {
             this.$emit('update:drawer', this.drawer);
         },
         async logout() {
-            localStorage.removeItem("AdminLoggedIn");
+            const authStore = useAuthStore();
+            await authStore.logoutAdmin();
             this.$router.push({ name: 'Login' });
         },
         formatTime(timestamp) {
@@ -158,12 +160,13 @@ export default {
             return result.replace('khoảng ', '');
         },
         handleNotificationClick(notification) {
+            console.log(notification);
             if (!notification.read) {
                 this.orderStore.markNotificationAsRead(notification.id);
             }
 
-            if (notification.orderCode) {
-                this.$router.push(`/admin/pages/order-detail/${notification.orderCode}`);
+            if (notification.orderId) {
+                this.$router.push(`/admin/pages/order-detail/${notification.orderId}`);
             }
 
             this.notificationMenu = false;
