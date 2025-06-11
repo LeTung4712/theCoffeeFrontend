@@ -13,19 +13,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.18.0'
+          node-version: "20.18.0"
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Clean install
+        run: |
+          rm -rf node_modules
+          rm -f package-lock.json
+          npm install
 
       - name: Build
+        env:
+          ROLLUP_SKIP_NODE_RESOLVE: true
         run: npm run build
 
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: the-coffee-shop-2024
-          
