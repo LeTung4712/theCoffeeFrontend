@@ -1,5 +1,16 @@
 <template>
   <div class="order-history-tab">
+    <!-- Thêm overlay loading -->
+    <v-overlay v-model="showLoadingOverlay" class="align-center justify-center" persistent>
+      <v-card class="pa-6 text-center" color="white" width="300">
+        <v-progress-circular indeterminate color="primary" size="64" width="6" class="mb-4"></v-progress-circular>
+        <div class="text-h6 font-weight-medium mb-2">Đang xử lý thanh toán</div>
+        <div class="text-body-2 text-medium-emphasis">
+          Vui lòng đợi trong giây lát...
+        </div>
+      </v-card>
+    </v-overlay>
+
     <!-- Tabs trạng thái đơn hàng -->
     <v-tabs v-model="activeTab" color="primary" slider-color="primary" centered class="mb-4"
       @touchstart="handleTouchStart" @touchend="handleTouchEnd">
@@ -255,6 +266,7 @@ export default {
       selectedOrderId: null,
       isProcessing: false,
       paymentTimers: {},
+      showLoadingOverlay: false // Thêm state cho overlay
     }
   },
 
@@ -518,19 +530,53 @@ export default {
 
     async handlePaymentAgain(order) {
       try {
+        this.showLoadingOverlay = true // Hiển thị overlay khi bắt đầu xử lý
         const paymentData = {
           order_code: order.order_code,
-          return_url: `${window.location.origin}/user/lich-su`
+          return_url: `${window.location.origin}/thanh-toan-process`
         }
-        const response = await paymentAPI.createMomoPayment(paymentData)
+        let response
+        let retryCount = 0
+        const maxRetries = 3
+
+        // Kiểm tra phương thức thanh toán trước đó
+        switch (order.payment_method) {
+          case 'vnpay':
+            response = await paymentAPI.createVNPayPayment(paymentData)
+            break
+          case 'momo':
+            // Thêm logic retry cho MoMo
+            while (retryCount < maxRetries) {
+              try {
+                response = await paymentAPI.createMomoPayment(paymentData)
+                if (response.data.payUrl) {
+                  break // Nếu có payUrl thì thoát vòng lặp
+                }
+              } catch (error) {
+                if (retryCount === maxRetries - 1) throw error // Nếu là lần cuối thì throw error
+              }
+              retryCount++
+              // Đợi 1 giây trước khi thử lại
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+            break
+          case 'zalopay':
+            response = await paymentAPI.createZaloPayPayment(paymentData)
+            break
+          default:
+            throw new Error('Phương thức thanh toán không được hỗ trợ')
+        }
+
         const paymentUrl = response.data.payUrl
 
         if (!paymentUrl) {
+          this.showLoadingOverlay = false // Ẩn overlay nếu không có URL
           throw new Error('Không nhận được URL thanh toán')
         }
-        // Chuyển hướng người dùng đến trang thanh toán MoMo
+        // Chuyển hướng người dùng đến trang thanh toán
         window.location.href = paymentUrl
       } catch (error) {
+        this.showLoadingOverlay = false // Ẩn overlay nếu có lỗi
         this.notificationStore.error('Lỗi khi tạo thanh toán online', 2000)
       }
     },
