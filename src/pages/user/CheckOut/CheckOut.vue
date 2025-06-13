@@ -1,5 +1,16 @@
 <template>
   <v-container class="fill-height pa-0">
+    <!-- Thêm overlay loading -->
+    <v-overlay v-model="showLoadingOverlay" class="align-center justify-center" persistent>
+      <v-card class="pa-6 text-center" color="white" width="300">
+        <v-progress-circular indeterminate color="primary" size="64" width="6" class="mb-4"></v-progress-circular>
+        <div class="text-h6 font-weight-medium mb-2">Đang xử lý thanh toán</div>
+        <div class="text-body-2 text-medium-emphasis">
+          Vui lòng đợi trong giây lát...
+        </div>
+      </v-card>
+    </v-overlay>
+
     <v-row justify="center" align="center">
       <v-col cols="12" md="10">
         <!-- Header -->
@@ -239,7 +250,8 @@ export default {
       agreedToTerms: true,
       showConfirmDialog: false,
       isDeleting: false,
-      redirectTimeout: null
+      redirectTimeout: null,
+      showLoadingOverlay: false
     }
   },
 
@@ -250,7 +262,7 @@ export default {
       this.notificationStore.warning('Giỏ hàng của bạn hiện đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.', 5000)
       this.redirectTimeout = setTimeout(() => {
         this.$router.push('/mainpage')
-      }, 3000)
+      }, 1000)
     }
   },
 
@@ -379,6 +391,7 @@ export default {
 
     async handleOnlinePayment(order_code, paymentType) {
       try {
+        this.showLoadingOverlay = true
         const paymentData = {
           order_code: order_code,
           return_url: `${window.location.origin}/thanh-toan-process`
@@ -400,8 +413,7 @@ export default {
         const paymentUrl = response.data.payUrl
 
         if (!paymentUrl) {
-          // Nếu không nhận được URL thanh toán, vẫn thông báo đơn hàng thành công
-          // và chuyển đến trang lịch sử đơn hàng
+          this.showLoadingOverlay = false
           this.clearCartAndVoucher()
           this.notificationStore.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.', 3000)
           this.notificationStore.warning('Không thể tạo thanh toán online. Vui lòng thanh toán khi nhận hàng.', 5000)
@@ -413,10 +425,11 @@ export default {
         this.clearCartAndVoucher()
         window.location.href = paymentUrl
       } catch (error) {
-        //console.error('Payment error:', error);
-        // Lấy thông báo lỗi từ response của backend
+        this.showLoadingOverlay = false
+        this.clearCartAndVoucher()
         const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi thanh toán';
         this.notificationStore.error(errorMessage, 3000);
+        this.$router.push('/user/lich-su')
       }
     },
 

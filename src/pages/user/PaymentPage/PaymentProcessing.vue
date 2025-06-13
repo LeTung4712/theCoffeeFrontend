@@ -29,7 +29,7 @@
                                         <v-icon color="primary" size="small" class="me-2">mdi-receipt</v-icon>
                                         <span class="text-body-2">Mã giao dịch</span>
                                     </div>
-                                    <span class="text-primary font-weight-medium">{{ paymentData && paymentData.txnRef
+                                    <span class="text-primary font-weight-medium">{{ paymentData && paymentData.bankCode
                                         }}</span>
                                 </div>
 
@@ -38,7 +38,7 @@
                                         <v-icon color="primary" size="small" class="me-2">mdi-bank</v-icon>
                                         <span class="text-body-2">Phương thức</span>
                                     </div>
-                                    <span class="text-primary font-weight-medium">{{ paymentData && paymentData.bankCode
+                                    <span class="text-primary font-weight-medium">{{ paymentData && paymentData.method
                                         }}</span>
                                 </div>
 
@@ -48,7 +48,7 @@
                                         <span class="text-body-2">Thời gian</span>
                                     </div>
                                     <span class="text-primary font-weight-medium">{{ paymentData &&
-                                        formatDate(paymentData.payDate) }}</span>
+                                        formatDate(paymentData.timestamp) }}</span>
                                 </div>
 
                                 <v-divider class="my-3"></v-divider>
@@ -59,7 +59,7 @@
                                         <span class="text-body-2 font-weight-medium">Số tiền</span>
                                     </div>
                                     <span class="text-primary text-h6 font-weight-bold">{{ paymentData &&
-                                        formatPrice(paymentData.amount) }}đ</span>
+                                        paymentData.amount }}đ</span>
                                 </div>
                             </div>
                         </v-card>
@@ -105,7 +105,7 @@
                                         <v-icon color="error" size="small" class="me-2">mdi-receipt</v-icon>
                                         <span class="text-body-2">Mã giao dịch</span>
                                     </div>
-                                    <span class="text-error font-weight-medium">{{ paymentData && paymentData.txnRef
+                                    <span class="text-error font-weight-medium">{{ paymentData && paymentData.bankCode
                                         }}</span>
                                 </div>
 
@@ -114,7 +114,7 @@
                                         <v-icon color="error" size="small" class="me-2">mdi-bank</v-icon>
                                         <span class="text-body-2">Phương thức</span>
                                     </div>
-                                    <span class="text-error font-weight-medium">{{ paymentData && paymentData.bankCode
+                                    <span class="text-error font-weight-medium">{{ paymentData && paymentData.method
                                         }}</span>
                                 </div>
 
@@ -124,7 +124,7 @@
                                         <span class="text-body-2">Thời gian</span>
                                     </div>
                                     <span class="text-error font-weight-medium">{{ paymentData &&
-                                        formatDate(paymentData.payDate) }}</span>
+                                        formatDate(paymentData.timestamp) }}</span>
                                 </div>
 
                                 <v-divider class="my-3"></v-divider>
@@ -135,7 +135,7 @@
                                         <span class="text-body-2 font-weight-medium">Số tiền</span>
                                     </div>
                                     <span class="text-error text-h6 font-weight-bold">{{ paymentData &&
-                                        formatPrice(paymentData.amount) }}đ</span>
+                                        paymentData.amount }}đ</span>
                                 </div>
                             </div>
                         </v-card>
@@ -161,7 +161,6 @@
 <script>
 import { useNotificationStore } from '@/stores/notification'
 import { useOrderStore } from '@/stores/order'
-import { formatPrice } from '@/utils/format'
 
 export default {
     name: 'PaymentProcessing',
@@ -187,7 +186,7 @@ export default {
 
             // Xác định loại thanh toán từ URL
             const paymentType = this.determinePaymentType(urlParams)
-
+            //console.log(paymentType)
             // Xử lý kết quả thanh toán dựa trên loại
             switch (paymentType) {
                 case 'vnpay':
@@ -230,10 +229,10 @@ export default {
                 responseCode: vnpResponseCode,
                 transactionNo: vnpTransactionNo,
                 orderInfo: vnpOrderInfo,
-                amount: vnpAmount,
-                bankCode: vnpBankCode,
-                payDate: vnpPayDate,
-                txnRef: vnpTxnRef
+                amount: vnpAmount / 100,
+                method: vnpBankCode,
+                bankCode: vnpTxnRef,
+                timestamp: vnpPayDate
             }
 
             if (vnpResponseCode === '00') {
@@ -248,16 +247,24 @@ export default {
             const transId = urlParams.get('transId')
             const orderId = urlParams.get('orderId')
             const amount = urlParams.get('amount')
-            const message = urlParams.get('message')
-            const payType = urlParams.get('payType')
+            const responseTime = urlParams.get('responseTime')
+
+            // Chuyển đổi timestamp sang định dạng yyyyMMddHHmmss
+            const momoDate = new Date(parseInt(responseTime))
+            const formattedDate = momoDate.getFullYear() +
+                String(momoDate.getMonth() + 1).padStart(2, '0') +
+                String(momoDate.getDate()).padStart(2, '0') +
+                String(momoDate.getHours()).padStart(2, '0') +
+                String(momoDate.getMinutes()).padStart(2, '0') +
+                String(momoDate.getSeconds()).padStart(2, '0')
 
             this.paymentData = {
                 responseCode: resultCode,
                 transactionNo: transId,
-                orderInfo: orderId,
+                bankCode: orderId,
                 amount: amount,
-                bankCode: payType,
-                message: message
+                method: 'MoMo',
+                timestamp: formattedDate,
             }
 
             if (resultCode === '0') {
@@ -273,27 +280,30 @@ export default {
             const amount = urlParams.get('amount')
             const message = urlParams.get('message')
 
+            // Format thời gian hiện tại thành yyyyMMddHHmmss
+            const now = new Date()
+            const formattedDate = now.getFullYear() +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                String(now.getDate()).padStart(2, '0') +
+                String(now.getHours()).padStart(2, '0') +
+                String(now.getMinutes()).padStart(2, '0') +
+                String(now.getSeconds()).padStart(2, '0')
+
             this.paymentData = {
                 responseCode: status,
-                transactionNo: apptransid,
+                bankCode: apptransid,
                 amount: amount,
+                method: 'ZaloPay',
+                timestamp: formattedDate,
                 message: message
             }
+            console.log(this.paymentData)
 
             if (status === '1') {
                 await this.handleSuccessfulPayment()
             } else {
                 this.handleFailedPayment()
             }
-        },
-
-        formatPrice(price) {
-            if (!price) return '0'
-            // Xử lý số tiền từ các cổng thanh toán khác nhau
-            if (typeof price === 'string' && price.includes('.')) {
-                return formatPrice(parseFloat(price))
-            }
-            return formatPrice(price / 100) // VNPay trả về số tiền nhân 100
         },
 
         formatDate(dateStr) {
