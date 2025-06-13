@@ -343,7 +343,7 @@ export default {
           final_price: this.orderData.finalPrice,
           payment_method: this.paymentMethod,
           products: this.orderData.items.map(item => ({
-            product_id: item.id,
+            product_id: item.product_item.id,
             product_name: item.product_item.name,
             product_price: item.product_item.price,
             product_quantity: item.quantity,
@@ -353,6 +353,8 @@ export default {
           }))
         }
 
+        // console.log('orderData', orderData)
+        // return
         const { data: { order_code } } = await userAPI.order.create(orderData)
 
         // Map các phương thức thanh toán với hàm xử lý tương ứng
