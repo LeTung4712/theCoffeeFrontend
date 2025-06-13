@@ -36,6 +36,9 @@
           <p class="mb-2">
             Một mã xác thực gồm 6 số đã được gửi đến số điện thoại
             <span class="font-weight-bold">{{ data.mobile_no }}</span>
+            <span v-if="response && response.data && response.data.otp" class="d-block mt-2 text-primary">
+              Mã OTP: {{ response.data.otp }}
+            </span>
           </p>
           <p>Nhập mã để tiếp tục</p>
         </v-card-text>
@@ -96,6 +99,7 @@ export default {
     errorMessage: '',
     countdown: 0,
     timer: null,
+    response: null,
   }),
 
   watch: {
@@ -147,10 +151,9 @@ export default {
       try {
         this.loading = true;
         this.errorMessage = ''
-        //console.log('this.data.mobile_no', this.data.mobile_no);
-        const response = await userAuth.login(this.data.mobile_no);
+        this.response = await userAuth.login(this.data.mobile_no);
 
-        if (response.status === 200) {
+        if (this.response.status === 200) {
           this.otpActive = true;
           this.loginHidden = true;
           this.startCountdown();
