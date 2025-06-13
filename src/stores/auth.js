@@ -12,9 +12,7 @@ export const useAuthStore = defineStore("auth", {
     user: {
       user: JSON.parse(localStorage.getItem("user")) || null,
       accessToken: localStorage.getItem("user_access_token") || null,
-      isAuthenticated: !!(
-        localStorage.getItem("user_access_token")
-      ),
+      isAuthenticated: !!localStorage.getItem("user_access_token"),
     },
   }),
 
@@ -53,10 +51,6 @@ export const useAuthStore = defineStore("auth", {
     // Logout cho admin
     async logoutAdmin() {
       try {
-        await adminAuth.logout();
-      } catch (error) {
-        console.error("Admin logout error:", error);
-      } finally {
         // Xóa khỏi localStorage
         localStorage.removeItem("admin_access_token");
 
@@ -65,16 +59,15 @@ export const useAuthStore = defineStore("auth", {
           accessToken: null,
           isAuthenticated: false,
         };
+        await adminAuth.logout();
+      } catch (error) {
+        console.error("Admin logout error:", error);
       }
     },
 
     // Logout cho user
     async logoutUser() {
       try {
-        await userAuth.logout();
-      } catch (error) {
-        console.error("User logout error:", error);
-      } finally {
         // Xóa khỏi localStorage
         localStorage.removeItem("user");
         localStorage.removeItem("user_access_token");
@@ -87,6 +80,9 @@ export const useAuthStore = defineStore("auth", {
           accessToken: null,
           isAuthenticated: false,
         };
+        await userAuth.logout();
+      } catch (error) {
+        console.error("User logout error:", error);
       }
     },
 
