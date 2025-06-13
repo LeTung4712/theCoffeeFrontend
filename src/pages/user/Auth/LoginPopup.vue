@@ -196,9 +196,10 @@ export default {
 
         // Đóng dialog
         this.dialog = false;
-
+       
         // Thông báo thành công
         notificationStore.success('Đăng nhập thành công', 3000);
+        this.$router.push('/user/user-info');
       } catch (error) {
         notificationStore.error(error.response?.data?.message || 'Mã OTP không chính xác', 3000);
         console.error('OTP verification error:', error);
