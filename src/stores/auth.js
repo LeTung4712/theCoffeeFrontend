@@ -51,9 +51,6 @@ export const useAuthStore = defineStore("auth", {
     // Logout cho admin
     async logoutAdmin() {
       try {
-        // Xóa khỏi localStorage
-        localStorage.removeItem("admin_access_token");
-
         // Reset state
         this.admin = {
           accessToken: null,
@@ -62,18 +59,22 @@ export const useAuthStore = defineStore("auth", {
         await adminAuth.logout();
       } catch (error) {
         console.error("Admin logout error:", error);
+        // Reset state
+        this.admin = {
+          accessToken: null,
+          isAuthenticated: false,
+        };
+        localStorage.removeItem("admin_access_token");
+        window.location.href = "/admin/login";
+      } finally {
+        // Xóa khỏi localStorage
+        localStorage.removeItem("admin_access_token");
       }
     },
 
     // Logout cho user
     async logoutUser() {
       try {
-        // Xóa khỏi localStorage
-        localStorage.removeItem("user");
-        localStorage.removeItem("user_access_token");
-        localStorage.removeItem("addressNote");
-        localStorage.removeItem("oldAddress");
-        localStorage.removeItem("voucher");
         // Reset state
         this.user = {
           user: null,
@@ -83,6 +84,27 @@ export const useAuthStore = defineStore("auth", {
         await userAuth.logout();
       } catch (error) {
         console.error("User logout error:", error);
+        // Reset state
+        this.user = {
+          user: null,
+          accessToken: null,
+          isAuthenticated: false,
+        };
+        // Xóa khỏi localStorage
+        localStorage.removeItem("user");
+        localStorage.removeItem("user_access_token");
+        localStorage.removeItem("addressNote");
+        localStorage.removeItem("oldAddress");
+        localStorage.removeItem("voucher");
+
+        window.location.href = "/";
+      } finally {
+        // Xóa khỏi localStorage
+        localStorage.removeItem("user");
+        localStorage.removeItem("user_access_token");
+        localStorage.removeItem("addressNote");
+        localStorage.removeItem("oldAddress");
+        localStorage.removeItem("voucher");
       }
     },
 

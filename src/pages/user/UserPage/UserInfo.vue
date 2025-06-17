@@ -212,7 +212,7 @@ export default {
                 ])
             } catch (error) {
                 this.notificationStore.error('Không thể tải thông tin người dùng', 3000)
-                console.error('Lỗi khi khởi tạo dữ liệu:', error)
+                //console.error('Lỗi khi khởi tạo dữ liệu:', error)
             }
         },
 
