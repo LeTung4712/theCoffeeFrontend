@@ -77,8 +77,8 @@
                 <div class="search-container">
                   <v-text-field v-model="newAddress.address" label="Địa chỉ" variant="outlined" density="comfortable"
                     hide-details="auto" class="mb-3" :rules="addressRules" required prepend-inner-icon="mdi-magnify"
-                    clearable @click:clear="clearSearch" @update:model-value="handleSearch" :loading="addressStore.isSearching"
-                    bg-color="surface" color="primary"></v-text-field>
+                    clearable @click:clear="clearSearch" @update:model-value="handleSearch"
+                    :loading="addressStore.isSearching" bg-color="surface" color="primary"></v-text-field>
 
                   <!-- Kết quả tìm kiếm -->
                   <div v-if="addressStore.currentSearchResults.length > 0" class="search-results mb-4">
@@ -93,11 +93,6 @@
                     </v-list>
                   </div>
 
-                  <!-- Không có kết quả -->
-                  <v-alert v-if="newAddress.address && !addressStore.isSearching && !addressStore.currentSearchResults.length"
-                    type="info" variant="tonal" class="mt-4" density="comfortable">
-                    Không tìm thấy địa chỉ phù hợp
-                  </v-alert>
                 </div>
               </v-col>
 
