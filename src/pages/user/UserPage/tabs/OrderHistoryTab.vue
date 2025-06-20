@@ -466,11 +466,13 @@ export default {
     },
 
     canCancelOrder(order) {
+      // Với đơn COD, chỉ được hủy khi đơn hàng ở trạng thái "Chờ xử lý"
       if (order.payment_method === 'cod') {
-        return order.status === 0;
+        return order.status.toString() === '0';
       }
-      // Đơn online: chỉ cho hủy khi chưa thanh toán và chưa giao
-      return order.status === 0 && order.payment_status === '0';
+
+      // Với đơn online, chỉ được hủy khi "Chờ xử lý" VÀ "Chưa thanh toán"
+      return order.status.toString() === '0' && order.payment_status.toString() === '0';
     },
 
     canPaymentAgain(order) {
@@ -511,7 +513,7 @@ export default {
 
       if (hoursDiff > 24) {
         try {
-          await orderAPI.cancelOrder({ order_id: order.id });
+          await userAPI.order.cancel(order.id);
           this.notificationStore.warning(`Đơn hàng ${order.order_code} đã bị hủy do quá thời gian thanh toán`, 5000);
           this.$emit('order-status-updated', { orderId: order.id, status: '-1' });
         } catch (error) {
