@@ -466,8 +466,8 @@ export default {
     },
 
     canCancelOrder(order) {
-      // Chỉ cho phép hủy khi chưa giao hàng và chưa thanh toán
-      return order.status === 0 && order.payment_status !== '1';
+      // Chỉ cho phép hủy khi chưa giao hàng hoặc chưa thanh toán
+      return order.status === 0 || order.payment_status !== '1';
     },
 
     canPaymentAgain(order) {
