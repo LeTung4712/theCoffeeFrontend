@@ -174,8 +174,7 @@
                         <v-icon left>mdi-check-circle</v-icon>
                         Đã nhận hàng
                       </v-btn>
-                      <v-btn v-if="canCancelOrder(order.status)" color="error"
-                        @click.stop="confirmCancelOrder(order.id)">
+                      <v-btn v-if="canCancelOrder(order)" color="error" @click.stop="confirmCancelOrder(order.id)">
                         <v-icon left>mdi-close-circle</v-icon>
                         Hủy đơn
                       </v-btn>
@@ -466,8 +465,9 @@ export default {
       return status.toString() === '1' // Chỉ cho phép nhận đơn khi đang giao hàng
     },
 
-    canCancelOrder(status) {
-      return ['0'].includes(status.toString()) // Chỉ cho phép hủy khi chưa giao hàng hoặc đang giao hàng
+    canCancelOrder(order) {
+      // Chỉ cho phép hủy khi chưa giao hàng và chưa thanh toán
+      return order.status === 0 && order.payment_status !== '1';
     },
 
     canPaymentAgain(order) {
