@@ -466,8 +466,11 @@ export default {
     },
 
     canCancelOrder(order) {
-      // Chỉ cho phép hủy khi chưa giao hàng hoặc chưa thanh toán
-      return order.status === 0 || order.payment_status !== '1';
+      if (order.payment_method === 'cod') {
+        return order.status === 0;
+      }
+      // Đơn online: chỉ cho hủy khi chưa thanh toán và chưa giao
+      return order.status === 0 && order.payment_status === '0';
     },
 
     canPaymentAgain(order) {
