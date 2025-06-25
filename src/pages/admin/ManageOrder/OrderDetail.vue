@@ -196,6 +196,14 @@
                             HỦY ĐƠN HÀNG
                         </v-btn>
                     </v-col>
+                    <!-- Nút Giao thành công cho admin -->
+                    <v-col v-if="canShowGiaoThanhCongButton" cols="auto">
+                        <v-btn color="primary" size="large" @click="handleGiaoThanhCong" :loading="loading"
+                            :disabled="loading" class="action-button" elevation="2">
+                            <v-icon start>mdi-check-circle</v-icon>
+                            GIAO THÀNH CÔNG
+                        </v-btn>
+                    </v-col>
                 </v-row>
             </v-card-text>
         </v-card>
@@ -292,6 +300,10 @@ export default {
                 (order.payment_method === 'cod' && order.payment_status === '0') ||
                 (order.payment_method !== 'cod' && order.payment_status === '1')
             );
+        },
+        // Hiển thị nút Giao thành công khi đơn đang ở trạng thái ĐANG GIAO HÀNG
+        canShowGiaoThanhCongButton() {
+            return this.userOrderInfor.order_status === '1';
         }
     },
 
@@ -380,6 +392,16 @@ export default {
                 this.$router.push('/admin/pages/manage-orders');
             } catch (error) {
                 console.error("Error canceling order:", error);
+            }
+        },
+
+        async handleGiaoThanhCong() {
+            try {
+                await adminAPI.order.complete(this.userOrderInfor.order_id);
+                this.notificationStore.success("Xác nhận giao thành công", 3000);
+                this.$router.push('/admin/pages/manage-orders');
+            } catch (error) {
+                console.error("Error completing delivery:", error);
             }
         },
 

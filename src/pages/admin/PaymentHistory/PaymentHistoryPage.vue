@@ -106,9 +106,9 @@
                                 </template>
                                 <template v-slot:item.status="{ item }">
                                     <v-chip :color="getStatusColor(item.status)" size="small" class="font-weight-medium"
-                                        :class="{ 'text-white': item.status === '3' }">
+                                        :class="{ 'text-white': item.status === '2' }">
                                         <v-icon start size="small"
-                                            :icon="item.status === '3' ? 'mdi-check-circle' : 'mdi-close-circle'" />
+                                            :icon="item.status === '2' ? 'mdi-check-circle' : 'mdi-close-circle'" />
                                         {{ getStatusText(item.status) }}
                                     </v-chip>
                                 </template>
