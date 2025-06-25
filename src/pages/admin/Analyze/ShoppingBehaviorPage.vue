@@ -16,11 +16,25 @@
                     variant="outlined"></v-select>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-                <v-btn color="primary" class="ml-4" @click="analyzeShoppingBehavior" :loading="isLoading">
+                <v-btn color="primary" class="ml-4" @click="handleAnalyzeClick" :loading="isLoading">
                     Phân tích
                 </v-btn>
             </v-col>
         </v-row>
+        <!-- Dialog cảnh báo confidence thấp -->
+        <v-dialog v-model="showLowConfidenceDialog" max-width="400">
+            <v-card>
+                <v-card-title class="headline">Cảnh báo</v-card-title>
+                <v-card-text>
+                    Nếu chọn confidence nhỏ hơn 0.5 có thể khiến hệ thống bị treo. Bạn có chắc chắn muốn tiếp tục?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey" text @click="showLowConfidenceDialog = false">Huỷ</v-btn>
+                    <v-btn color="primary" text @click="confirmAnalyze">Tiếp tục</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
         <v-row>
             <v-col cols="12" md="6">
@@ -257,6 +271,7 @@ export default {
                 { title: 'Giảm dần', value: 'desc' },
                 { title: 'Tăng dần', value: 'asc' },
             ],
+            showLowConfidenceDialog: false,
         }
     },
 
@@ -317,6 +332,18 @@ export default {
             }
         },
 
+        handleAnalyzeClick() {
+            if (this.minConfidence < 0.5) {
+                this.showLowConfidenceDialog = true;
+                return;
+            }
+            this.analyzeShoppingBehavior();
+        },
+        confirmAnalyze() {
+            this.showLowConfidenceDialog = false;
+            this.analyzeShoppingBehavior();
+        },
+
         async analyzeShoppingBehavior() {
             this.isLoading = true;
             try {
@@ -337,8 +364,8 @@ export default {
                     this.notificationStore.success('Phân tích hành vi mua sắm thành công', 3000);
                 }
             } catch (error) {
-                console.error('Error analyzing shopping behavior:', error);
-                this.notificationStore.error('Có lỗi xảy ra khi phân tích hành vi mua sắm', 3000);
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi phân tích hành vi mua sắm';
+                this.notificationStore.error(errorMessage, 3000);
             } finally {
                 this.isLoading = false;
             }

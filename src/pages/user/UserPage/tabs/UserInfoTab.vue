@@ -73,11 +73,9 @@ export default {
       form: { ...this.userInfo },
       rules: {
         email: [
-          v => !!v || 'Vui lòng nhập email',
           v => /.+@.+/.test(v) || 'Email không hợp lệ'
         ],
         date_of_birth: [
-          v => !!v || 'Vui lòng chọn ngày sinh',
           v => new Date(v) < new Date() || 'Ngày sinh không hợp lệ'
         ],
         last_name: [

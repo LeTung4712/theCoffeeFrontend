@@ -259,12 +259,10 @@ export default {
         async handleUpdate(updatedInfo) {
             this.loading = true
             try {
-                console.log('updatedInfo', updatedInfo)
+                //console.log('updatedInfo', updatedInfo)
                 const response = await userAPI.profile.update(updatedInfo)
                 this.userInfomation = { ...this.userInfomation, ...updatedInfo }
-                if (response.data?.userInfo) {
-                    this.authStore.updateUser(response.data.userInfo)
-                }
+                this.authStore.updateUser(response.data)
                 this.notificationStore.success('Cập nhật thông tin thành công', 3000)
             } catch (error) {
                 const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi cập nhật thông tin';
