@@ -3,7 +3,8 @@
     <v-card class="rounded-lg dialog-card d-flex flex-column" style="max-height: 90vh;">
       <!-- Header -->
       <v-card-title class="d-flex align-center py-3 px-4 bg-white border-bottom sticky-header">
-        <v-btn icon="mdi-close" variant="text" density="comfortable" @click="closeDialog" class="mr-2" />
+        <v-btn icon="mdi-close" variant="text" density="comfortable" @click="closeDialog" class="mr-2"
+          aria-label="Đóng hộp thoại chỉnh sửa" />
         <span class="mx-auto text-subtitle-1 font-weight-bold text-warning-darken-2">Chỉnh sửa món</span>
       </v-card-title>
 
@@ -36,11 +37,12 @@
                 </span>
                 <v-btn-group variant="outlined" color="warning" rounded="lg" class="quantity-group">
                   <v-btn icon="mdi-minus" variant="text" @click="decreaseQuantity" :disabled="quantity <= 1"
-                    density="comfortable" />
+                    density="comfortable" aria-label="Giảm số lượng" />
                   <v-card-text class="quantity-text">
                     {{ quantity }}
                   </v-card-text>
-                  <v-btn icon="mdi-plus" variant="text" @click="increaseQuantity" density="comfortable" />
+                  <v-btn icon="mdi-plus" variant="text" @click="increaseQuantity" density="comfortable"
+                    aria-label="Tăng số lượng" />
                 </v-btn-group>
               </div>
             </div>

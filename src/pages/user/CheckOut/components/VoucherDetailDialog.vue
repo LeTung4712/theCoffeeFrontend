@@ -4,8 +4,8 @@
     <v-card>
       <v-card-title class="d-flex align-center pa-2 border-b header-fixed">
         <span class="mx-auto text-subtitle-1 font-weight-bold">Chi tiết khuyến mãi</span>
-        <v-btn icon="mdi-close" variant="text" @click="dialog = false" class="ml-n1" density="comfortable"
-        size="small" />
+        <v-btn icon="mdi-close" variant="text" @click="dialog = false" class="ml-n1" density="comfortable" size="small"
+          aria-label="Đóng hộp thoại chi tiết voucher" />
       </v-card-title>
 
       <v-card-text class="pa-4">

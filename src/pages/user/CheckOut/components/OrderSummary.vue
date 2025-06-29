@@ -15,7 +15,7 @@
           <div class="d-flex align-start">
             <!-- Thêm nút edit -->
             <v-btn icon="mdi-pencil" size="small" variant="text" density="compact" class="me-2 mt-1"
-              @click="openEditDialog(order)"></v-btn>
+              @click="openEditDialog(order)" aria-label="Chỉnh sửa món hàng"></v-btn>
 
             <div>
               <!-- Tên sản phẩm -->
@@ -84,7 +84,7 @@
               </span>
               <span v-else>0đ</span>
               <v-btn v-if="selectedVoucher" icon="mdi-close" size="small" color="error" variant="text" density="compact"
-                class="ml-1" @click="removeVoucher" title="Xóa voucher"></v-btn>
+                class="ml-1" @click="removeVoucher" title="Xóa voucher" aria-label="Xóa voucher đã chọn"></v-btn>
             </div>
           </div>
         </template>

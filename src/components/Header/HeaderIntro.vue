@@ -1,22 +1,22 @@
 <template>
   <div class="row">
-  <div class="col-sm-12 col-md-12 col-lg-12">
-  <div class="header_metaintro  ">
-    <div class=" " >
-      <a href="/" aria-label="Xem thông tin về 154 cửa hàng khắp cả nước">
-        <img src="https://file.hstatic.net/1000075078/file/vector_706a88566eab4f009bed6eea93cd890b.png" alt="Icon cửa hàng" style="margin-right: 5px">
-        <span class="fix_color">154 Cửa hàng khắp cả nước</span>
-      </a>
-    </div>
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <div class="header_metaintro  ">
+        <div class=" ">
+          <a href="/" aria-label="Xem thông tin về 154 cửa hàng khắp cả nước" class="d-flex align-center">
+            <v-icon size="24" color="primary" style="margin-right: 5px;">mdi-store</v-icon>
+            <span class="fix_color">154 Cửa hàng khắp cả nước</span>
+          </a>
+        </div>
 
-    <div class="distance " >
-      <a href="/" aria-label="Đặt hàng qua hotline 1800.6936">
-        <img src="https://file.hstatic.net/1000075078/file/group_8de276faa50c486b9d485826c506803b.png" alt="Icon điện thoại" style="margin-right: 5px">
-        <span class="fix_color">Đặt hàng: 1800.6936</span>
-      </a>
+        <div class="distance ">
+          <a href="/" aria-label="Đặt hàng qua hotline 1800.6936" class="d-flex align-center">
+            <v-icon size="24" color="primary" style="margin-right: 5px;">mdi-phone</v-icon>
+            <span class="fix_color">Đặt hàng: 1800.6936</span>
+          </a>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
   </div>
 </template>
 
@@ -27,30 +27,31 @@ export default {
 </script>
 
 <style scoped>
-  .header_metaintro {
-    display: flex;
-    justify-content: center;
-    padding: 10px 4.2%;
+.header_metaintro {
+  display: flex;
+  justify-content: center;
+  padding: 10px 4.2%;
 
-  }
-  .header_metaintro a{
-    text-decoration: none;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.42;
-  }
+}
 
-  .distance{
-    padding: 0 4.2%;
-  }
+.header_metaintro a {
+  text-decoration: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.42;
+}
 
-  .fix_color{
-    color: #00000099;
-    font-size: 12px;
-    font-weight: 400;
-    font-family: 'SF Pro Text', sans-serif;
-    line-height: 1.42;
-  }
+.distance {
+  padding: 0 4.2%;
+}
+
+.fix_color {
+  color: #00000099;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: 'SF Pro Text', sans-serif;
+  line-height: 1.42;
+}
 </style>

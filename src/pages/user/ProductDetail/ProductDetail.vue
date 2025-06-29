@@ -47,13 +47,15 @@
 
                             <v-row align="center" class="mb-6">
                                 <v-col cols="auto">
-                                    <v-btn icon="mdi-minus" color="primary" variant="text" @click="decreaseQuantity" />
+                                    <v-btn icon="mdi-minus" color="primary" variant="text" @click="decreaseQuantity"
+                                        aria-label="Giảm số lượng" />
                                 </v-col>
                                 <v-col cols="auto">
                                     <span class="text-h6">{{ quantity }}</span>
                                 </v-col>
                                 <v-col cols="auto">
-                                    <v-btn icon="mdi-plus" color="primary" variant="text" @click="increaseQuantity" />
+                                    <v-btn icon="mdi-plus" color="primary" variant="text" @click="increaseQuantity"
+                                        aria-label="Tăng số lượng" />
                                 </v-col>
                             </v-row>
 

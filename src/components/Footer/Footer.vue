@@ -6,10 +6,11 @@
         <v-col cols="12" md="6">
           <h3 class="text-h6 text-white font-weight-bold mb-2" id="company-info">The Coffee Shop</h3>
           <div class="text-caption text-white" aria-labelledby="company-info">
-            <p>Hotline đặt hàng: <a href="tel:18006936" class="text-white text-decoration-none" aria-label="Gọi hotline đặt hàng 1800 6936">1800 6936</a></p>
+            <p>Hotline đặt hàng: <a href="tel:18006936" class="text-white text-decoration-none"
+                aria-label="Gọi hotline đặt hàng 1800 6936">1800 6936</a></p>
             <p>Địa chỉ: 123 Đại Cồ Việt, Quận Hai Bà Trưng, Hà Nội</p>
-            <p>Email: <a href="mailto:hi@thecoffeeshop.com"
-                class="text-white text-decoration-none" aria-label="Gửi email đến hi@thecoffeeshop.com">hi@thecoffeeshop.com</a></p>
+            <p>Email: <a href="mailto:hi@thecoffeeshop.com" class="text-white text-decoration-none"
+                aria-label="Gửi email đến hi@thecoffeeshop.com">hi@thecoffeeshop.com</a></p>
           </div>
         </v-col>
 

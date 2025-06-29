@@ -4,14 +4,15 @@
       <!-- Activator -->
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props" icon="mdi-plus-circle" color="primary" variant="text" size="x-large"
-          title="thêm vào giỏ hàng" class="scale-button" />
+          title="thêm vào giỏ hàng" class="scale-button" aria-label="Thêm sản phẩm vào giỏ hàng" />
       </template>
 
       <!-- Dialog Content -->
       <v-card class="rounded-lg dialog-card d-flex flex-column">
         <!-- Header -->
         <v-card-title class="d-flex align-center py-3 px-4 bg-white border-bottom dialog-header">
-          <v-btn icon="mdi-close" variant="text" density="comfortable" @click="closeDialog" class="mr-2" />
+          <v-btn icon="mdi-close" variant="text" density="comfortable" @click="closeDialog" class="mr-2"
+            aria-label="Đóng hộp thoại" />
           <span class="mx-auto text-subtitle-1 font-weight-bold text-primary">Thêm món mới</span>
         </v-card-title>
 
@@ -38,11 +39,12 @@
                   <span class="text-subtitle-1 font-weight-bold">{{ formattedPrice(price) }}đ</span>
                   <v-btn-group variant="outlined" color="primary" rounded="lg" class="quantity-group">
                     <v-btn icon="mdi-minus" variant="text" @click="decreaseQuantity" :disabled="quantity <= 1"
-                      density="comfortable" />
+                      density="comfortable" aria-label="Giảm số lượng" />
                     <v-card-text class="quantity-text">
                       {{ quantity }}
                     </v-card-text>
-                    <v-btn icon="mdi-plus" variant="text" @click="increaseQuantity" density="comfortable" />
+                    <v-btn icon="mdi-plus" variant="text" @click="increaseQuantity" density="comfortable"
+                      aria-label="Tăng số lượng" />
                   </v-btn-group>
                 </div>
               </div>

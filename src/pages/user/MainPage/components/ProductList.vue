@@ -10,14 +10,15 @@
           <!-- Search Dialog -->
           <v-dialog v-model="dialogSearch" max-width="700" class="mt-16">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" icon variant="text" class="ml-4" color="primary">
+              <v-btn v-bind="props" icon variant="text" class="ml-4" color="primary"
+                aria-label="Mở hộp thoại tìm kiếm sản phẩm">
                 <v-icon size="40">mdi-magnify</v-icon>
               </v-btn>
             </template>
 
             <v-card>
               <v-card-title class="d-flex align-center">
-                <v-btn icon @click="dialogSearch = false">
+                <v-btn icon @click="dialogSearch = false" aria-label="Đóng hộp thoại tìm kiếm">
                   <v-icon size="32" color="text-secondary">mdi-close</v-icon>
                 </v-btn>
                 <span class="mx-auto">Tìm kiếm</span>
@@ -53,7 +54,8 @@
                 :class="{ 'selected': category_type === category.id }" @click="category_type = category.id">
                 <div class="category-image-wrapper">
                   <div class="category-image">
-                    <v-img :src="category.image_url" class="category-image" width="60" height="60" cover alt="Category Image" />
+                    <v-img :src="category.image_url" class="category-image" width="60" height="60" cover
+                      alt="Category Image" />
                   </div>
                 </div>
                 <span class="category-name">{{ category.name }}</span>
@@ -71,7 +73,7 @@
           </template>
           <template v-else>
             <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4" lg="2">
-              <ProductCard :product="product" :currentID="product.id" :dialog="dialog" 
+              <ProductCard :product="product" :currentID="product.id" :dialog="dialog"
                 class="product-card-responsive" />
             </v-col>
           </template>
@@ -102,7 +104,7 @@ export default {
   setup() {
     const categoryStore = useCategoryStore()
     const { rootCategories, loading: loadingCategories } = storeToRefs(categoryStore)
-    
+
     return {
       categories: rootCategories,
       loadingCategories,
