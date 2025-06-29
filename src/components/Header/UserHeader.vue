@@ -35,9 +35,10 @@
               <template v-if="logged">
                 <v-menu v-model="displayClick" location="bottom" :close-on-content-click="false">
                   <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon variant="text" height="48">
+                    <v-btn v-bind="props" icon variant="text" height="48" aria-label="Mở menu người dùng"
+                      aria-haspopup="true" aria-expanded="false">
                       <v-avatar size="40">
-                        <v-img :src="userAvatar" />
+                        <v-img :src="userAvatar" alt="Avatar của người dùng" />
                       </v-avatar>
                       <span class="ml-2 text-body-1 d-none d-sm-flex">
                         {{ user.last_name }}
@@ -45,19 +46,21 @@
                     </v-btn>
                   </template>
 
-                  <v-list>
+                  <v-list role="menu" aria-label="Menu người dùng">
                     <v-list-item v-for="(item, index) in userMenuItems" :key="index" :prepend-icon="item.icon"
-                      :title="item.title" @click="handleClickInfo(item.route)" />
-                    <v-divider />
-                    <v-list-item prepend-icon="mdi-logout" title="Thoát" @click="logout" />
+                      :title="item.title" @click="handleClickInfo(item.route)" role="menuitem"
+                      :aria-label="`Đi đến ${item.title}`" />
+                    <v-divider role="separator" />
+                    <v-list-item prepend-icon="mdi-logout" title="Thoát" @click="logout" role="menuitem"
+                      aria-label="Đăng xuất khỏi tài khoản" />
                   </v-list>
                 </v-menu>
               </template>
               <template v-else>
                 <!-- Khi chưa đăng nhập, click avatar sẽ mở dialog -->
-                <v-btn icon variant="text" height="48" @click="openLoginDialog">
+                <v-btn icon variant="text" height="48" @click="openLoginDialog" aria-label="Đăng nhập vào tài khoản">
                   <v-avatar size="40">
-                    <v-img :src="userAvatar" />
+                    <v-img :src="userAvatar" alt="Avatar mặc định" />
                   </v-avatar>
                 </v-btn>
                 <!-- Login Popup -->
@@ -67,12 +70,14 @@
 
             <!-- Cart Button -->
             <v-col cols="auto" class="ml-2 ml-sm-6">
-              <v-btn icon variant="text" @click="handelClickCart" height="48">
+              <v-btn icon variant="text" @click="handelClickCart" height="48" aria-label="Xem giỏ hàng"
+                :aria-describedby="cartStore.itemCount > 0 ? 'cart-count' : ''">
                 <v-badge :content="cartStore.itemCount" color="error" location="bottom start" :dot="false" offset-x="0"
-                  offset-y="0" v-if="cartStore.itemCount > 0">
-                  <v-icon size="32" color="background">mdi-cart</v-icon>
+                  offset-y="0" v-if="cartStore.itemCount > 0" id="cart-count"
+                  aria-label="Số lượng sản phẩm trong giỏ hàng">
+                  <v-icon size="32" color="background" aria-hidden="true">mdi-cart</v-icon>
                 </v-badge>
-                <v-icon v-else size="32" color="white">mdi-cart</v-icon>
+                <v-icon v-else size="32" color="white" aria-hidden="true">mdi-cart</v-icon>
               </v-btn>
             </v-col>
           </v-row>

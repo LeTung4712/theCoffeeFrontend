@@ -3,15 +3,15 @@
   <div class="col-sm-12 col-md-12 col-lg-12">
   <div class="header_metaintro  ">
     <div class=" " >
-      <a href="/" >
-        <img src="https://file.hstatic.net/1000075078/file/vector_706a88566eab4f009bed6eea93cd890b.png" alt="" style="margin-right: 5px">
+      <a href="/" aria-label="Xem thông tin về 154 cửa hàng khắp cả nước">
+        <img src="https://file.hstatic.net/1000075078/file/vector_706a88566eab4f009bed6eea93cd890b.png" alt="Icon cửa hàng" style="margin-right: 5px">
         <span class="fix_color">154 Cửa hàng khắp cả nước</span>
       </a>
     </div>
 
     <div class="distance " >
-      <a href="/">
-        <img src="https://file.hstatic.net/1000075078/file/group_8de276faa50c486b9d485826c506803b.png" alt="" style="margin-right: 5px">
+      <a href="/" aria-label="Đặt hàng qua hotline 1800.6936">
+        <img src="https://file.hstatic.net/1000075078/file/group_8de276faa50c486b9d485826c506803b.png" alt="Icon điện thoại" style="margin-right: 5px">
         <span class="fix_color">Đặt hàng: 1800.6936</span>
       </a>
     </div>

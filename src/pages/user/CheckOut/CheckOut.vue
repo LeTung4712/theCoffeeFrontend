@@ -105,7 +105,11 @@
                       <template #label>
                         <span>
                           Đồng ý với các
-                          <a href="#" class="text-primary text-decoration-underline">điều khoản và điều kiện</a>
+                          <a href="#" class="text-primary text-decoration-underline"
+                            aria-label="Đọc điều khoản và điều kiện mua hàng của The Coffee House"
+                            @click.prevent="showTermsAndConditions">
+                            điều khoản và điều kiện
+                          </a>
                           mua hàng của The Coffee House
                         </span>
                       </template>
@@ -516,6 +520,11 @@ export default {
       }
 
       this.handleCheckout()
+    },
+
+    showTermsAndConditions() {
+      // Implement the logic to show terms and conditions
+      console.log('Terms and conditions dialog');
     }
   },
 

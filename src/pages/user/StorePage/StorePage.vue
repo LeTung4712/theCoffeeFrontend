@@ -53,10 +53,14 @@
                     </v-card-text>
 
                     <v-card-actions>
-                        <v-btn color="primary" variant="text" :href="store.mapLink" target="_blank">
+                        <v-btn color="primary" variant="text" :href="store.mapLink" target="_blank"
+                            :aria-label="`Xem ${store.name} trên bản đồ Google Maps`" rel="noopener noreferrer">
+                            <v-icon class="mr-1">mdi-map-marker</v-icon>
                             Xem trên bản đồ
                         </v-btn>
-                        <v-btn color="primary" variant="text" :href="'tel:' + store.phone">
+                        <v-btn color="primary" variant="text" :href="'tel:' + store.phone"
+                            :aria-label="`Gọi điện thoại đến ${store.name} - ${store.phone}`">
+                            <v-icon class="mr-1">mdi-phone</v-icon>
                             Gọi ngay
                         </v-btn>
                     </v-card-actions>
