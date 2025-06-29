@@ -4,7 +4,7 @@
       <v-btn v-bind="props" variant="text" class="delivery-btn rounded-pill px-2 px-sm-4" color="secondary">
         <v-row no-gutters align="center" style="height: 100%; width: 100%">
           <v-col cols="auto">
-            <v-img src="@/assets/Delivery2.png" width="36" height="36" class="mr-2 rounded-circle" />
+            <v-img src="@/assets/Delivery2.png" alt="Delivery" width="36" height="36" class="mr-2 rounded-circle" />
           </v-col>
           <v-col class="address-container">
             <div class="ml-2">

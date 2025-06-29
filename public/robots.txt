@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://coffee-shop.click/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_nuxt/
+Disallow: /static/
+
+# Allow important pages
+Allow: /
+Allow: /products/
+Allow: /categories/
+Allow: /about/
+Allow: /contact/ 

@@ -53,7 +53,7 @@
                 :class="{ 'selected': category_type === category.id }" @click="category_type = category.id">
                 <div class="category-image-wrapper">
                   <div class="category-image">
-                    <v-img :src="category.image_url" class="category-image" width="60" height="60" cover />
+                    <v-img :src="category.image_url" class="category-image" width="60" height="60" cover alt="Category Image" />
                   </div>
                 </div>
                 <span class="category-name">{{ category.name }}</span>

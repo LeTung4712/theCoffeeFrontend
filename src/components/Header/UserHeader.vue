@@ -5,7 +5,7 @@
         <!-- Logo - Chỉ hiện trên desktop -->
         <v-col cols="auto" class="pl-0 d-none d-sm-flex">
           <v-btn variant="text" to="/mainpage" class="pa-0">
-            <v-img :src="logo" width="180" height="60" />
+            <v-img :src="logo" alt="Logo" width="180" height="60" />
           </v-btn>
         </v-col>
 
