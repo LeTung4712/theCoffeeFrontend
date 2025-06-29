@@ -1,12 +1,16 @@
 <template>
   <v-container fluid class="pa-0">
+    <!-- Preload hình ảnh banner đầu tiên để cải thiện LCP -->
+    <link rel="preload" as="image" :href="urls_header[0]" />
+
     <v-row no-gutters>
       <v-col cols="12">
         <!-- Phần Slide -->
         <v-carousel cycle hide-delimiter-background :show-arrows="$vuetify.display.mdAndUp" :height="carouselHeight"
           class="carousel-container">
           <v-carousel-item v-for="(url_header, i) in urls_header" :key="i" cover>
-            <v-img :src="url_header" :height="carouselHeight" class="align-center" />
+            <v-img :src="url_header" :alt="`Banner ${i + 1}`" :height="carouselHeight" class="align-center"
+              loading="lazy" :style="{ objectFit: 'cover' }" />
           </v-carousel-item>
         </v-carousel>
       </v-col>
