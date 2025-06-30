@@ -30,7 +30,7 @@
                                         <span class="text-body-2">Mã giao dịch</span>
                                     </div>
                                     <span class="text-primary font-weight-medium">{{ paymentData && paymentData.bankCode
-                                        }}</span>
+                                    }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -39,7 +39,7 @@
                                         <span class="text-body-2">Phương thức</span>
                                     </div>
                                     <span class="text-primary font-weight-medium">{{ paymentData && paymentData.method
-                                        }}</span>
+                                    }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -106,7 +106,7 @@
                                         <span class="text-body-2">Mã giao dịch</span>
                                     </div>
                                     <span class="text-error font-weight-medium">{{ paymentData && paymentData.bankCode
-                                        }}</span>
+                                    }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -115,7 +115,7 @@
                                         <span class="text-body-2">Phương thức</span>
                                     </div>
                                     <span class="text-error font-weight-medium">{{ paymentData && paymentData.method
-                                        }}</span>
+                                    }}</span>
                                 </div>
 
                                 <div class="d-flex justify-space-between align-center mb-3">
@@ -434,20 +434,28 @@ export default {
 /* Responsive styles */
 @media (max-width: 600px) {
     .payment-card {
-        margin: 1rem;
+        margin: 8px 0 !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .payment-container {
+        padding: 0 !important;
+    }
+
+    .v-card-title,
+    .v-card-text,
+    .v-card-actions {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
     }
 
     .action-btn {
-        min-width: 160px;
-        font-size: 0.875rem;
-    }
-
-    .v-card-title {
-        font-size: 1.5rem !important;
-    }
-
-    .v-card-text {
-        padding: 1rem !important;
+        min-width: 120px;
+        font-size: 0.85rem;
+        padding-left: 8px;
+        padding-right: 8px;
     }
 }
 

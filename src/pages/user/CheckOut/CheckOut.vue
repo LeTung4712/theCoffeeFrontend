@@ -110,7 +110,7 @@
                             @click.prevent="showTermsAndConditions">
                             điều khoản và điều kiện
                           </a>
-                          mua hàng của The Coffee House
+                          mua hàng của The Coffee Shop
                         </span>
                       </template>
                     </v-checkbox>

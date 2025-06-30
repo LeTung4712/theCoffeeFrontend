@@ -53,19 +53,21 @@
 
           <!-- Note -->
           <v-text-field v-model="item_note" placeholder="Ghi chú thêm cho món này" variant="outlined"
-            density="comfortable" prepend-inner-icon="mdi-note-text" class="mt-6" hide-details
-            bg-color="grey-lighten-4" />
+            density="comfortable" prepend-inner-icon="mdi-note-text" class="mt-6" hide-details bg-color="grey-lighten-4"
+            :counter="100" maxlength="100" />
+          <div class="text-caption text-grey-darken-1 mt-1" style="text-align: right;">
+            {{ item_note.length }}/100 ký tự
+          </div>
 
           <!-- Size Selection -->
           <template v-if="hasToppings">
             <div class="text-overline mt-6 mb-2 font-weight-medium">
               CHỌN SIZE (BẮT BUỘC)
             </div>
-            <v-radio-group v-model="size" inline mandatory class="mt-0 size-radio-group" density="comfortable">
-              <v-radio v-for="option in sizeOptions" :key="option.value" :value="option.value" color="primary"
-                class="flex-grow-1 mx-4">
+            <v-radio-group v-model="size" mandatory class="mt-0 size-radio-group" density="comfortable">
+              <v-radio v-for="option in sizeOptions" :key="option.value" :value="option.value" color="primary">
                 <template v-slot:label>
-                  <div class="d-flex flex-column">
+                  <div class="d-flex flex-row align-center" style="gap: 4px;">
                     <span class="font-weight-medium">{{ option.label }}</span>
                     <span class="text-caption text-grey-darken-1">
                       + {{ formattedPrice(option.price) }}đ
@@ -408,6 +410,11 @@ export default {
   .v-card-text::-webkit-scrollbar {
     width: 4px;
   }
+
+  .size-radio-group .v-radio {
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+  }
 }
 
 /* Animation cho bottom sheet trên mobile */
@@ -516,10 +523,17 @@ export default {
   .size-radio-group :deep(.v-radio .v-label) {
     font-size: 0.9rem;
     white-space: nowrap;
+    text-align: center;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
   }
 
-  .size-radio-group :deep(.v-radio .v-selection-control) {
-    margin-inline-end: 4px !important;
+  .size-radio-group :deep(.v-radio) {
+    min-width: 90px;
+    max-width: 120px;
   }
 }
 
