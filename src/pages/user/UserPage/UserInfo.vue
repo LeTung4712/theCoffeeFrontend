@@ -211,8 +211,8 @@ export default {
                     this.getOrders(userData.id)
                 ])
             } catch (error) {
-                this.notificationStore.error('Không thể tải thông tin người dùng', 3000)
-                //console.error('Lỗi khi khởi tạo dữ liệu:', error)
+                //this.notificationStore.error('Không thể tải thông tin người dùng', 3000)
+                console.error('Lỗi khi khởi tạo dữ liệu:', error)
             }
         },
 
@@ -228,8 +228,8 @@ export default {
                     this.addressStore.updateAddress(defaultAddress)
                 }
             } catch (error) {
-                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách địa chỉ';
-                this.notificationStore.error(errorMessage, 3000);
+                //const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách địa chỉ';
+                //this.notificationStore.error(errorMessage, 3000);
             }
         },
 
@@ -239,8 +239,8 @@ export default {
                 const response = await userAPI.order.getHistory()
                 this.listOrders = response.data.orders
             } catch (error) {
-                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách đơn hàng';
-                this.notificationStore.error(errorMessage, 3000);
+                //const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Có lỗi xảy ra khi tải danh sách đơn hàng';
+                //this.notificationStore.error(errorMessage, 3000);
                 this.listOrders = []
             }
         },
