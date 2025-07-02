@@ -5,42 +5,14 @@
         <!-- Header -->
         <v-row align="center" justify="center" class="mb-8">
           <v-icon class="mr-3" color="primary" size="35">mdi-beer-outline</v-icon>
-          <span class="text-h4 font-weight-bold">Sản phẩm của Shop</span>
+          <span ref="shopProductTitle" class="text-h4 font-weight-bold">Sản phẩm của Shop</span>
 
-          <!-- Search Dialog -->
-          <v-dialog v-model="dialogSearch" max-width="700" class="mt-16">
-            <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" icon variant="text" class="ml-4" color="primary"
-                aria-label="Mở hộp thoại tìm kiếm sản phẩm">
-                <v-icon size="40">mdi-magnify</v-icon>
-              </v-btn>
-            </template>
-
-            <v-card>
-              <v-card-title class="d-flex align-center">
-                <v-btn icon @click="dialogSearch = false" aria-label="Đóng hộp thoại tìm kiếm">
-                  <v-icon size="32" color="text-secondary">mdi-close</v-icon>
-                </v-btn>
-                <span class="mx-auto">Tìm kiếm</span>
-              </v-card-title>
-
-              <v-divider></v-divider>
-
-              <v-card-text class="search-dialog-content">
-                <v-text-field v-model="searchProduct" prepend-icon="mdi-magnify" placeholder="Nhập tên sản phẩm"
-                  variant="outlined" density="comfortable" @keydown.delete="updateSearch" hide-details
-                  class="sticky-search">
-                </v-text-field>
-
-                <v-row class="mt-4">
-                  <v-col v-for="product in filteredList" :key="product.id" cols="12" sm="6" md="3">
-                    <ProductCard :currentID="product.id" :dialog="dialog" :product="product" :isInProductListing="1"
-                      class="product-card-responsive" />
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
+          <!-- Search Dialog mới -->
+          <ProductSearchDialog v-model="dialogSearch" @select="navigateToProduct" />
+          <v-btn icon variant="text" class="ml-4" color="primary" @click="dialogSearch = true"
+            aria-label="Mở hộp thoại tìm kiếm sản phẩm">
+            <v-icon size="40">mdi-magnify</v-icon>
+          </v-btn>
         </v-row>
 
         <!-- Categories -->
@@ -78,6 +50,10 @@
             </v-col>
           </template>
         </v-row>
+        <!-- Pagination UI -->
+        <v-row justify="center" v-if="lastPage > 1">
+          <v-pagination v-model="currentPage" :length="lastPage" color="primary" class="my-4" />
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
@@ -89,11 +65,13 @@ import { userAPI } from "@/api/user";
 import ProductCard from "@/components/Products/ProductCard.vue";
 import { useCategoryStore } from '@/stores/category'
 import { storeToRefs } from 'pinia'
+import ProductSearchDialog from "@/components/Products/ProductSearchDialog.vue";
 
 export default {
   name: "ProductList",
   components: {
-    ProductCard
+    ProductCard,
+    ProductSearchDialog
   },
 
   props: {
@@ -117,10 +95,12 @@ export default {
       dialogSearch: false,
       category_type: 1,
       products: [],
-      searchProduct: null,
-      product_searchs: [],
       loadingProducts: false,
-      error: null
+      error: null,
+      currentPage: 1,
+      lastPage: 1,
+      perPage: 12,
+      total: 0
     }
   },
 
@@ -128,8 +108,7 @@ export default {
     try {
       // Tải categories và products song song
       await Promise.all([
-        this.initializeCategories(),
-        this.getAllProducts()
+        this.initializeCategories()
       ])
     } catch (error) {
       this.error = 'Có lỗi xảy ra khi tải dữ liệu'
@@ -151,38 +130,32 @@ export default {
       }
     },
 
-    async getProductsByCategoryId() {
+    async getProductsByCategoryId(page) {
       this.loadingProducts = true
       this.error = null
-
       try {
-        const response = await userAPI.product.getByCategory(this.category_type)
+        const response = await userAPI.product.getByCategory(this.category_type, page, this.perPage)
         if (response?.data?.products) {
           this.products = response.data.products
+          if (response.data.pagination) {
+            this.currentPage = response.data.pagination.current_page
+            this.lastPage = response.data.pagination.last_page
+            this.perPage = response.data.pagination.per_page
+            this.total = response.data.pagination.total
+          }
         }
       } catch (error) {
         console.error('Lỗi khi lấy sản phẩm:', error)
         this.error = 'Không thể tải sản phẩm'
       } finally {
         this.loadingProducts = false
-      }
-    },
-
-    async getAllProducts() {
-      try {
-        const response = await userAPI.product.getAll()
-        if (response?.data?.products) {
-          this.product_searchs = response.data.products
-        }
-      } catch (error) {
-        console.error('Lỗi khi lấy tất cả sản phẩm:', error)
-        throw error
-      }
-    },
-
-    updateSearch() {
-      if (this.searchProduct?.length === 1) {
-        this.searchProduct = null
+        // Scroll lên tiêu đề
+        this.$nextTick(() => {
+          const el = this.$refs.shopProductTitle;
+          if (el && el.scrollIntoView) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
       }
     },
 
@@ -215,8 +188,14 @@ export default {
   },
 
   watch: {
+    currentPage(newPage) {
+      this.getProductsByCategoryId(newPage);
+    },
     category_type: {
-      handler: 'getProductsByCategoryId',
+      handler(val) {
+        this.currentPage = 1;
+        this.getProductsByCategoryId(1);
+      },
       immediate: true
     }
   },
@@ -224,14 +203,6 @@ export default {
   computed: {
     filteredProducts() {
       return this.products;
-    },
-
-    filteredList() {
-      if (!this.searchProduct) return this.product_searchs
-      const searchTerm = this.searchProduct.toLowerCase()
-      return this.product_searchs.filter(product =>
-        product.name.toLowerCase().includes(searchTerm)
-      )
     },
   },
 }

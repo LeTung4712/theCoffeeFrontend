@@ -33,9 +33,12 @@ export const userAPI = {
   // Danh sách sản phẩm
   product: {
     getAll: () => api.get("/products"),
+    search: (keyword) => api.get("/products/search", { params: { keyword } }),
     getById: (id) => api.get(`/products/${id}`),
-    getByCategory: (categoryId) =>
-      api.get(`/categories/${categoryId}/products`),
+    getByCategory: (categoryId, page = 1, per_page = 12) =>
+      api.get(`/categories/${categoryId}/products`, {
+        params: { page, per_page },
+      }),
     getRecommendations: (cartItems) =>
       api.get("/recommendations", {
         params: { cartItems: cartItems.join(",") },

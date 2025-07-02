@@ -202,5 +202,12 @@ export default {
     .add-button-wrapper {
         transform: scale(0.9);
     }
+
+    .product-card {
+        height: auto !important;
+        min-height: unset !important;
+        max-height: unset !important;
+        padding: 0;
+    }
 }
 </style>
