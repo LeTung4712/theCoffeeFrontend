@@ -5,7 +5,7 @@
         <div class="d-none d-sm-flex flex-column h-100">
             <div class="image-container">
                 <v-img :src="product.image_url" :width="155" :height="155" cover class="rounded-lg bg-grey-lighten-3"
-                    :lazy-src="product.image_url" alt="Product Image" />
+                    :lazy-src="product.thumbnail_url" alt="Product Image" />
             </div>
 
             <v-card-text class="d-flex flex-column h-100">
